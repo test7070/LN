@@ -648,13 +648,15 @@
 				<table class="tview" id="tview">
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
-						<td align="center" style="width:80px; color:black;"><a>交運日期</a></td>
-						<td align="center" style="width:80px; color:black;"><a>登錄日期</a></td>
-						<td align="center" style="width:120px; color:black;"><a>司機</a></td>
-						<td align="center" style="width:80px; color:black;"><a>應收金額</a></td>
-						<td align="center" style="width:80px; color:black;"><a>盤車</a></td>
-						<td align="center" style="width:80px; color:black;"><a>應付金額</a></td>
-						<td align="center" style="width:150px; color:black;"><a>電腦編號</a></td>
+						<td align="center" style="width:80px; color:black;"><a>日期</a></td>
+						<td align="center" style="width:80px; color:black;"><a>M.V.</a></td>
+						<td align="center" style="width:80px; color:black;"><a>VOY NO.</a></td>
+						<td align="center" style="width:80px; color:black;"><a>PORT</a></td>
+						<td align="center" style="width:80px; color:black;"><a>ARRIVAL</a></td>
+						<td align="center" style="width:80px; color:black;"><a>BERTHED</a></td>
+						<td align="center" style="width:80px; color:black;"><a>WHARF NO</a></td>
+						<td align="center" style="width:80px; color:black;"><a>DEPARTURE</a></td>
+						<td align="center" style="width:80px; color:black;"><a>ETA AT NEXT PORT</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox"/></td>
@@ -729,11 +731,62 @@
 			</div>
 			<img id="img" crossorigin="anonymous" style="float:left;display:none;"/> 
 		</div>
+		<div>
+			<table>
+				<tr style='color:white; background:#003366;' > 				
+					<td align="center" colspan="1" rowspan="3" style="width:30px;"> </td>
+					<td align="center" colspan="1" rowspan="3" style="width:25px;"> </td>
+					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>BAY<BR>NO.</a></td>
+					<td align="center" colspan="4" rowspan="1"><a>LADEN</a></td>
+					<td align="center" colspan="4" rowspan="1"><a>EMPTY</a></td>
+					<td align="center" colspan="2" rowspan="2"><a>IN<BR>HATCH<BR>SHIFT</a></td>
+					<td align="center" colspan="2" rowspan="2"><a>SHIFT</a></td>
+					<td align="center" colspan="2" rowspan="2"><a>RELOAD</a></td>
+					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
+				</tr>
+				<tr style='color:white; background:#003366;' > 	
+					<!--  -->
+					<!--  -->
+					<!-- BAY NO. -->
+					<td align="center" colspan="2" rowspan="1"><a>DIS</a></td>
+					<td align="center" colspan="2" rowspan="1"><a>LOAD</a></td>
+					<td align="center" colspan="2" rowspan="1"><a>DIS</a></td>
+					<td align="center" colspan="2" rowspan="1"><a>LOAD</a></td>
+					<!-- IN HATCH SHIFT -->
+					<!-- SHIFT -->
+					<!-- RELOAD -->
+					<!-- TIME -->
+				</tr>
+				<tr style='color:white; background:#003366;' > 	
+					<!--  -->
+					<!--  -->
+					<!-- BAY NO. -->
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
+				</tr>
+			</table>
+		</div>
 		<div class='dbbs' >
 			<table id="tbbs" class='tbbs'>
 				<tr style='color:white; background:#003366;' >
 					<td align="center" style="width:25px"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" style="width:20px;"> </td>
+					<td align="center" colspan=""><a>LADEN</a></td>
+					
 					<td align="center" style="width:80px;"><a>類型</a></td>
 					<td align="center" style="width:80px;"><a>車牌</a></td>
 					<td align="center" style="width:120px;"><a>客戶</a></td>
@@ -751,7 +804,7 @@
 					<td align="center" style="width:120px;"><a>備註</a></td>
 					<td align="center" style="width:100px;"><a>派車<br>單號</a></td>
 					<td align="center" style="width:150px;"><a> </a></td>
-					</a></td>
+					
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
 					<td align="center">
