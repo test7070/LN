@@ -67,6 +67,12 @@
 			function bbsAssign() {
 				for (var i = 0; i < q_bbsCount; i++) {
 					$('#lblNo_' + i).text(i + 1);
+					//計價預設打勾
+					if(q_cur==1 || q_cur==2){
+						if(!$('#chkChk1_'+i).hasClass('isChecked')){
+							$('#chkChk1_'+i).prop('checked',true).addClass('isChecked');
+						}
+					}
                     if($('#btnMinus_' + i).hasClass('isAssign'))
                     	continue;
                     $('#txtStraddrno_' + i).bind('contextmenu', function(e) {
@@ -174,11 +180,19 @@
 			function btnIns() {
 				_btnIns();
 				$('#txtNoa').val('AUTO');
+				//計價預設打勾
+				/*for(var i=0;i<q_bbsCount;i++){
+					$('#chkChk1_'+i).prop('checked',true).addClass('isChecked');
+				}*/
 			}
 
 			function btnModi() {
 				if (emp($('#txtNoa').val()))
 					return;
+				for(var i=0;i<q_bbsCount;i++){
+					$('#chkChk1_'+i).addClass('isChecked');
+					console.log('#chkChk1_'+i+':'+$('#chkChk1_'+i).hasClass('isChecked'));
+				}
 				_btnModi();
 			}
 
@@ -227,10 +241,14 @@
 			function refresh(recno) {
 				_refresh(recno);
 				refreshBbs();
-				
 			}
 			
 			function refreshBbs(){
+				//-------------------
+				for(var i=0;i<q_bbsCount;i++){
+					$('#chkChk1_'+i).removeClass('isChecked');
+				}
+				//-------------------
 				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0
 					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0;
 				for(var i=0;i<q_bbsCount;i++){
@@ -555,6 +573,7 @@
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>計價</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:80px;"><a>BAY<BR>NO.</a></td>
 					<td align="center" colspan="4" rowspan="1"><a>LADEN</a></td>
 					<td align="center" colspan="4" rowspan="1"><a>EMPTY</a></td>
@@ -564,11 +583,11 @@
 					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起迄點</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
 					<!--  -->
 					<!--  -->
+					<!-- CHK1 -->
 					<!-- BAY NO. -->
 					<td align="center" colspan="2" rowspan="1"><a>DIS</a></td>
 					<td align="center" colspan="2" rowspan="1"><a>LOAD</a></td>
@@ -580,11 +599,11 @@
 					<!-- TIME -->
 					<!-- ADDR -->
 					<!-- MEMO -->
-					<!-- CHK1 -->
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
 					<!--  -->
 					<!--  -->
+					<!-- CHK1 -->
 					<!-- BAY NO. -->
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
@@ -604,7 +623,6 @@
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
 					<!-- ADDR -->
 					<!-- MEMO -->
-					<!-- CHK1 -->
 				</tr>
 			</table>
 		</div>
@@ -614,6 +632,7 @@
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px"> </td>
 					<td align="center" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
@@ -633,7 +652,6 @@
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>MEMO</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
 					<td align="center" style="width:50px">
@@ -641,6 +659,7 @@
 						<input type="text" id="txtNoq.*" style="display:none;"/>
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
+					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
 					<td style="width:80px"><input type="text" id="txtStatus.*" style="width:95%;"/></td>
 					<td style="width:50px;"><input type="text" id="txtInmount.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:50px;"><input type="text" id="txtOutmount.*" style="width:95%;text-align:right;"/></td>
@@ -664,13 +683,13 @@
 						<input type="button" id="btnStraddr" style="display:none;"/>
 					</td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
-					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
 				</tr>
 			</table>
 		</div>
 		<div style="width: 1550px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>TOTAL</a></td>
@@ -692,7 +711,6 @@
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 				</tr>
 			</table>
 		</div>
