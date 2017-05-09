@@ -15,18 +15,18 @@
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
 			q_tables = 's';
-			var q_name = "tran";
+			var q_name = "borr";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2'
 				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'
 				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14'];
-			var q_readonlys = ['txtOrdeno','txtNo2'];
+			var q_readonlys = [];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
-			var bbmMask = new Array(['txtDatea', '999/99/99'],['txtTrandate', '999/99/99'],['txtDeparture','999/99/99']);
-			var bbsNum = new Array(['txtInmount',10,0],['txtOutmount',10,0]
-				,['txtPton',10,0],['txtPton2',10,0],['txtPlus',10,0],['txtMinus',10,0]
-				,['txtOverw',10,0],['txtOverh',10,0],['txtCommission',10,0],['txtCommission2',10,0]
-				,['txtBmiles',10,0],['txtEmiles',10,0],['txtWeight2',10,0],['txtWeight3',10,0]);
+			var bbmMask = new Array(['txtDatea', '999/99/99'],['txtBegindate', '999/99/99'],['txtEnddate','999/99/99']);
+			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0]
+				,['txtN03',10,0],['txtN04',10,0],['txtN05',10,0],['txtN06',10,0]
+				,['txtN07',10,0],['txtN08',10,0],['txtN09',10,0],['txtN10',10,0]
+				,['txtN11',10,0],['txtN12',10,0],['txtN13',10,0],['txtN14',10,0]);
 			var bbsMask = new Array();
 			var bbtNum  = new Array(); 
 			var bbtMask = new Array();
@@ -38,8 +38,9 @@
 			q_alias = '';
 			q_desc = 1;
 			brwCount2 = 7;
-			aPop = new Array(['txtStraddrno_', 'btnStraddr_', 'addr', 'noa,addr', 'txtStraddrno_,txtStraddr_', 'addr_b.aspx']);
-	
+			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr_b.aspx']);
+			
+			var _status = {bbs:[]};	
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
 					return;
@@ -62,6 +63,7 @@
 
 			function mainPost() {
 				q_mask(bbmMask);
+				document.title = 'WORKING SHEET';
 			}
             
 			function bbsAssign() {
@@ -69,67 +71,35 @@
 					$('#lblNo_' + i).text(i + 1);
 					//計價預設打勾
 					if(q_cur==1 || q_cur==2){
-						if(!$('#chkChk1_'+i).hasClass('isChecked')){
-							$('#chkChk1_'+i).prop('checked',true).addClass('isChecked');
+						if(_status['bbs'].length<=i){
+							_status['bbs'].push(true);
+							$('#chkChk1_'+i).prop('checked',true);
 						}
 					}
                     if($('#btnMinus_' + i).hasClass('isAssign'))
                     	continue;
-                    $('#txtStraddrno_' + i).bind('contextmenu', function(e) {
+                    	
+                    $('#txtAddrno_' + i).bind('contextmenu', function(e) {
                         /*滑鼠右鍵*/
                         e.preventDefault();
                         var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
-                        $('#btnStraddr_'+n).click();
-                    });
-                    $('#txtEndaddrno_' + i).bind('contextmenu', function(e) {
-                        /*滑鼠右鍵*/
-                        e.preventDefault();
-                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
-                        $('#btnEndaddr_'+n).click();
+                        $('#btnAddr_'+n).click();
                     });
                     
-                    $('#txtInmount_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtOutmount_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtPton_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtPton2_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtPlus_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtMinus_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtOverw_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtOverh_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtCommission_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtCommission2_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtBmiles_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtEmiles_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtWeight2_'+i).change(function(e){
-                    	refreshBbs();
-                    });
-                    $('#txtWeight3_'+i).change(function(e){
-                    	refreshBbs();
-                    });
+                    $('#txtN01_'+i).change(function(e){refreshBbs();});
+                    $('#txtN02_'+i).change(function(e){refreshBbs();});
+                    $('#txtN03_'+i).change(function(e){refreshBbs();});
+                    $('#txtN04_'+i).change(function(e){refreshBbs();});
+                    $('#txtN05_'+i).change(function(e){refreshBbs();});
+                    $('#txtN06_'+i).change(function(e){refreshBbs();});
+                    $('#txtN07_'+i).change(function(e){refreshBbs();});
+                    $('#txtN08_'+i).change(function(e){refreshBbs();});
+                    $('#txtN09_'+i).change(function(e){refreshBbs();});
+                    $('#txtN10_'+i).change(function(e){refreshBbs();});
+                    $('#txtN11_'+i).change(function(e){refreshBbs();});
+                    $('#txtN12_'+i).change(function(e){refreshBbs();});
+                    $('#txtN13_'+i).change(function(e){refreshBbs();});
+                    $('#txtN14_'+i).change(function(e){refreshBbs();});
 				}
 				_bbsAssign();
 				$('#tbbs').find('tr.data').children().hover(function(e){
@@ -141,12 +111,11 @@
 			}
 
 			function bbsSave(as) {
-				if (!as['status']) {
+				if (!as['typea']) {
 					as[bbsKey[1]] = '';
 					return;
 				}
 				q_nowf();
-				as['trandate'] = abbm2['trandate'];
 				as['datea'] = abbm2['datea'];
 				return true;
 			}
@@ -181,19 +150,21 @@
 				_btnIns();
 				$('#txtNoa').val('AUTO');
 				//計價預設打勾
-				/*for(var i=0;i<q_bbsCount;i++){
-					$('#chkChk1_'+i).prop('checked',true).addClass('isChecked');
-				}*/
+				_status['bbs'] = new Array();
+				for(var i=0;i<q_bbsCount;i++){
+					_status['bbs'].push(true);
+					$('#chkChk1_'+i).prop('checked',true);
+				}
 			}
 
 			function btnModi() {
 				if (emp($('#txtNoa').val()))
 					return;
-				for(var i=0;i<q_bbsCount;i++){
-					$('#chkChk1_'+i).addClass('isChecked');
-					console.log('#chkChk1_'+i+':'+$('#chkChk1_'+i).hasClass('isChecked'));
-				}
 				_btnModi();
+				_status['bbs'] = new Array();
+				for(var i=0;i<q_bbsCount;i++){
+					_status['bbs'].push(true);
+				}
 			}
 
 			function btnPrint() {
@@ -220,9 +191,9 @@
 					alert("error: btnok!");
 				}
 				var t_noa = trim($('#txtNoa').val());
-				var t_date = trim($('#txtTrandate').val());
+				var t_date = trim($('#txtDate').val());
 				if (t_noa.length == 0 || t_noa == "AUTO")
-					q_gtnoa(q_name, replaceAll(q_getPara('sys.key_trans') + (t_date.length == 0 ? q_date() : t_date), '/', ''));
+					q_gtnoa(q_name, replaceAll(q_getPara('sys.key_B0rr') + (t_date.length == 0 ? q_date() : t_date), '/', ''));
 				else
 					wrServer(t_noa);
 			}
@@ -244,28 +215,23 @@
 			}
 			
 			function refreshBbs(){
-				//-------------------
-				for(var i=0;i<q_bbsCount;i++){
-					$('#chkChk1_'+i).removeClass('isChecked');
-				}
-				//-------------------
 				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0
 					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0;
 				for(var i=0;i<q_bbsCount;i++){
-					t01 += q_float('txtInmount_'+i);
-					t02 += q_float('txtOutmount_'+i);
-					t03 += q_float('txtPton_'+i);
-					t04 += q_float('txtPton2_'+i);
-					t05 += q_float('txtPlus_'+i);
-					t06 += q_float('txtMinus_'+i);
-					t07 += q_float('txtOverw_'+i);
-					t08 += q_float('txtOverh_'+i);
-					t09 += q_float('txtCommission_'+i);
-					t10 += q_float('txtCommission2_'+i);
-					t11 += q_float('txtBmiles_'+i);
-					t12 += q_float('txtEmiles_'+i);
-					t13 += q_float('txtWeight2_'+i);
-					t14 += q_float('txtWeight3_'+i);
+					t01 += q_float('txtN01_'+i);
+					t02 += q_float('txtN02_'+i);
+					t03 += q_float('txtN03_'+i);
+					t04 += q_float('txtN04_'+i);
+					t05 += q_float('txtN05_'+i);
+					t06 += q_float('txtN06_'+i);
+					t07 += q_float('txtN07_'+i);
+					t08 += q_float('txtN08_'+i);
+					t09 += q_float('txtN09_'+i);
+					t10 += q_float('txtN10_'+i);
+					t11 += q_float('txtN11_'+i);
+					t12 += q_float('txtN12_'+i);
+					t13 += q_float('txtN13_'+i);
+					t14 += q_float('txtN14_'+i);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
@@ -287,12 +253,12 @@
 				_readonly(t_para, empty);
 				if(t_para){
 					$('#txtDatea').datepicker('destroy');
-					$('#txtTrandate').datepicker('destroy');
-					$('#txtDeparture').datepicker('destroy');
+					$('#txtBegindate').datepicker('destroy');
+					$('#txtEnddate').datepicker('destroy');
 				}else{
 					$('#txtDatea').datepicker();
-					$('#txtTrandate').datepicker();
-					$('#txtDeparture').datepicker();
+					$('#txtBegindate').datepicker();
+					$('#txtEnddate').datepicker();
 				}
 			}
 
@@ -496,11 +462,11 @@
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox"/></td>
-						<td id='trandate' style="text-align: center;">~trandate</td>
-						<td id='datea' style="text-align: center;">~datea</td>
-						<td id='driver' style="text-align: center;">~driver</td>
-						<td id='total' style="text-align: right;">~total</td>
-						<td id='total3' style="text-align: right;">~total3</td>
+						<td id='v02' style="text-align: center;">~v02</td>
+						<td id='v03' style="text-align: center;">~v03</td>
+						<td id='begindate' style="text-align: center;">~begindate</td>
+						<td id='v06' style="text-align: center;">~v06</td>
+						<td id='enddate' style="text-align: center;">~enddate</td>
 					</tr>
 				</table>
 			</div>
@@ -517,37 +483,31 @@
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">工作單號</a></td>
-						<td><input type="text" id="txtWorkno" class="txt c1"/></td>
+						<td><input type="text" id="txtV01" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期</a></td>
-						<td><input type="text" id="txtTrandate" class="txt c1" title="作業日期"/></td>
-					</tr>
-					<tr style="display:none;"><!-- 由BBS的決定 -->
-						<td><span> </span><a class="lbl">開工時間</a></td>
-						<td><input type="text" id="txtBtime" class="txt c1"/></td>
-						<td><span> </span><a class="lbl">完工時間</a></td>
-						<td><input type="text" id="txtEtime" class="txt c1"/></td>
+						<td><input type="text" id="txtDatea" class="txt c1" title="作業日期"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">M. V.</a></td>
-						<td><input type="text" id="txtVessel" class="txt c1" title="船名"/></td>
+						<td><input type="text" id="txtV02" class="txt c1" title="船名"/></td>
 						<td><span> </span><a class="lbl">VOY NO.</a></td>
-						<td><input type="text" id="txtVoyage" class="txt c1" title="航次"/></td>
+						<td><input type="text" id="txtV03" class="txt c1" title="航次"/></td>
 						<td><span> </span><a class="lbl">PORT.</a></td>
-						<td><input type="text" id="txtPort" class="txt c1"/ title="靠泊碼頭"></td>
+						<td><input type="text" id="txtV04" class="txt c1"/ title="靠泊碼頭"></td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">ARRIVAL</a></td>
-						<td><input type="text" id="txtDatea" class="txt c1"/></td>
+						<td><input type="text" id="txtBegindate" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">BERTHED</a></td>
-						<td><input type="text" id="txtBerthed" class="txt c1"/></td>
+						<td><input type="text" id="txtV05" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">WHARF NO</a></td>
-						<td><input type="text" id="txtAddr" class="txt c1"/></td>
+						<td><input type="text" id="txtV06" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">DEPARTURE</a></td>
-						<td><input type="text" id="txtDeparture" class="txt c1"/></td>
+						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
 						<td colspan="2"><span> </span><a class="lbl">ETA AT NEXT PORT</a></td>
-						<td colspan="2"><input type="text" id="txtPort2" class="txt c1"/></td>
+						<td colspan="2"><input type="text" id="txtV07" class="txt c1"/></td>
 					</tr>
 					
 					<tr>
@@ -581,7 +541,7 @@
 					<td align="center" colspan="2" rowspan="2"><a>SHIFT</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>RELOAD</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起迄點</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起迄地點</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
@@ -660,27 +620,27 @@
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
-					<td style="width:80px"><input type="text" id="txtStatus.*" style="width:95%;"/></td>
-					<td style="width:50px;"><input type="text" id="txtInmount.*" style="width:95%;text-align: right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtOutmount.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtPton.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtPton2.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtPlus.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtMinus.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtOverw.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtOverh.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtCommission.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtCommission2.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtBmiles.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtEmiles.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtWeight2.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtWeight3.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:100px;"><input type="text" id="txtStime.*" style="width:95%;"/></td>
-					<td style="width:100px;"><input type="text" id="txtDtime.*" style="width:95%;"/></td>
+					<td style="width:80px"><input type="text" id="txtTypea.*" style="width:95%;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN03.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN04.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN05.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN06.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN07.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN08.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN09.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN10.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN11.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN12.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN13.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN14.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:100px;"><input type="text" id="txtIndate.*" style="width:95%;"/></td>
+					<td style="width:100px;"><input type="text" id="txtEdate.*" style="width:95%;"/></td>
 					<td style="width:200px">
-						<input type="text" id="txtStraddrno.*" style="float:left;width:35%;"/>
-						<input type="text" id="txtStraddr.*" style="float:left;width:55%;"/>
-						<input type="button" id="btnStraddr" style="display:none;"/>
+						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
+						<input type="button" id="btnAddr" style="display:none;"/>
 					</td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
@@ -693,20 +653,20 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>TOTAL</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA02" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA03" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA04" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA05" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA06" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA07" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA08" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA09" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA10" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA11" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA12" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA13" class="txt" style="width:95%;float:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA14" class="txt" style="width:95%;float:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA03" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA04" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA05" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA06" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA07" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA08" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA09" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA10" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA11" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA12" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA13" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA14" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>

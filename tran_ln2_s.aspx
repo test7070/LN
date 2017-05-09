@@ -14,8 +14,8 @@
 		<script src="css/jquery/ui/jquery.ui.widget.js"></script>
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
-            aPop = new Array(['txtNoa', '', 'addr', 'noa,addr', 'txtNoa', 'addr_b.aspx']);
-            var q_name = "addr_s";
+            aPop = new Array();
+            var q_name = "tran_ln2_s";
 
             $(document).ready(function() {
                 main();
@@ -29,26 +29,31 @@
             function q_gfPost() {
                 q_getFormat();
                 q_langShow();
+                bbmMask = [['txtBdate', r_picd], ['txtEdate', r_picd]];
+                q_mask(bbmMask);
                 $('#txtNoa').focus();
                 $('#txtBdate').datepicker();
                 $('#txtEdate').datepicker();
-                $('#txtBdeparture').datepicker();
-                $('#txtEdeparture').datepicker();
             }
 
             function q_seekStr() {
             	t_bdate = $('#txtBdate').val();
             	t_edate = $('#txtBdate').val();
                 t_noa = $.trim($('#txtNoa').val());
+                t_carno = $.trim($('#txtCarno').val());
+                t_driverno = $.trim($('#txtDriverno').val());
 				t_memo = $.trim($('#txtMemo').val());
 				
                 var t_where = " 1=1 " 
-                	+ q_sqlPara2("noa", t_noa);
-                if (t_addr.length > 0)
-                    t_where += " and charindex('" + t_addr + "',addr)>0";
+                	+ q_sqlPara2("noa", t_noa)
+                	+ q_sqlPara2("datea", t_bdate,t_edate);
+                if (t_carno.length > 0)
+                    t_where += " and charindex('" + t_carno + "',carno)>0";
+                if (t_driverno.length > 0)
+                    t_where += " and ( charindex('" + t_driverno + "',driverno)>0 or charindex('" + t_driverno + "',driver)>0)";
                 if (t_memo.length > 0){
                 	t_where += " and (charindex('" + t_memo + "',memo)>0"
-                		+" or exists(select noq from addrs where addrs.noa=addr.noa and  (charindex('" + t_memo + "',addrs.memo)>0)))";
+                		+" or exists(select noq from borrs where borrs.noa=borr.noa and  (charindex('" + t_memo + "',borrs.memo)>0)))";
                 }    
                 t_where = ' where=^^' + t_where + '^^ ';
                 return t_where;
@@ -67,7 +72,7 @@
 		<div style='width:400px; text-align:center;padding:15px;' >
 			<table id="seek"  border="1"   cellpadding='3' cellspacing='2' style='width:100%;' >
 				<tr class='seek_tr'>
-					<td style="width:35%;"><a id='lblDatea'>日期L</a></td>
+					<td style="width:35%;"><a id='lblDate'>日期</a></td>
 					<td style="width:65%;  ">
 					<input class="txt" id="txtBdate" type="text" style="width:90px; font-size:medium;" />
 					<span style="display:inline-block; vertical-align:middle">&sim;</span>
@@ -79,16 +84,12 @@
 					<td><input class="txt" id="txtNoa" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
-					<td class='seek'  style="width:20%;"><a>工作單號</a></td>
-					<td><input class="txt" id="txtWorkno" type="text" style="width:215px; font-size:medium;" /></td>
+					<td class='seek'  style="width:20%;"><a>車牌</a></td>
+					<td><input class="txt" id="txtCarno" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
-					<td class='seek'  style="width:20%;"><a>M.V.</a></td>
-					<td><input class="txt" id="txtVessel" type="text" style="width:215px; font-size:medium;" /></td>
-				</tr>
-				<tr class='seek_tr'>
-					<td class='seek'  style="width:20%;"><a>VOY NO.</a></td>
-					<td><input class="txt" id="txtVoyage" type="text" style="width:215px; font-size:medium;" /></td>
+					<td class='seek'  style="width:20%;"><a>司機</a></td>
+					<td><input class="txt" id="txtDriverno" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a>備註</a></td>
