@@ -44,16 +44,16 @@
 
             function q_seekStr() {
             	t_bdate = $('#txtBdate').val();
-            	t_edate = $('#txtBdate').val();
+            	t_edate = $('#txtEdate').val();
             	t_bbegindate = $('#txtBbegindate').val();
-            	t_ebegindate = $('#txtBbegindate').val();
+            	t_ebegindate = $('#txtEbegindate').val();
             	t_benddate = $('#txtBenddate').val();
             	t_eenddate = $('#txtEenddate').val();
                 t_noa = $.trim($('#txtNoa').val());
                 t_workno = $.trim($('#txtWorkno').val());
 				t_memo = $.trim($('#txtMemo').val());
 				
-                var t_where = " 1=1 " 
+                var t_where = " 1=1 and vccno='WORK'" 
                 	+ q_sqlPara2("noa", t_noa)
                 	+ q_sqlPara2("datea", t_bdate,t_edate) 
                 	+ q_sqlPara2("begindate", t_bbegindate,t_ebegindate) 

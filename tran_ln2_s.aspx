@@ -38,13 +38,13 @@
 
             function q_seekStr() {
             	t_bdate = $('#txtBdate').val();
-            	t_edate = $('#txtBdate').val();
+            	t_edate = $('#txtEdate').val();
                 t_noa = $.trim($('#txtNoa').val());
                 t_carno = $.trim($('#txtCarno').val());
                 t_driverno = $.trim($('#txtDriverno').val());
 				t_memo = $.trim($('#txtMemo').val());
 				
-                var t_where = " 1=1 " 
+                var t_where = " 1=1 and vccno='CY'" 
                 	+ q_sqlPara2("noa", t_noa)
                 	+ q_sqlPara2("datea", t_bdate,t_edate);
                 if (t_carno.length > 0)

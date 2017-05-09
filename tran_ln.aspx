@@ -51,6 +51,7 @@
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
 				q_brwCount();
+				q_content = "where=^^ vccno='WORK'^^";
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 			});
 			function main() {
@@ -149,6 +150,7 @@
 			function btnIns() {
 				_btnIns();
 				$('#txtNoa').val('AUTO');
+				$('#txtVccno').val('WORK');
 				//計價預設打勾
 				_status['bbs'] = new Array();
 				for(var i=0;i<q_bbsCount;i++){
@@ -522,7 +524,10 @@
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 						<td><input id="txtWorker2" type="text"  class="txt c1"/></td>
 						<td><span> </span><a id="lblNoa" class="lbl"> </a></td>
-						<td><input type="text" id="txtNoa" class="txt c1"/></td>
+						<td>
+							<input type="text" id="txtNoa" class="txt c1"/>
+							<input type="text" id="txtVccno" style="display:none;"/>
+						</td>
 					</tr>
 				</table>
 			</div>

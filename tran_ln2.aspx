@@ -394,6 +394,7 @@
 						for ( i = 0; i < as.length; i++) {
 							t_calctype += (t_calctype.length > 0 ? ',' : '') + as[i].noa + as[i].noq + '@' + as[i].typea;
 						}
+						q_content = "where=^^ vccno='CY'^^";
                 		q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
                 		break;
                     case q_name:
@@ -415,6 +416,7 @@
 			function btnIns() {
 				_btnIns();
 				$('#txtNoa').val('AUTO');
+				$('#txtVccno').val('CY');
 				$('#txtDatea').focus();
 			}
 
@@ -787,7 +789,10 @@
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 						<td><input id="txtWorker2" type="text"  class="txt c1"/></td>
 						<td><span> </span><a id="lblNoa" class="lbl"> </a></td>
-						<td colspan="1"><input type="text" id="txtNoa" class="txt c1"/></td>
+						<td>
+							<input type="text" id="txtNoa" class="txt c1"/>
+							<input type="text" id="txtVccno" style="display:none;"/>
+						</td>
 					</tr>
 				</table>
 			</div>
