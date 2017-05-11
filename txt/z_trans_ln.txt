@@ -1,0 +1,96 @@
+z_trans_ln01:--z_trans_ln01  z_trans_ln.txt	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_noa nvarchar(20) = case when '#non' = [4] then '' else [4] end
+	------------------------------------------------------------------------
+	declare @tmp table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,workno nvarchar(20)
+		,a01 nvarchar(20) --M.V.
+		,a02 nvarchar(20) --VOY NO.
+		,a03 nvarchar(20) --PORT
+		,a04 nvarchar(20) --ARRIVAL
+		,a05 nvarchar(20) --BERTHED
+		,a06 nvarchar(20) --WHARF NO
+		,a07 nvarchar(20) --DEPARTURE
+		,a08 nvarchar(20) --ETA AT NETX PORT
+		
+		,b01 nvarchar(20)
+		,b02 nvarchar(20)
+		,b03 nvarchar(20)
+		
+		,c01 float
+		,c02 float
+		,c03 float
+		,c04 float
+		,c05 float
+		,c06 float
+		,c07 float
+		,c08 float
+		,c09 float
+		,c10 float
+		,c11 float
+		,c12 float
+		,c13 float
+		,c14 float
+	)
+	insert into @tmp(gno,pno
+		,noa,noq,workno
+		,a01,a02,a03,a04,a05,a06,a07,a08
+		,b01,b02,b03
+		,c01,c02,c03,c04,c05,c06,c07
+		,c08,c09,c10,c11,c12,c13,c14)
+	select '1' gno, 1 pno  
+		,a.noa,b.noq,a.v01
+		,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07
+		,b.typea,b.indate,b.edate
+		,b.N01,b.N02,b.N03,b.N04,b.N05,b.N06,b.N07
+		,b.N08,b.N09,b.N10,b.N11,b.N12,b.N13,b.N14
+	from borr a
+	left join borrs b on a.noa=b.noa
+	where a.noa = @t_noa
+	order by a.noa,b.noq
+	
+	insert into @tmp(gno,pno,noa
+		,c01,c02,c03,c04,c05,c06,c07
+		,c08,c09,c10,c11,c12,c13,c14)
+	select '2',3,noa
+		,SUM(isnull(c01,0)),SUM(isnull(c02,0)),SUM(isnull(c03,0)),SUM(isnull(c04,0)),SUM(isnull(c05,0))
+		,SUM(isnull(c06,0)),SUM(isnull(c07,0)),SUM(isnull(c08,0)),SUM(isnull(c09,0)),SUM(isnull(c10,0))
+		,SUM(isnull(c11,0)),SUM(isnull(c12,0)),SUM(isnull(c13,0)),SUM(isnull(c14,0))
+	from @tmp
+	where gno='1'
+	group by noa
+	
+	--------------------------------------------------------------------------------
+	declare @pagecount int = 34
+	declare @noa nvarchar(20)
+	declare @n int
+	
+	declare cursor_table cursor for	
+	select noa,count(1) from @tmp group by noa
+	open cursor_table
+	fetch next from cursor_table
+	into @noa,@n
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		while @n%@pagecount!=0
+		begin
+			insert into @tmp(gno,pno,noa)values('3',2,@noa)
+			set @n = @n + 1
+		end
+		
+		fetch next from cursor_table
+		into @noa,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	select * from @tmp order by noa,pno,sel;

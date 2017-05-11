@@ -470,8 +470,10 @@
 			</table>
 		</div>
 		<datalist id="listUnit"> 
-			<option>20'</option>
-			<option>40'</option>
+			<option>20'E</option>
+			<option>40'E</option>
+			<option>20'F</option>
+			<option>40'F</option>
 		</datalist>
 		<input id="q_sys" type="hidden" />
 	</body>

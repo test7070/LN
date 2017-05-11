@@ -31,11 +31,11 @@
 						name : 'db',
 						value : q_db
 					},{
-						type : '0', //[2]
+						type : '0', //[3]
 						name : 'project',
 						value : q_getPara('sys.project').toUpperCase()
-					}, {//[3]
-                        type : '1',
+					}, {//[4]
+                        type : '6',
                         name : 'xnoa'
                     }]
                 });
@@ -48,8 +48,7 @@
 	            }    
 	            if(t_para.length==0 || t_para.noa==undefined){
 	            }else{
-	            	$('#txtXnoa1').val(t_para.noa);
-	            	$('#txtXnoa2').val(t_para.noa);
+	            	$('#txtXnoa').val(t_para.noa);
 	            }
             }
 

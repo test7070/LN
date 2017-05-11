@@ -38,7 +38,10 @@
 			q_alias = '';
 			q_desc = 1;
 			brwCount2 = 7;
-			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr_b.aspx']);
+			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr_b.aspx']
+				,['txtCustno', 'lblCust', 'cust', 'noa,nick', 'txtCustno,txtCust', 'cust_b.aspx']
+				,['txtPartno', 'lblPart2', 'cust', 'noa,nick', 'txtPartno,txtPart', 'cust_b.aspx']
+				,['txtSalesno', 'lblSales', 'cardeal', 'noa,nick', 'txtSalesno,txtSales', 'cardeal_b.aspx']);
 			
 			var _status = {bbs:[]};	
 			function sum() {
@@ -490,6 +493,23 @@
 						<td><input type="text" id="txtDatea" class="txt c1" title="作業日期"/></td>
 					</tr>
 					<tr>
+						<td><span> </span><a class="lbl" id="lblSales">車行</a></td>
+						<td>
+							<input type="text" id="txtSalesno" class="txt" style="float:left;width:40%;"/>
+							<input type="text" id="txtSales" class="txt" style="float:left;width:60%;"/>
+						</td>
+						<td><span> </span><a class="lbl" id="lblCust">客戶</a></td>
+						<td>
+							<input type="text" id="txtCustno" class="txt" style="float:left;width:40%;"/>
+							<input type="text" id="txtCust" class="txt" style="float:left;width:60%;"/>
+						</td>
+						<td><span> </span><a class="lbl" id="lblPart2">貨主</a></td>
+						<td>
+							<input type="text" id="txtPartno" class="txt" style="float:left;width:40%;"/>
+							<input type="text" id="txtPart" class="txt" style="float:left;width:60%;"/>
+						</td>
+					</tr>
+					<tr>
 						<td><span> </span><a class="lbl">M. V.</a></td>
 						<td><input type="text" id="txtV02" class="txt c1" title="船名"/></td>
 						<td><span> </span><a class="lbl">VOY NO.</a></td>
@@ -645,7 +665,7 @@
 					<td style="width:200px">
 						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
 						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
-						<input type="button" id="btnAddr" style="display:none;"/>
+						<input type="button" id="btnAddr.*" style="display:none;"/>
 					</td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
