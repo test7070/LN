@@ -1,10 +1,157 @@
+z_trans_ln02:--z_trans_ln02  z_trans_ln.txt	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	-------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,datea nvarchar(20)
+		,workno nvarchar(20)
+		,vocc nvarchar(50)
+		,voyage nvarchar(20)
+		,port nvarchar(20)
+		
+		,custno nvarchar(20)
+		,cust nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,addrno nvarchar(20)
+		,addr nvarchar(50)
+		,memo nvarchar(max)
+		
+		,laden_dis_20 float --20F
+		,laden_dis_40 float --40F 
+		,laden_load_20 float--20E
+		,laden_load_40 float--40E
+		,empty_dis_20 float --20E
+		,empty_dis_40 float --40E
+		,empty_load_20 float--20F
+		,empty_load_40 float--40F
+	)
+	
+	insert into @tmpa(datea,workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,laden_dis_20,laden_dis_40,laden_load_20,laden_load_40
+		,empty_dis_20,empty_dis_40,empty_load_20,empty_load_40)
+	select b.datea,b.v01,b.v02,b.v03,b.v06
+		,b.custno,b.cust,b.salesno,b.sales,a.addrno,a.addr,a.memo
+		,a.n01,a.n02,a.n03,a.n04
+		,a.n05,a.n06,a.n07,a.n08
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.vccno='WORK'
+	and b.v01=@t_workno
+	------------------------------------------------
+	declare @tmpb table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,datea nvarchar(20)
+		,workno nvarchar(20)
+		,vocc nvarchar(50)
+		,voyage nvarchar(20)
+		,port nvarchar(20)
+		
+		,custno nvarchar(20)
+		,cust nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,addrno nvarchar(20)
+		,addr nvarchar(50)
+		,memo nvarchar(max)
+		
+		,casetype nvarchar(20)
+		,[empty] float
+		,fill float
+	)
+	insert into @tmpb(gno,datea,workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,casetype,[empty],fill)
+	select '1',datea, workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,'20'''
+		,isnull(laden_load_20,0)+isnull(empty_dis_20,0)
+		,isnull(laden_dis_20,0)+isnull(empty_load_20,0)
+	from @tmpa
+	where isnull(laden_load_20,0)!=0
+	or isnull(empty_dis_20,0)!=0
+	or isnull(laden_dis_20,0)!=0 
+	or isnull(empty_load_20,0)!=0 
+	
+	insert into @tmpb(gno,datea,workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,casetype,[empty],fill)
+	select '1',datea, workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,'40'''
+		,isnull(laden_load_40,0)+isnull(empty_dis_40,0)
+		,isnull(laden_dis_40,0)+isnull(empty_load_40,0)
+	from @tmpa
+	where isnull(laden_load_40,0)!=0
+	or isnull(empty_dis_40,0)!=0
+	or isnull(laden_dis_40,0)!=0 
+	or isnull(empty_load_40,0)!=0 
+	
+	update @tmpb set pno=b.recno
+	from @tmpb a
+	left join (select sel,ROW_NUMBER()over(partition by workno,custno,cardealno order by casetype,sel) recno from @tmpb) b on a.sel=b.sel
+	----------------------------------------------------------------------------
+	declare @pagecount int = 37
+	declare @workno nvarchar(20)
+	declare @n int
+	
+	declare cursor_table cursor for	
+	select workno,count(1) from @tmpb group by workno
+	open cursor_table
+	fetch next from cursor_table
+	into @workno,@n
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		while @n%@pagecount!=0
+		begin
+			insert into @tmpb(gno,pno,workno)values('2',2,@workno)
+			set @n = @n + 1
+		end
+		
+		fetch next from cursor_table
+		into @workno,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	select gno
+		,workno a01
+		,ISNULL(vocc,'')+' '+ISNULL(voyage,'') a02
+		,port a03
+		,datea a04
+		
+		,cust b01
+		,cardeal b02
+		,casetype b03
+		,[empty] b04
+		,fill b05
+		,addr b06
+		,memo b07
+		,@t_user worker
+	from @tmpb
+	order by workno,gno,custno,cardealno,pno;
+
+
 z_trans_ln01:--z_trans_ln01  z_trans_ln.txt	
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
 	declare @t_db nvarchar(max) = '[2]'
 	declare @t_project nvarchar(max) = '[3]'
-	declare @t_noa nvarchar(20) = case when '#non' = [4] then '' else [4] end
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	------------------------------------------------------------------------
 	declare @tmp table(
 		sel int identity(1,1)

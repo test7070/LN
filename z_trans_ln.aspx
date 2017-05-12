@@ -34,9 +34,16 @@
 						type : '0', //[3]
 						name : 'project',
 						value : q_getPara('sys.project').toUpperCase()
-					}, {//[4]
+					},{
+						type : '0', //[4]
+						name : 'user',
+						value : r_name
+					}, {//[5]
                         type : '6',
                         name : 'xnoa'
+                    }, {//[6]
+                        type : '6',
+                        name : 'xworkno'
                     }]
                 });
                 q_popAssign();
@@ -49,6 +56,10 @@
 	            if(t_para.length==0 || t_para.noa==undefined){
 	            }else{
 	            	$('#txtXnoa').val(t_para.noa);
+	            }
+	            if(t_para.length==0 || t_para.workno==undefined){
+	            }else{
+	            	$('#txtXworkno').val(t_para.workno);
 	            }
             }
 
