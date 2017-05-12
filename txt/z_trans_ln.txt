@@ -55,7 +55,8 @@ z_trans_ln01:--z_trans_ln01  z_trans_ln.txt
 		,b.N08,b.N09,b.N10,b.N11,b.N12,b.N13,b.N14
 	from borr a
 	left join borrs b on a.noa=b.noa
-	where a.noa = @t_noa
+	where a.vccno='WORK'
+	and a.noa = @t_noa
 	order by a.noa,b.noq
 	
 	insert into @tmp(gno,pno,noa

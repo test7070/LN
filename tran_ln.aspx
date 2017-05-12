@@ -558,7 +558,7 @@
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>計價</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:80px;"><a>BAY<BR>NO.</a></td>
 					<td align="center" colspan="4" rowspan="1"><a>LADEN</a></td>
 					<td align="center" colspan="4" rowspan="1"><a>EMPTY</a></td>
@@ -590,14 +590,14 @@
 					<!--  -->
 					<!-- CHK1 -->
 					<!-- BAY NO. -->
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="E">20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="E">40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="E">20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="E">40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">40'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
