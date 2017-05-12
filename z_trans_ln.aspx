@@ -38,10 +38,10 @@
 						type : '0', //[4]
 						name : 'user',
 						value : r_name
-					}, {//[5]
+					}, {//[5]              1
                         type : '6',
                         name : 'xnoa'
-                    }, {//[6]
+                    }, {//[6]              2
                         type : '6',
                         name : 'xworkno'
                     }]
