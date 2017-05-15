@@ -40,7 +40,7 @@
 			aPop = new Array(['txtUccno_', 'btnProduct_', 'ucc', 'noa,product', 'txtUccno_,txtProduct_', 'ucc_b.aspx']
 				,['txtStraddrno_', 'btnStraddr_', 'addr2', 'noa,addr', 'txtStraddrno_,txtStraddr_', 'addr2_b.aspx']
 				,['txtEndaddrno_', 'btnEndaddr_', 'addr2', 'noa,addr', 'txtEndaddrno_,txtEndaddr_', 'addr2_b.aspx']
-				,['txtAddno3_', 'btnAdd3_', 'addr2', 'noa,addr', 'txtAddno3_,txtAddr3_', 'addr2_b.aspx']
+				,['txtAddno3_', 'btnAdd3_', 'addr2', 'noa,addr', 'txtAddno3_,txtAdd3_', 'addr2_b.aspx']
 				,['txtCarno', 'lblCarno', 'car2', 'a.noa,driverno,driver', 'txtCarno,txtDriverno,txtDriver', 'car2_b.aspx']
 				,['txtDriverno', 'lblDriver', 'driver', 'noa,namea', 'txtDriverno,txtDriver', 'driver_b.aspx']
 				,['txtCustno_', 'btnCust_', 'cust', 'noa,comp,nick', 'txtCustno_,txtComp_,txtNick_', 'cust_b.aspx']
@@ -909,7 +909,7 @@
 						<input type="button" id="btnStraddr.*" style="display:none;"/>
 					</td>
 					<td>
-						<input type="text" id="txtAddrno3.*" style="float:left;width:30%;"/>
+						<input type="text" id="txtAddno3.*" style="float:left;width:30%;"/>
 						<input type="text" id="txtAdd3.*" style="float:left;width:60%;"/>
 						<input type="button" id="btnAdd3.*" style="display:none;"/>
 					</td>
