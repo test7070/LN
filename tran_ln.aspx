@@ -22,7 +22,7 @@
 			var q_readonlys = [];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
-			var bbmMask = new Array(['txtDatea', '999/99/99'],['txtBegindate', '999/99/99'],['txtEnddate','999/99/99']);
+			var bbmMask = [];
 			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0]
 				,['txtN03',10,0],['txtN04',10,0],['txtN05',10,0],['txtN06',10,0]
 				,['txtN07',10,0],['txtN08',10,0],['txtN09',10,0],['txtN10',10,0]
@@ -66,6 +66,7 @@
 			}
 
 			function mainPost() {
+				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd]);
 				q_mask(bbmMask);
 				document.title = 'WORKING SHEET';
 			}
@@ -258,13 +259,13 @@
 			function readonly(t_para, empty) {
 				_readonly(t_para, empty);
 				if(t_para){
-					$('#txtDatea').datepicker('destroy');
-					$('#txtBegindate').datepicker('destroy');
-					$('#txtEnddate').datepicker('destroy');
+					//$('#txtDatea').datepicker('destroy');
+					//$('#txtBegindate').datepicker('destroy');
+					//$('#txtEnddate').datepicker('destroy');
 				}else{
-					$('#txtDatea').datepicker();
-					$('#txtBegindate').datepicker();
-					$('#txtEnddate').datepicker();
+					//$('#txtDatea').datepicker();
+					//$('#txtBegindate').datepicker();
+					//$('#txtEnddate').datepicker();
 				}
 			}
 

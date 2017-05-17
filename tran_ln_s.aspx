@@ -34,12 +34,12 @@
 					,['txtBenddate', r_picd], ['txtEenddate', r_picd]];
                 q_mask(bbmMask);
                 $('#txtNoa').focus();
-                $('#txtBdate').datepicker();
-                $('#txtEdate').datepicker();
-                $('#txtBbegindate').datepicker();
-                $('#txtEbegindate').datepicker();
-                $('#txtBenddate').datepicker();
-                $('#txtEenddate').datepicker();
+                //$('#txtBdate').datepicker();
+                //$('#txtEdate').datepicker();
+                //$('#txtBbegindate').datepicker();
+                //$('#txtEbegindate').datepicker();
+                //$('#txtBenddate').datepicker();
+                //$('#txtEenddate').datepicker();
             }
 
             function q_seekStr() {

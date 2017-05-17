@@ -32,8 +32,8 @@
                 bbmMask = [['txtBdate', r_picd], ['txtEdate', r_picd]];
                 q_mask(bbmMask);
                 $('#txtNoa').focus();
-                $('#txtBdate').datepicker();
-                $('#txtEdate').datepicker();
+              //  $('#txtBdate').datepicker();
+               // $('#txtEdate').datepicker();
             }
 
             function q_seekStr() {

@@ -23,7 +23,7 @@
 			var q_readonlys = ['txtOrdeno','txtNo2'];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
-			var bbmMask = new Array(['txtDatea', '999/99/99'],['txtTrandate', '999/99/99']);
+			var bbmMask = [];
 			var bbsNum = new Array(['txtBmile',10,1],['txtEmile',10,1],['txtOil',10,1],['txtTotal',10,1],['txtTotal2',10,1]);
 			var bbsMask = new Array();
 			var bbtNum  = new Array(); 
@@ -87,6 +87,7 @@
 			}
 
 			function mainPost() {
+				bbmMask = new Array(['txtDatea', r_picd],['txtTrandate', r_picd]);
 				q_mask(bbmMask);
 				
 				document.title = 'CY 出車作業';
@@ -278,6 +279,12 @@
                         e.preventDefault();
                         var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
                         $('#btnEndaddr_'+n).click();
+                    });
+                    $('#txtAddno3_' + i).bind('contextmenu', function(e) {
+                        /*滑鼠右鍵*/
+                        e.preventDefault();
+                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
+                        $('#btnAdd3_'+n).click();
                     });
 				}
 				_bbsAssign();
@@ -553,12 +560,12 @@
 			function readonly(t_para, empty) {
 				_readonly(t_para, empty);
 				if(t_para){
-					$('#txtDatea').datepicker('destroy');
-					$('#txtTrandate').datepicker('destroy');
+				//	$('#txtDatea').datepicker('destroy');
+				//	$('#txtTrandate').datepicker('destroy');
 					$('#btnOrde').attr('disabled','disabled');
 				}else{
-					$('#txtDatea').datepicker();
-					$('#txtTrandate').datepicker();
+				//	$('#txtDatea').datepicker();
+				//	$('#txtTrandate').datepicker();
 					$('#btnOrde').removeAttr('disabled');
 				}
 			}
