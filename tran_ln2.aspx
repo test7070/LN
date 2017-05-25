@@ -44,7 +44,8 @@
 				,['txtCarno', 'lblCarno', 'car2', 'a.noa,driverno,driver', 'txtCarno,txtDriverno,txtDriver', 'car2_b.aspx']
 				,['txtDriverno', 'lblDriver', 'driver', 'noa,namea', 'txtDriverno,txtDriver', 'driver_b.aspx']
 				,['txtCustno_', 'btnCust_', 'cust', 'noa,comp,nick', 'txtCustno_,txtComp_,txtNick_', 'cust_b.aspx']
-				,['txtBoatno_', 'btnBoat_', 'boat', 'noa,boat', 'txtBoatno_,txtBoat_', 'boat_b.aspx']);
+				//,['txtBoatno_', 'btnBoat_', 'boat', 'noa,boat', 'txtBoatno_,txtBoat_', 'boat_b.aspx']
+				);
 			
 			var t_carteam='', t_calctype='';
 			
@@ -88,6 +89,7 @@
 
 			function mainPost() {
 				bbmMask = new Array(['txtDatea', r_picd],['txtTrandate', r_picd]);
+				bbsMask = new Array(['txtTimea', '99:99'],['txtTrandate', r_picd]);
 				q_mask(bbmMask);
 				
 				document.title = 'CY 出車作業';
@@ -105,7 +107,7 @@
 				for(var i=0;i<t_unit.length;i++){
 					$('#listUnit').append('<option value="'+t_unit[i]+'"></option>');
 				}
-				var t_cstype = ['領','送','收','交'];
+				var t_cstype = ['去程','過夜','回程'];
 				for(var i=0;i<t_cstype.length;i++){
 					$('#listCstype').append('<option value="'+t_cstype[i]+'"></option>');
 				}
@@ -306,12 +308,11 @@
 			}
 
 			function bbsSave(as) {
-				if (!as['custno'] && !as['straddrno'] && !as['endaddrno']) {
+				if (!as['cstype'] && !as['custno'] && !as['straddrno'] && !as['endaddrno']) {
 					as[bbsKey[1]] = '';
 					return;
 				}
 				q_nowf();
-				as['trandate'] = abbm2['trandate'];
 				as['datea'] = abbm2['datea'];
 				as['driverno'] = abbm2['driverno'];
 				as['driver'] = abbm2['driver'];
@@ -737,7 +738,7 @@
 				margin: -1px;
 			}
 			.dbbs {
-				width: 1700px;
+				width: 1750px;
 			}
 			.dbbt {
 				width: 2000px;
@@ -838,9 +839,9 @@
 						<td colspan="5"><input type="text" id="txtMemo" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblBmile" class="lbl">上次里程</a></td>
+						<td><span> </span><a id="lblBmile" class="lbl">去程里程</a></td>
 						<td><input type="text" id="txtBmile" class="txt c1 num"/></td>
-						<td><span> </span><a id="lblEmile" class="lbl">本次里程</a></td>
+						<td><span> </span><a id="lblEmile" class="lbl">回程里程</a></td>
 						<td><input type="text" id="txtEmile" class="txt c1 num"/></td>
 						<td><span> </span><a id="lblOil" class="lbl">油量</a></td>
 						<td><input type="text" id="txtOil" class="txt c1 num"/></td>
@@ -868,9 +869,11 @@
 				<tr style='color:white; background:#003366;' >
 					<td align="center" style="width:25px"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" style="width:20px;"> </td>
-					<td align="center" style="width:60px;"><a>作業</a></td>
-					<td align="center" style="width:200px;"><a>貨主</a></td>
-					<td align="center" style="width:100px;"><a>船公司</a></td>
+					<td align="center" style="width:80px;"><a>作業</a></td>
+					<td align="center" style="width:120px;"><a>日期</a></td>
+					<td align="center" style="width:80px;"><a>時間</a></td>
+					<td align="center" style="width:200px;"><a>客戶</a></td>
+					
 					<td align="center" style="width:200px;"><a>起點</a></td>
 					<td align="center" style="width:200px;"><a>中途點</a></td>
 					<td align="center" style="width:200px;"><a>迄點</a></td>
@@ -894,22 +897,24 @@
 						<input type="text" id="txtCarno.*" style="display:none;"/>
 						<input type="text" id="txtDriverno.*" style="display:none;"/>
 						<input type="text" id="txtDriver.*" style="display:none;"/>
-						<input type="text" id="txtTrandate.*" style="display:none;"/>
+						
 						<input type="text" id="txtDatea.*" style="display:none;"/>
 					</td>
 					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
 					<td><input type="text" id="txtCstype.*" list="listCstype" style="width:95%;text-align: center;"/></td>
+					<td><input type="text" id="txtTrandate.*" style="float:left;width:95%;"/></td>
+					<td><input type="text" id="txtTimea.*" style="float:left;width:95%;"/></td>
 					<td>
 						<input type="text" id="txtCustno.*" style="float:left;width:30%;"/>
 						<input type="text" id="txtComp.*" style="float:left;width:60%;"/>
 						<input type="text" id="txtNick.*" style="display:none;"/>
 						<input type="button" id="btnCust.*" style="display:none;"/>
 					</td>
-					<td>
+					<!--<td>
 						<input type="text" id="txtBoatno.*" style="display:none;"/>
 						<input type="text" id="txtBoat.*" style="float:left;width:95%;"/>
 						<input type="button" id="btnBoat.*" style="display:none;"/>
-					</td>
+					</td>-->
 					<td>
 						<input type="text" id="txtStraddrno.*" style="float:left;width:30%;"/>
 						<input type="text" id="txtStraddr.*" style="float:left;width:60%;"/>
