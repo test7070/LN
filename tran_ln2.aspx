@@ -111,7 +111,7 @@
 				for(var i=0;i<t_cstype.length;i++){
 					$('#listCstype').append('<option value="'+t_cstype[i]+'"></option>');
 				}
-				var t_ef = ['E','F'];
+				var t_ef = ['E','L'];
 				for(var i=0;i<t_ef.length;i++){
 					$('#listEf').append('<option value="'+t_ef[i]+'"></option>');
 				}
@@ -877,7 +877,7 @@
 					<td align="center" style="width:200px;"><a>起點</a></td>
 					<td align="center" style="width:200px;"><a>中途點</a></td>
 					<td align="center" style="width:200px;"><a>迄點</a></td>
-					<td align="center" style="width:60px;"><a>E／F</a></td>
+					<td align="center" style="width:60px;"><a>E／L</a></td>
 					<td align="center" style="width:100px;"><a>櫃型</a></td>
 					<td align="center" style="width:130px;"><a>櫃號</a></td>
 					
@@ -932,7 +932,7 @@
 					</td>
 					
 					
-					<td><input type="text" id="txtFill.*" list="listEf" style="width:95%;text-align: center;"/></td>
+					<td><input type="text" id="txtFill.*" list="listEf" style="width:95%;text-align: center;" title="Empty / Laden"/></td>
 					<td><input type="text" id="txtCasetype.*" list="listCasetype" style="width:95%;"/></td>
 					<td>
 						<input type="text" id="txtCaseno.*" style="float:left;width:95%;"/>
