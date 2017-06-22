@@ -1,0 +1,544 @@
+z_trans_ln04:--z_trans_ln04 z_trans_ln.txt	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	-------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,gno nvarchar(10)
+		,recno int
+		,workno nvarchar(20)
+		,datea nvarchar(20)
+		,vocc nvarchar(20)
+		,voyage nvarchar(20)
+		
+		,n01 float
+		,n02 float
+		,n03 float
+		,n04 float
+		,n05 float
+		,n06 float
+		,n07 float
+		,n08 float
+		,n09 float
+		,n10 float
+		,n11 float
+		,n12 float
+		,n13 float
+		,n14 float
+		,btime nvarchar(20)
+		,etime nvarchar(20)
+		
+		,c20 float
+		,c40 float
+		
+		,memo nvarchar(max)
+	)
+	--應該只會有一筆
+	insert into @tmpa(gno,workno,datea,vocc,voyage
+		,n01,n02,n03,n04,n05,n06,n07
+		,n08,n09,n10,n11,n12,n13,n14)
+	select '1',b.v01,b.datea,b.v02,b.v03
+		,sum(isnull(a.n01,0)),sum(isnull(a.n02,0)),sum(isnull(a.n03,0)),sum(isnull(a.n04,0))
+		,sum(isnull(a.n05,0)),sum(isnull(a.n06,0)),sum(isnull(a.n07,0)),sum(isnull(a.n08,0))
+		,sum(isnull(a.n09,0)),sum(isnull(a.n10,0)),sum(isnull(a.n11,0)),sum(isnull(a.n12,0))
+		,sum(isnull(a.n13,0)),sum(isnull(a.n14,0))
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	group by b.v01,b.datea,b.v02,b.v03
+	
+	update @tmpa set c20=b.n01+b.n03+b.n05+b.n07+b.n11+b.n13
+		,c40=b.n02+b.n04+b.n06+b.n08+b.n12+b.n14
+	from @tmpa a
+	left join (select b.v01 workno,b.datea,b.v02 vocc,b.v03 voyage
+		,sum(isnull(a.n01,0)) n01,sum(isnull(a.n02,0)) n02,sum(isnull(a.n03,0)) n03,sum(isnull(a.n04,0)) n04
+		,sum(isnull(a.n05,0)) n05,sum(isnull(a.n06,0)) n06,sum(isnull(a.n07,0)) n07,sum(isnull(a.n08,0)) n08
+		,sum(isnull(a.n09,0)) n09,sum(isnull(a.n10,0)) n10,sum(isnull(a.n11,0)) n11,sum(isnull(a.n12,0)) n12
+		,sum(isnull(a.n13,0)) n13,sum(isnull(a.n14,0)) n14
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	and isnull(a.chk1,0) = 1 
+	group by b.v01,b.datea,b.v02,b.v03,b.partno,b.part) b
+	on a.workno=b.workno and a.datea=b.datea and a.vocc=b.vocc and a.voyage=b.voyage 
+	
+	declare @btime nvarchar(20) = ''
+	declare @etime nvarchar(20) = ''
+	
+	select @btime=Min(ISNULL(a.indate,''))
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	and len(ISNULL(a.indate,''))>0
+	
+	select @etime=MAX(ISNULL(a.edate,''))
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	and len(ISNULL(a.edate,''))>0
+	
+	update @tmpa set btime=@btime,etime=@etime
+	-----------------------------------------------------------------------------------
+	declare @sel int
+	declare @memo nvarchar(max)
+	
+	declare cursor_table cursor for	
+	select a.memo 
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	and len(ISNULL(a.memo,''))>0
+	
+	open cursor_table
+	fetch next from cursor_table
+	into @memo
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		-- @tmpa 應該只會有一筆
+		if exists(select top 1 * from @tmpa where len(ISNULL(memo,''))=0 and sel = 1)
+		begin
+			update @tmpa set memo=@memo where sel = 1
+		end
+		else 
+		begin
+			insert into @tmpa(gno,workno,memo)values('2',@t_workno,@memo)
+		end
+		
+		fetch next from cursor_table
+		into @memo
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	insert into @tmpa(gno,workno)values('3',@t_workno)
+	insert into @tmpa(gno,workno)values('4',@t_workno)
+	
+	select gno
+		,workno a01
+		,vocc a02
+		,voyage a03
+		,datea a04
+		,btime a05
+		,etime a06
+	
+		, n01 b01 --進口重櫃 20'F
+		, n02 b02 --進口重櫃 40'F
+		, n03 b03 --進口空櫃 20'E
+		, n04 b04 --進口空櫃 40'E
+		, n07 b05 --出口重櫃 20'F
+		, n08 b06 --出口重櫃 40'F
+		, n05 b07 --出口空櫃 20'E
+		, n06 b08 --出口空櫃 40'E
+		, ISNULL(n11,0)+ISNULL(n13,0) b09 --翻倉 20'
+		, ISNULL(n12,0)+ISNULL(n14,0) b10 --翻倉 40'
+		, ISNULL(n01,0)+ISNULL(n03,0)+ISNULL(n05,0)+ISNULL(n07,0)+ISNULL(n11,0)+ISNULL(n13,0) b11 -- 總共作業 20
+		, ISNULL(n02,0)+ISNULL(n04,0)+ISNULL(n06,0)+ISNULL(n08,0)+ISNULL(n12,0)+ISNULL(n14,0) b12 -- 總共作業 40
+		, '' b13 --(暫時不知如何抓)
+		, '' b14 --(暫時不知如何抓)
+		
+		,c20 c01--可請款 20'
+		,c40 c02--可請款 40'
+		--出場 (暫時不知如何抓)
+		,'' d01
+		,'' d02
+		,'' d03
+		,'' d04
+		
+		,memo
+		,@t_user worker 
+	from @tmpa order by sel;
+
+z_trans_ln03:--z_trans_ln03  z_trans_ln.txt	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	-------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,gno nvarchar(10)
+		,recno int
+		,datea nvarchar(20)
+		,workno nvarchar(20)
+		,voyage nvarchar(20)
+		,custno nvarchar(20)
+		,cust nvarchar(50)
+			
+		,addrno nvarchar(20)
+		,addr nvarchar(50)
+		,casetype nvarchar(20)
+		,mount1 float --自運
+		,mount2 float --外車  (車行是'新安'以外的都算外車)
+		,price1 float
+		,price2 float
+		
+		,money1 float
+		,money2 float
+		,money3 float
+		
+		,mount4 float
+		,price4 float
+		,money4 float
+		
+		,total float
+	)
+	--20'F
+	insert into @tmpa(gno,datea,workno,voyage,custno,cust,addrno,addr
+		,casetype,mount1,mount2)
+	select '1',b.datea,b.v01,b.v03,b.custno,b.cust,a.addrno,a.addr,'20''F'
+		,suM(case when CHARINDEX('新安',b.sales)>0 then 1 else 0 end*(case ISNULL(a.n01,0) when 0 then 0 else a.n01 end + case ISNULL(a.n07,0) when 0 then 0 else a.n07 end)) mount
+		,suM(case when CHARINDEX('新安',b.sales)>0 then 0 else 1 end*(case ISNULL(a.n01,0) when 0 then 0 else a.n01 end + case ISNULL(a.n07,0) when 0 then 0 else a.n07 end)) mount2
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	and not (ISNULL(a.n01,0)=0 and ISNULL(a.n07,0)=0 )
+	and isnull(a.chk1,0)=1
+	group by b.datea,b.v01,b.v03,b.custno,b.cust,a.addrno,a.addr
+	--40'F
+	insert into @tmpa(gno,datea,workno,voyage,custno,cust,addrno,addr
+		,casetype,mount1,mount2)
+	select '1',b.datea,b.v01,b.v03,b.custno,b.cust,a.addrno,a.addr,'40''F'
+		,suM(case when CHARINDEX('新安',b.sales)>0 then 1 else 0 end*(case ISNULL(a.n02,0) when 0 then 0 else a.n02 end + case ISNULL(a.n08,0) when 0 then 0 else a.n08 end)) mount
+		,suM(case when CHARINDEX('新安',b.sales)>0 then 0 else 1 end*(case ISNULL(a.n02,0) when 0 then 0 else a.n02 end + case ISNULL(a.n08,0) when 0 then 0 else a.n08 end)) mount2
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	and not (ISNULL(a.n02,0)=0 and ISNULL(a.n08,0)=0 )
+	and isnull(a.chk1,0)=1
+	group by b.datea,b.v01,b.v03,b.custno,b.cust,a.addrno,a.addr
+	--20'E
+	insert into @tmpa(gno,datea,workno,voyage,custno,cust,addrno,addr
+		,casetype,mount1,mount2)
+	select '1',b.datea,b.v01,b.v03,b.custno,b.cust,a.addrno,a.addr,'20''E'
+		,suM(case when CHARINDEX('新安',b.sales)>0 then 1 else 0 end*(case ISNULL(a.n03,0) when 0 then 0 else a.n03 end + case ISNULL(a.n05,0) when 0 then 0 else a.n05 end)) mount
+		,suM(case when CHARINDEX('新安',b.sales)>0 then 0 else 1 end*(case ISNULL(a.n03,0) when 0 then 0 else a.n03 end + case ISNULL(a.n05,0) when 0 then 0 else a.n05 end)) mount2
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	and not (ISNULL(a.n03,0)=0 and ISNULL(a.n05,0)=0 )
+	and isnull(a.chk1,0)=1
+	group by b.datea,b.v01,b.v03,b.custno,b.cust,a.addrno,a.addr
+	--40'E
+	insert into @tmpa(gno,datea,workno,voyage,custno,cust,addrno,addr
+		,casetype,mount1,mount2)
+	select '1',b.datea,b.v01,b.v03,b.custno,b.cust,a.addrno,a.addr,'40''E'
+		,suM(case when CHARINDEX('新安',b.sales)>0 then 1 else 0 end*(case ISNULL(a.n04,0) when 0 then 0 else a.n04 end + case ISNULL(a.n06,0) when 0 then 0 else a.n06 end)) mount
+		,suM(case when CHARINDEX('新安',b.sales)>0 then 0 else 1 end*(case ISNULL(a.n04,0) when 0 then 0 else a.n04 end + case ISNULL(a.n06,0) when 0 then 0 else a.n06 end)) mount2
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.v01 = @t_workno
+	and not (ISNULL(a.n04,0)=0 and ISNULL(a.n06,0)=0 )
+	and isnull(a.chk1,0)=1
+	group by b.datea,b.v01,b.v03,b.custno,b.cust,a.addrno,a.addr
+	---------------------------------------------------------------------------------
+	update @tmpa set price1=ISNULL(b.custprice,0),price2=ISNULL(b.driverprice,0)
+		,price4=ISNULL(b.custprice,0)
+	from @tmpa a
+	outer apply(select top 1 * from addrs 
+		where a.addrno=noa and a.casetype=replace(custunit,'~#$','''') 
+		and a.datea>=datea order by datea desc,noa desc ) b
+	
+	update @tmpa set money1 = ROUND(mount1*price1,0),money2 = ROUND(mount2*price2,0)
+		,money3 = ROUND(mount2*(price1-price2),0)
+		,mount4 = mount1+mount2,money4 = ROUND((mount1+mount2)*price4,0)
+		
+	update @tmpa set recno=b.recno
+	from @tmpa a
+	left join (select sel,ROW_NUMBER()over(partition by workno,custno order by addrno,casetype) recno from @tmpa ) b on a.sel=b.sel
+	
+	update @tmpa set total=b.money4
+	from @tmpa a
+	outer apply(select SUM(money4) money4 from @tmpa where workno=a.workno and custno=a.custno) b
+	where a.recno=1
+	
+	insert into @tmpa(gno,workno,custno,money1,money2,money3,money4)
+	select '2',workno,CHAR(255),SUM(ISNULL(money1,0)),SUM(ISNULL(money2,0)),SUM(ISNULL(money3,0)),SUM(ISNULL(money4,0))
+	from @tmpa
+	group by workno
+	
+	select gno
+		,recno rr
+		,voyage a01
+		,datea a02
+		,workno a03
+		
+		,addr b01
+		,casetype b02
+		,mount1 b03
+		,price1 b04
+		,dbo.getComma(money1,-1) b05
+		,mount2 b06
+		,price2 b07
+		,dbo.getComma(money2,-1) b08
+		,dbo.getComma(money3,-1) b09
+		,mount4 b10
+		,price4 b11
+		,dbo.getComma(money4,-1) b12
+		,dbo.getComma(total,-1) b13
+		,cust b14
+	from @tmpa 
+	order by workno,custno,recno;
+
+z_trans_ln02:--z_trans_ln02  z_trans_ln.txt	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	-------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,datea nvarchar(20)
+		,workno nvarchar(20)
+		,vocc nvarchar(50)
+		,voyage nvarchar(20)
+		,port nvarchar(20)
+		
+		,custno nvarchar(20)
+		,cust nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,addrno nvarchar(20)
+		,addr nvarchar(50)
+		,memo nvarchar(max)
+		
+		,laden_dis_20 float --20F
+		,laden_dis_40 float --40F 
+		,laden_load_20 float--20E
+		,laden_load_40 float--40E
+		,empty_dis_20 float --20E
+		,empty_dis_40 float --40E
+		,empty_load_20 float--20F
+		,empty_load_40 float--40F
+	)
+	
+	insert into @tmpa(datea,workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,laden_dis_20,laden_dis_40,laden_load_20,laden_load_40
+		,empty_dis_20,empty_dis_40,empty_load_20,empty_load_40)
+	select b.datea,b.v01,b.v02,b.v03,b.v06
+		,b.custno,b.cust,b.salesno,b.sales,a.addrno,a.addr,a.memo
+		,a.n01,a.n02,a.n03,a.n04
+		,a.n05,a.n06,a.n07,a.n08
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.vccno='WORK'
+	and b.v01=@t_workno
+	------------------------------------------------
+	declare @tmpb table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,datea nvarchar(20)
+		,workno nvarchar(20)
+		,vocc nvarchar(50)
+		,voyage nvarchar(20)
+		,port nvarchar(20)
+		
+		,custno nvarchar(20)
+		,cust nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,addrno nvarchar(20)
+		,addr nvarchar(50)
+		,memo nvarchar(max)
+		
+		,casetype nvarchar(20)
+		,[empty] float
+		,fill float
+	)
+	insert into @tmpb(gno,datea,workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,casetype,[empty],fill)
+	select '1',datea, workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,'20'''
+		,isnull(laden_load_20,0)+isnull(empty_dis_20,0)
+		,isnull(laden_dis_20,0)+isnull(empty_load_20,0)
+	from @tmpa
+	where isnull(laden_load_20,0)!=0
+	or isnull(empty_dis_20,0)!=0
+	or isnull(laden_dis_20,0)!=0 
+	or isnull(empty_load_20,0)!=0 
+	
+	insert into @tmpb(gno,datea,workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,casetype,[empty],fill)
+	select '1',datea, workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal,addrno,addr,memo
+		,'40'''
+		,isnull(laden_load_40,0)+isnull(empty_dis_40,0)
+		,isnull(laden_dis_40,0)+isnull(empty_load_40,0)
+	from @tmpa
+	where isnull(laden_load_40,0)!=0
+	or isnull(empty_dis_40,0)!=0
+	or isnull(laden_dis_40,0)!=0 
+	or isnull(empty_load_40,0)!=0 
+	
+	update @tmpb set pno=b.recno
+	from @tmpb a
+	left join (select sel,ROW_NUMBER()over(partition by workno,custno,cardealno order by casetype,sel) recno from @tmpb) b on a.sel=b.sel
+	----------------------------------------------------------------------------
+	declare @pagecount int = 37
+	declare @workno nvarchar(20)
+	declare @n int
+	
+	declare cursor_table cursor for	
+	select workno,count(1) from @tmpb group by workno
+	open cursor_table
+	fetch next from cursor_table
+	into @workno,@n
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		while @n%@pagecount!=0
+		begin
+			insert into @tmpb(gno,pno,workno)values('2',2,@workno)
+			set @n = @n + 1
+		end
+		
+		fetch next from cursor_table
+		into @workno,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	select gno
+		,workno a01
+		,ISNULL(vocc,'')+' '+ISNULL(voyage,'') a02
+		,port a03
+		,datea a04
+		
+		,cust b01
+		,cardeal b02
+		,casetype b03
+		,[empty] b04
+		,fill b05
+		,addr b06
+		,memo b07
+		,@t_user worker
+	from @tmpb
+	order by workno,gno,custno,cardealno,pno;
+
+
+z_trans_ln01:--z_trans_ln01  z_trans_ln.txt	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	------------------------------------------------------------------------
+	declare @tmp table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,workno nvarchar(20)
+		,a01 nvarchar(20) --M.V.
+		,a02 nvarchar(20) --VOY NO.
+		,a03 nvarchar(20) --PORT
+		,a04 nvarchar(20) --ARRIVAL
+		,a05 nvarchar(20) --BERTHED
+		,a06 nvarchar(20) --WHARF NO
+		,a07 nvarchar(20) --DEPARTURE
+		,a08 nvarchar(20) --ETA AT NETX PORT
+		
+		,b01 nvarchar(20)
+		,b02 nvarchar(20)
+		,b03 nvarchar(20)
+		
+		,c01 float
+		,c02 float
+		,c03 float
+		,c04 float
+		,c05 float
+		,c06 float
+		,c07 float
+		,c08 float
+		,c09 float
+		,c10 float
+		,c11 float
+		,c12 float
+		,c13 float
+		,c14 float
+	)
+	insert into @tmp(gno,pno
+		,noa,noq,workno
+		,a01,a02,a03,a04,a05,a06,a07,a08
+		,b01,b02,b03
+		,c01,c02,c03,c04,c05,c06,c07
+		,c08,c09,c10,c11,c12,c13,c14)
+	select '1' gno, 1 pno  
+		,a.noa,b.noq,a.v01
+		,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07
+		,b.typea,b.indate,b.edate
+		,b.N01,b.N02,b.N03,b.N04,b.N05,b.N06,b.N07
+		,b.N08,b.N09,b.N10,b.N11,b.N12,b.N13,b.N14
+	from borr a
+	left join borrs b on a.noa=b.noa
+	where a.vccno='WORK'
+	and a.noa = @t_noa
+	order by a.noa,b.noq
+	
+	insert into @tmp(gno,pno,noa
+		,c01,c02,c03,c04,c05,c06,c07
+		,c08,c09,c10,c11,c12,c13,c14)
+	select '2',3,noa
+		,SUM(isnull(c01,0)),SUM(isnull(c02,0)),SUM(isnull(c03,0)),SUM(isnull(c04,0)),SUM(isnull(c05,0))
+		,SUM(isnull(c06,0)),SUM(isnull(c07,0)),SUM(isnull(c08,0)),SUM(isnull(c09,0)),SUM(isnull(c10,0))
+		,SUM(isnull(c11,0)),SUM(isnull(c12,0)),SUM(isnull(c13,0)),SUM(isnull(c14,0))
+	from @tmp
+	where gno='1'
+	group by noa
+	
+	--------------------------------------------------------------------------------
+	declare @pagecount int = 34
+	declare @noa nvarchar(20)
+	declare @n int
+	
+	declare cursor_table cursor for	
+	select noa,count(1) from @tmp group by noa
+	open cursor_table
+	fetch next from cursor_table
+	into @noa,@n
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		while @n%@pagecount!=0
+		begin
+			insert into @tmp(gno,pno,noa)values('3',2,@noa)
+			set @n = @n + 1
+		end
+		
+		fetch next from cursor_table
+		into @noa,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	select * from @tmp order by noa,pno,sel;
