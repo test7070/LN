@@ -1,6 +1,5 @@
 *.class
 *.pyc
 *.pyo
-*.project
 .git
 git
