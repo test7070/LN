@@ -44,10 +44,15 @@
                     }, {//[6]              2
                         type : '6',
                         name : 'xworkno'
+                    },
+					{//[7]              2
+                        type : '6',
+                        name : 'mon'
                     }]
                 });
                 q_popAssign();
-
+				$('#txtMon').mask('999/99');
+				$('#txtMon').datepicker();
 				var t_para = new Array();
 	            try{
 	            	t_para = JSON.parse(q_getId()[3]);
