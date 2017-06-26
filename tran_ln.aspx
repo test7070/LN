@@ -39,6 +39,7 @@
 			q_desc = 1;
 			brwCount2 = 7;
 			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr_b.aspx']
+				,['txtAddrno2_', 'btnAddr2_', 'addr', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr_b.aspx']
 				,['txtCustno', 'lblCust', 'cust', 'noa,nick', 'txtCustno,txtCust', 'cust_b.aspx']
 				,['txtPartno', 'lblPart2', 'cust', 'noa,nick', 'txtPartno,txtPart', 'cust_b.aspx']
 				,['txtSalesno', 'lblSales', 'cardeal', 'noa,nick', 'txtSalesno,txtSales', 'cardeal_b.aspx']);
@@ -50,6 +51,9 @@
 			}
 			
 			$(document).ready(function() {
+				$.datepicker.r_len=4;
+				$.datepicker.setDefaults($.datepicker.regional["ENG"]);
+				
 				var t_where = '';
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
@@ -66,7 +70,7 @@
 			}
 
 			function mainPost() {
-				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd]);
+				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtV09',r_picd],['txtV10',r_picd]);
 				q_mask(bbmMask);
 				document.title = 'WORKING SHEET';
 			}
@@ -89,6 +93,12 @@
                         e.preventDefault();
                         var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
                         $('#btnAddr_'+n).click();
+                    });
+                    $('#txtAddrno2_' + i).bind('contextmenu', function(e) {
+                        /*滑鼠右鍵*/
+                        e.preventDefault();
+                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
+                        $('#btnAddr2_'+n).click();
                     });
                     
                     $('#txtN01_'+i).change(function(e){refreshBbs();});
@@ -259,13 +269,17 @@
 			function readonly(t_para, empty) {
 				_readonly(t_para, empty);
 				if(t_para){
-					//$('#txtDatea').datepicker('destroy');
-					//$('#txtBegindate').datepicker('destroy');
-					//$('#txtEnddate').datepicker('destroy');
+					$('#txtDatea').datepicker('destroy');
+					$('#txtBegindate').datepicker('destroy');
+					$('#txtEnddate').datepicker('destroy');
+					$('#txtV09').datepicker('destroy');
+					$('#txtV10').datepicker('destroy');
 				}else{
-					//$('#txtDatea').datepicker();
-					//$('#txtBegindate').datepicker();
-					//$('#txtEnddate').datepicker();
+					$('#txtDatea').datepicker();
+					$('#txtBegindate').datepicker();
+					$('#txtEnddate').datepicker();
+					$('#txtV09').datepicker();
+					$('#txtV10').datepicker();
 				}
 			}
 
@@ -493,6 +507,8 @@
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1" title="作業日期"/></td>
+						<td><span> </span><a class="lbl">PLAN_ID</a></td>
+						<td><input type="text" id="txtV08" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl" id="lblSales">車行</a></td>
@@ -533,7 +549,14 @@
 						<td colspan="2"><span> </span><a class="lbl">ETA AT NEXT PORT</a></td>
 						<td colspan="2"><input type="text" id="txtV07" class="txt c1"/></td>
 					</tr>
-					
+					<tr>
+						<td><span> </span><a class="lbl">派車日期</a></td>
+						<td><input type="text" id="txtV09" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">完工日期</a></td>
+						<td><input type="text" id="txtV10" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">完工編號</a></td>
+						<td><input type="text" id="txtV11" class="txt c1"/></td>
+					</tr>
 					<tr>
 						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>
 						<td colspan="5">
@@ -555,7 +578,7 @@
 			</div>
 			<img id="img" crossorigin="anonymous" style="float:left;display:none;"/> 
 		</div>
-		<div style="width: 1550px;">
+		<div style="width: 1750px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
@@ -568,7 +591,8 @@
 					<td align="center" colspan="2" rowspan="2"><a>SHIFT</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>RELOAD</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起迄地點</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起點</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
@@ -585,6 +609,7 @@
 					<!-- RELOAD -->
 					<!-- TIME -->
 					<!-- ADDR -->
+					<!-- ADDR2 -->
 					<!-- MEMO -->
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
@@ -609,12 +634,13 @@
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
 					<!-- ADDR -->
+					<!-- ADDR2 -->
 					<!-- MEMO -->
 				</tr>
 			</table>
 		</div>
 		
-		<div class='dbbs' style="width: 1550px;">
+		<div class='dbbs' style="width: 1750px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px"> </td>
@@ -637,6 +663,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>MEMO</a></td>
 				</tr>
@@ -669,11 +696,16 @@
 						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
 						<input type="button" id="btnAddr.*" style="display:none;"/>
 					</td>
+					<td style="width:200px">
+						<input type="text" id="txtAddrno2.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtAddr2.*" style="float:left;width:55%;"/>
+						<input type="button" id="btnAddr2.*" style="display:none;"/>
+					</td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
 			</table>
 		</div>
-		<div style="width: 1550px;">
+		<div style="width: 1750px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
@@ -696,6 +728,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA14" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
