@@ -48,7 +48,12 @@
 					{//[7]              2
                         type : '6',
                         name : 'mon'
-                    }]
+                    },
+                    {//[8],[9]              2
+                        type : '1',
+                        name : 'date'
+                    }
+                    ]
                 });
                 q_popAssign();
 				$('#txtMon').mask('999/99');
