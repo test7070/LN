@@ -49,14 +49,17 @@
                         type : '6',
                         name : 'mon'
                     },
-                    {//[8],[9]              2
+					{//[7]              2
                         type : '1',
                         name : 'date'
-                    }
-                    ]
+                    }]
                 });
                 q_popAssign();
 				$('#txtMon').mask('999/99');
+				$('#txtMon').datepicker();
+				$('#txtDate1').mask('999/99/99');
+				$('#txtMon').datepicker();
+				$('#txtDate2').mask('999/99/99');
 				$('#txtMon').datepicker();
 				var t_para = new Array();
 	            try{

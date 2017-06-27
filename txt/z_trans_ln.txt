@@ -1,3 +1,235 @@
+﻿z_trans_ln07:--z_trans_ln07 z_trans_ln.txt
+declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+declare @t_edate nvarchar(20) = case when '#non' = [9] then '' else [9] end
+declare @tmp table(
+	gno nvarchar(1),
+	datea nvarchar(100),
+	yy nvarchar(10),
+	mm nvarchar(10),
+	dd nvarchar(10),
+	noq INT,
+	PID nvarchar(100),
+	SN nvarchar(100),
+	VN nvarchar(100),
+	cardate nvarchar(100),
+	mount float,
+	straddr nvarchar(max),
+	endaddr nvarchar(max),
+	sales nvarchar(100),
+	enddate nvarchar(100),
+	endno nvarchar(100),
+	memo nvarchar(max)
+)
+insert into @tmp (gno,datea,yy,mm,dd,noq,PID,SN,VN,cardate,mount,straddr,endaddr,sales,enddate,endno,memo)
+select '0',a.datea,SUBSTRING(a.datea,1,3),SUBSTRING(a.datea,5,2),SUBSTRING(a.datea,8,2),ROW_NUMBER() OVER(PARTITION BY a.datea order by a.datea),a.v08,a.v02,a.v03,a.v09,
+b.n01+b.n02+b.n03+b.n04+b.n05+b.n06+b.n07+b.n08+b.n09+b.n10+b.n11+b.n12+b.n13+b.n14,
+b.addr,b.addr2,a.sales,a.v10,a.v11,a.memo
+from borr a left join borrs b on a.noa = b.noa 
+where a.vccno='WORK' and a.datea between @t_bdate and @t_edate
+------------------------------------------------------------------------
+declare @t_pageline int = 20 --一頁幾行
+declare @datea nvarchar(100)
+declare @n int =0
+declare cursor_table cursor for 
+select datea,count(1) from @tmp where gno='0' group by datea
+open cursor_table 
+fetch next from cursor_table 
+into @datea,@n
+while(@@FETCH_STATUS <> -1) 
+begin
+while @n%@t_pageline !=0
+begin 
+set @n = @n + 1
+insert into @tmp(gno,datea) 
+values('1',@datea)
+end 
+
+fetch next from cursor_table 
+into @datea,@n
+end 
+close cursor_table
+deallocate cursor_table
+------------------------------------------------------------------------
+select * from @tmp order by datea,gno;
+------------------------------------------------------------------------
+z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
+declare @tmp table(
+	gno nvarchar(1),
+	yy nvarchar(10),
+	mm nvarchar(10),
+	d1 nvarchar(10),
+	d2 nvarchar(10),
+	ww nvarchar(10),
+	
+	ED2 float,
+	ED4 float,
+	EL2 float,
+	EL4 float,
+	SH2 float,
+	SH4 float,
+	TTE2 float,
+	TTE4 float,
+	LD2 float,
+	LD4 float,
+	LL2 float,
+	LL4 float,
+	RE2 float,
+	RE4 float,
+	TTL2 float,
+	TTL4 float,
+	TD2 float,
+	TD4 float,
+	TL2 float,
+	TL4 float,
+	TSR2 float,
+	TSR4 float,
+	TT2 float,
+	TT4 float,
+	total float,
+	total2 float,
+	total3 float,
+	
+	bbay nvarchar(100),
+	ebay nvarchar(100),
+	ship int
+)
+insert into @tmp (gno,yy,mm,d1,d2,ww)
+select '0',SUBSTRING(a.datea,1,3),SUBSTRING(a.datea,5,2),
+	 case 
+	 when SUBSTRING(a.datea,8,2) between '01' and '07' then 01
+	 when SUBSTRING(a.datea,8,2) between '08' and '14' then 08
+	 when SUBSTRING(a.datea,8,2) between '15' and '21' then 15
+	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 22
+	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 29 end,
+	 case 
+	 when SUBSTRING(a.datea,8,2) between '01' and '07' then 07
+	 when SUBSTRING(a.datea,8,2) between '08' and '14' then 14
+	 when SUBSTRING(a.datea,8,2) between '15' and '21' then 21
+	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 28
+	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 31 end,
+	 case 
+	 when SUBSTRING(a.datea,8,2) between '01' and '07' then 1
+	 when SUBSTRING(a.datea,8,2) between '08' and '14' then 2
+	 when SUBSTRING(a.datea,8,2) between '15' and '21' then 3
+	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 4
+	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 5 end
+from borr a
+where a.vccno='WORK'
+
+insert into @tmp (gno,ww,ED2,ED4,EL2,EL4,SH2,SH4,TTE2,TTE4,LD2,LD4,LL2,LL4,RE2,RE4,TTL2,TTL4
+,TD2,TD4,TL2,TL4,TSR2,TSR4,TT2,TT4,total,total2,total3,bbay,ebay,ship)
+select '1',	 case 
+	 when SUBSTRING(a.datea,8,2) between '01' and '07' then 1
+	 when SUBSTRING(a.datea,8,2) between '08' and '14' then 2
+	 when SUBSTRING(a.datea,8,2) between '15' and '21' then 3
+	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 4
+	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 5 end,
+SUM(b.n05)/*ED2*/,SUM(b.n06)/*ED4*/,SUM(b.n07)/*EL2*/
+,SUM(b.n08)/*EL4*/,SUM(b.n11)/*SH2*/,SUM(b.n12),--SH4
+SUM(b.n05)+SUM(b.n07)+SUM(b.n11)/*TTE2*/,SUM(b.n06)+SUM(b.n08)+SUM(b.n12)/*TTE4*/,
+SUM(b.n01)/*LD2*/,SUM(b.n02)/*LD4*/,SUM(b.n03)/*LL2*/
+,SUM(b.n04)/*LL4*/,SUM(b.n13)/*RE2*/,SUM(b.n14),--RE4
+SUM(b.n01)+SUM(b.n03)+SUM(b.n13)/*TTL2*/,SUM(b.n02)+SUM(b.n04)+SUM(b.n14),/*TTL4*/
+SUM(b.n01)+SUM(b.n05)/*TD2*/,SUM(b.n02)+SUM(b.n06)/*TD4*/,SUM(b.n03)+SUM(b.n07)/*TL2*/,
+SUM(b.n04)+SUM(b.n08)/*TL4*/,SUM(b.n11)+SUM(b.n13)/*TSR2*/,SUM(b.n12)+SUM(b.n14)/*TSR4*/,
+SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13),--TT2
+SUM(b.n06)+SUM(b.n08)+SUM(b.n12)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--TT4
+SUM(b.n05)+SUM(b.n06)+SUM(b.n07)+SUM(b.n08)+SUM(b.n11)+SUM(b.n12)+SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n06)+SUM(b.n08)+SUM(b.n12),--total
+SUM(b.n01)+SUM(b.n02)+SUM(b.n03)+SUM(b.n04)+SUM(b.n13)+SUM(b.n14)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--total2
+SUM(b.n01)+SUM(b.n05)+SUM(b.n02)+SUM(b.n06)+SUM(b.n03)+SUM(b.n07)+SUM(b.n04)+SUM(b.n08)+SUM(b.n11)+SUM(b.n13)+SUM(b.n12)+SUM(b.n14)
++SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13)+SUM(b.n06)+SUM(b.n08)+SUM(b.n12)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--total3
+min(a.v02),max(a.v02),count(1)
+from borr a
+left join borrs b on a.noa=b.noa
+where a.vccno='WORK'
+group by a.datea
+
+insert into @tmp (gno,ww)
+select '2',ww from @tmp
+
+insert into @tmp (gno,ww)
+select '3',ww from @tmp
+
+insert into @tmp (gno,ww)
+select '4',ww from @tmp
+
+
+insert into @tmp (gno,ww)
+select '5',ww from @tmp
+group by ww
+
+select DISTINCT * from @tmp order by ww,gno;
+---------------------------------------------------------------------------------
+z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
+declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+declare @tmp table(
+	gno nvarchar(1),
+	noa nvarchar(100),
+	yy nvarchar(10),
+	mm nvarchar(10),
+	noq INT IDENTITY PRIMARY KEY,
+	workdate nvarchar(100),
+	MV nvarchar(100),
+	VN nvarchar(100),
+	LD2 float,
+	LD4 float,
+	LL2 float,
+	LL4 float,
+	ED2 float,
+	ED4 float,
+	EL2 float,
+	EL4 float,
+	SH float,
+	RE float,
+	T2 float,
+	T4 float,
+	G2 float,
+	G4 float,
+	G21 float,
+	G41 float,
+	T21 float,
+	T41 float,
+	total float
+)
+insert into @tmp (gno,noa,yy,mm,workdate,MV,VN,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total)
+select '0',a.noa,SUBSTRING(@t_mon,1,3),SUBSTRING(@t_mon,5,2),a.datea,a.v02,a.v03,n01,n02,n03,n04,n05,n06,n07,n08,
+(b.n11+b.n13)/*SHIFT*/,(b.n12+b.n14)/*RELOAD*/,(b.n01+b.N03+b.N05+b.n07+b.n11+b.n13)/*T2*/,(b.n02+b.n04+b.n06+b.n08+b.n12+b.n14)/*T4*/,
+(b.n01+b.n02+b.n03+b.n04+b.n05+b.n06+b.n07+b.n08+b.n11+b.n12+b.n13+b.n14)/*Total*/
+from borr a
+left join borrs b on a.noa=b.noa
+where a.vccno='WORK' and @t_mon = SUBSTRING(a.datea,1,6)
+
+insert into @tmp (gno,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total)
+select '2',SUM(LD2),SUM(LD4),SUM(LL2),SUM(LL4),SUM(ED2),SUM(ED4),SUM(EL2),SUM(EL4),SUM(SH),SUM(RE),
+SUM(T2),SUM(T4),SUM(total)
+from @tmp
+------------------------------------------------------------------------
+declare @t_pageline int = 20 --一頁幾行
+declare @yy nvarchar(10)
+declare @mm nvarchar(10)
+declare @n int =0
+declare cursor_table cursor for 
+select yy,mm,count(1) from @tmp where gno='0' group by yy,mm
+open cursor_table 
+fetch next from cursor_table 
+into @yy,@mm,@n
+while(@@FETCH_STATUS <> -1) 
+begin
+while @n%@t_pageline !=0
+begin 
+set @n = @n + 1
+insert into @tmp(gno,yy,mm) 
+values('1',@yy,@mm)
+end 
+
+fetch next from cursor_table 
+into @yy,@mm,@n
+end 
+close cursor_table
+deallocate cursor_table
+------------------------------------------------------------------------
+select * from @tmp order by gno,noq;
+-------------------------------------------------------------------
 z_trans_ln04:--z_trans_ln04 z_trans_ln.txt	
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
