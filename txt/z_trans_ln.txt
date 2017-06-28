@@ -53,6 +53,7 @@ deallocate cursor_table
 select * from @tmp order by datea,gno;
 ------------------------------------------------------------------------
 z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
+declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 declare @tmp table(
 	gno nvarchar(1),
 	yy nvarchar(10),
@@ -114,7 +115,7 @@ select '0',SUBSTRING(a.datea,1,3),SUBSTRING(a.datea,5,2),
 	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 4
 	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 5 end
 from borr a
-where a.vccno='WORK'
+where a.vccno='WORK' and SUBSTRING(@t_mon,1,6) = SUBSTRING(a.datea,1,6)
 
 insert into @tmp (gno,ww,ED2,ED4,EL2,EL4,SH2,SH4,TTE2,TTE4,LD2,LD4,LL2,LL4,RE2,RE4,TTL2,TTL4
 ,TD2,TD4,TL2,TL4,TSR2,TSR4,TT2,TT4,total,total2,total3,bbay,ebay,ship)
@@ -141,7 +142,7 @@ SUM(b.n01)+SUM(b.n05)+SUM(b.n02)+SUM(b.n06)+SUM(b.n03)+SUM(b.n07)+SUM(b.n04)+SUM
 min(a.v02),max(a.v02),count(1)
 from borr a
 left join borrs b on a.noa=b.noa
-where a.vccno='WORK'
+where a.vccno='WORK' and SUBSTRING(@t_mon,1,6) = SUBSTRING(a.datea,1,6)
 group by a.datea
 
 insert into @tmp (gno,ww)
@@ -197,8 +198,8 @@ select '0',a.noa,SUBSTRING(@t_mon,1,3),SUBSTRING(@t_mon,5,2),a.datea,a.v02,a.v03
 (b.n01+b.n02+b.n03+b.n04+b.n05+b.n06+b.n07+b.n08+b.n11+b.n12+b.n13+b.n14)/*Total*/
 from borr a
 left join borrs b on a.noa=b.noa
-where a.vccno='WORK' and @t_mon = SUBSTRING(a.datea,1,6)
-
+where a.vccno='WORK' and SUBSTRING(@t_mon,1,6) = SUBSTRING(a.datea,1,6)
+if(@t_mon!='')
 insert into @tmp (gno,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total)
 select '2',SUM(LD2),SUM(LD4),SUM(LL2),SUM(LL4),SUM(ED2),SUM(ED4),SUM(EL2),SUM(EL4),SUM(SH),SUM(RE),
 SUM(T2),SUM(T4),SUM(total)
