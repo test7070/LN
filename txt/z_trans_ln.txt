@@ -1,4 +1,5 @@
 ﻿z_trans_ln07:--z_trans_ln07 z_trans_ln.txt
+declare @t_user nvarchar(max) = '[4]'
 declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 declare @t_edate nvarchar(20) = case when '#non' = [9] then '' else [9] end
 declare @tmp table(
@@ -50,9 +51,10 @@ end
 close cursor_table
 deallocate cursor_table
 ------------------------------------------------------------------------
-select * from @tmp order by datea,gno;
+select a.*,(@t_user) as worker from @tmp a order by datea,gno;
 ------------------------------------------------------------------------
 z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
+declare @t_user nvarchar(max) = '[4]'
 declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 declare @tmp table(
 	gno nvarchar(1),
@@ -135,10 +137,9 @@ SUM(b.n01)+SUM(b.n05)/*TD2*/,SUM(b.n02)+SUM(b.n06)/*TD4*/,SUM(b.n03)+SUM(b.n07)/
 SUM(b.n04)+SUM(b.n08)/*TL4*/,SUM(b.n11)+SUM(b.n13)/*TSR2*/,SUM(b.n12)+SUM(b.n14)/*TSR4*/,
 SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13),--TT2
 SUM(b.n06)+SUM(b.n08)+SUM(b.n12)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--TT4
-SUM(b.n05)+SUM(b.n06)+SUM(b.n07)+SUM(b.n08)+SUM(b.n11)+SUM(b.n12)+SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n06)+SUM(b.n08)+SUM(b.n12),--total
-SUM(b.n01)+SUM(b.n02)+SUM(b.n03)+SUM(b.n04)+SUM(b.n13)+SUM(b.n14)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--total2
-SUM(b.n01)+SUM(b.n05)+SUM(b.n02)+SUM(b.n06)+SUM(b.n03)+SUM(b.n07)+SUM(b.n04)+SUM(b.n08)+SUM(b.n11)+SUM(b.n13)+SUM(b.n12)+SUM(b.n14)
-+SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13)+SUM(b.n06)+SUM(b.n08)+SUM(b.n12)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--total3
+SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n06)+SUM(b.n08)+SUM(b.n12),--total
+SUM(b.n01)+SUM(b.n03)+SUM(b.n13)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--total2
+SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n06)+SUM(b.n08)+SUM(b.n12)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--total3
 min(a.v02),max(a.v02),count(1)
 from borr a
 left join borrs b on a.noa=b.noa
@@ -159,9 +160,10 @@ insert into @tmp (gno,ww)
 select '5',ww from @tmp
 group by ww
 
-select DISTINCT * from @tmp order by ww,gno;
+select DISTINCT a.*,(@t_user) as worker from @tmp a order by ww,gno;
 ---------------------------------------------------------------------------------
 z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
+declare @t_user nvarchar(max) = '[4]'
 declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 declare @tmp table(
 	gno nvarchar(1),
@@ -229,7 +231,7 @@ end
 close cursor_table
 deallocate cursor_table
 ------------------------------------------------------------------------
-select * from @tmp order by gno,noq;
+select a.*,(@t_user) as worker from @tmp a order by gno,noq;
 -------------------------------------------------------------------
 z_trans_ln04:--z_trans_ln04 z_trans_ln.txt	
 	SET QUOTED_IDENTIFIER OFF
