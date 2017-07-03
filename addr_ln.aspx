@@ -33,7 +33,9 @@
             brwList = [];
             brwNowPage = 0;
             brwKey = 'Noa';
-            aPop = new Array();
+            aPop = new Array(['txtCustno_', 'BtnCust_', 'cust', 'noa,nick', 'txtCustno_,txtCust_', 'cust_b.aspx'],
+				['txtStraddrno', 'lblStraddr', 'addr2', 'noa,addr', 'txtStraddrno,txtStraddr', 'addr2_b.aspx'],
+				['txtEndaddrno', 'lblEndaddr', 'addr2', 'noa,addr', 'txtEndaddrno,txtEndaddr', 'addr2_b.aspx']);
             $(document).ready(function() {
                 bbmKey = ['noa'];
                 bbsKey = ['noa', 'noq'];
@@ -155,8 +157,16 @@
 
             function bbsAssign() {
                 for (var i = 0; i < q_bbsCount; i++) {
+                	$('#lblNo_' + i).text(i + 1);
                 	if($('#btnMinus_' + i).hasClass('isAssign'))
                     	continue;
+                    $('#txtCustno_' + i).bind('contextmenu', function(e) {
+                        /*滑鼠右鍵*/
+                        e.preventDefault();
+                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
+                        $('#btnCust_'+n).click();
+                    });	
+                    	
                 }
                 _bbsAssign();
                 $('#tbbs').find('tr.data').children().hover(function(e){
@@ -429,9 +439,17 @@
 						</td>
 					</tr>
 					<tr>
-						<td><span> </span><a id='lblAddr' class="lbl"> </a></td>
+						<td><span> </span><a id='lblStraddr' class="lbl btn"> </a></td>
 						<td colspan="3">
-						<input id="txtAddr" type="text" class="txt c1" />
+							<input id="txtStraddrno" type="text" class="txt" style="float:left;width:45%;" />
+							<input id="txtStraddr" type="text" class="txt" style="float:left;width:55%;"/>
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id='lblEndaddr' class="lbl btn"> </a></td>
+						<td colspan="3">
+							<input id="txtEndaddrno" type="text" class="txt" style="float:left;width:45%;" />
+							<input id="txtEndaddr" type="text" class="txt" style="float:left;width:55%;"/>
 						</td>
 					</tr>
 					<tr> 
@@ -450,7 +468,9 @@
 					<td  align="center" style="width:30px;">
 						<input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  />
 					</td>
+					<td style="width:20px;"> </td>
 					<td align="center" style="width:80px;"><a>生效日期</a></td>
+					<td align="center" style="width:150px;"><a>客戶</a></td>
 					<td align="center" style="width:80px;"><a>規格</a></td>
 					<td align="center" style="width:80px;"><a>應收單價</a></td>
 					<td align="center" style="width:80px;"><a>應付單價</a></td>
@@ -461,7 +481,13 @@
 						<input class="btn"  id="btnMinus.*" type="button" value='-' style=" font-weight: bold;" />
 						<input id="txtNoq.*" type="text" style="display: none;" />
 					</td>
+					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
 					<td><input type="text" id="txtDatea.*" style="width:95%;" /></td>
+					<td>
+						<input type="text" id="txtCustno.*" style="width:45%;float:left;" />
+						<input type="text" id="txtCust.*" style="width:50%;"float:left;/>
+						<input type="button" id="btnCust.*" style="display:none;" />
+					</td>
 					<td><input type="text" id="txtCustunit.*" style="width:95%;" list="listUnit"/></td>
 					<td><input type="text" id="txtCustprice.*" style="width:95%;text-align:right;" /></td>
 					<td><input type="text" id="txtDriverprice.*" style="width:95%;text-align:right;" /></td>
