@@ -295,7 +295,7 @@
             }
             .dview {
                 float: left;
-                width: 300px;
+                width: 600px;
                 border-width: 0px;
             }
             .tview {
@@ -411,13 +411,15 @@
 				<table class="tview" id="tview">
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
-						<td align="center" style="width:100px; color:black;"><a id='vewNoa'> </a></td>
-						<td align="center" style="width:200px; color:black;"><a id='vewAddr'> </a></td>
+						<td align="center" style="width:200px; color:black;"><a id='vewNoa'> </a></td>
+						<td align="center" style="width:200px; color:black;"><a id='vewStraddr'> </a></td>
+						<td align="center" style="width:200px; color:black;"><a id='vewEndaddr'> </a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox" /></td>
 						<td style="text-align: center;" id='noa'>~noa</td>
-						<td style="text-align: left;" id='addr'>~addr</td>
+						<td style="text-align: left;" id='straddr'>~straddr</td>
+						<td style="text-align: left;" id='endaddr'>~endaddr</td>
 					</tr>
 				</table>
 			</div>

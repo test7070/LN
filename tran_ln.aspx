@@ -38,8 +38,8 @@
 			q_alias = '';
 			q_desc = 1;
 			brwCount2 = 7;
-			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr_b.aspx']
-				,['txtAddrno2_', 'btnAddr2_', 'addr', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr_b.aspx']
+			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr2', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr2_b.aspx']
+				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
 				,['txtCustno', 'lblCust', 'cust', 'noa,nick', 'txtCustno,txtCust', 'cust_b.aspx']
 				,['txtPartno', 'lblPart2', 'cust', 'noa,nick', 'txtPartno,txtPart', 'cust_b.aspx']
 				,['txtSalesno', 'lblSales', 'cardeal', 'noa,nick', 'txtSalesno,txtSales', 'cardeal_b.aspx']);

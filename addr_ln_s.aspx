@@ -14,7 +14,8 @@
 		<script src="css/jquery/ui/jquery.ui.widget.js"></script>
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
-            aPop = new Array(['txtNoa', '', 'addr', 'noa,addr', 'txtNoa', 'addr_b.aspx']);
+            aPop = new Array(['txtStraddr', 'lblStraddr', 'addr2', 'noa,addr', 'txtStraddr,txtStraddr', 'addr2_b.aspx']
+            	,['txtEndaddr', 'lblEndaddr', 'addr2', 'noa,addr', 'txtEndaddr,txtEndaddr', 'addr2_b.aspx']);
             var q_name = "addr_s";
 
             $(document).ready(function() {
@@ -35,12 +36,15 @@
 
             function q_seekStr() {
                 t_noa = $('#txtNoa').val();
-                t_addr = $.trim($('#txtAddr').val());
+                t_straddr = $.trim($('#txtStraddr').val());
+                t_endaddr = $.trim($('#txtEndaddr').val());
 				t_memo = $.trim($('#txtMemo').val());
                 var t_where = " 1=1 " 
                 	+ q_sqlPara2("noa", t_noa);
-                if (t_addr.length > 0)
-                    t_where += " and charindex('" + t_addr + "',addr)>0";
+                if (t_straddr.length > 0)
+                    t_where += " and charindex(N'" + t_straddr + "',straddr)>0";
+                if (t_endaddr.length > 0)
+                    t_where += " and charindex(N'" + t_endaddr + "',endaddr)>0";
                 if (t_memo.length > 0){
                 	t_where += " and (charindex('" + t_memo + "',memo)>0"
                 		+" or exists(select noq from addrs where addrs.noa=addr.noa and  (charindex('" + t_memo + "',addrs.memo)>0)))";
@@ -68,9 +72,15 @@
 					</td>
 				</tr>
 				<tr class='seek_tr'>
-					<td class='seek'  style="width:20%;"><a id='lblAddr'></a></td>
+					<td class='seek'  style="width:20%;"><a id='lblStraddr'></a></td>
 					<td>
-					<input class="txt" id="txtAddr" type="text" style="width:215px; font-size:medium;" />
+					<input class="txt" id="txtStraddr" type="text" style="width:215px; font-size:medium;" />
+					</td>
+				</tr>
+				<tr class='seek_tr'>
+					<td class='seek'  style="width:20%;"><a id='lblEndaddr'></a></td>
+					<td>
+					<input class="txt" id="txtEndaddr" type="text" style="width:215px; font-size:medium;" />
 					</td>
 				</tr>
 				<tr class='seek_tr'>
