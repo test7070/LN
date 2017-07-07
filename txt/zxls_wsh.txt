@@ -265,6 +265,12 @@ zxls_wsh:--zxls_wsh
 		declare @noa nvarchar(20) = ''
 		select @noa=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('_',@filename)-4)
 		
+		if not exists(select * from borr where noa=@noa)
+		begin
+			-- 找不到表頭
+			return
+		end
+		
 		declare @tmpss table(
 			sel int identity(1,1)
 			,bayno nvarchar(20)
