@@ -18,7 +18,7 @@
 			var q_name = "borr";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2'
 				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'
-				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14'];
+				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14','textA15'];
 			var q_readonlys = [];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
@@ -26,7 +26,7 @@
 			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0]
 				,['txtN03',10,0],['txtN04',10,0],['txtN05',10,0],['txtN06',10,0]
 				,['txtN07',10,0],['txtN08',10,0],['txtN09',10,0],['txtN10',10,0]
-				,['txtN11',10,0],['txtN12',10,0],['txtN13',10,0],['txtN14',10,0]);
+				,['txtN11',10,0],['txtN12',10,0],['txtN13',10,0],['txtN14',10,0],['txtN15',10,0]);
 			var bbsMask = new Array();
 			var bbtNum  = new Array(); 
 			var bbtMask = new Array();
@@ -233,7 +233,7 @@
 			
 			function refreshBbs(){
 				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0
-					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0;
+					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0,t15=0;
 				for(var i=0;i<q_bbsCount;i++){
 					t01 += q_float('txtN01_'+i);
 					t02 += q_float('txtN02_'+i);
@@ -249,6 +249,13 @@
 					t12 += q_float('txtN12_'+i);
 					t13 += q_float('txtN13_'+i);
 					t14 += q_float('txtN14_'+i);
+					t = q_float('txtN01_'+i)+q_float('txtN02_'+i)+q_float('txtN03_'+i)
+						+q_float('txtN04_'+i)+q_float('txtN05_'+i)+q_float('txtN06_'+i)
+						+q_float('txtN07_'+i)+q_float('txtN08_'+i)+q_float('txtN09_'+i)
+						+q_float('txtN10_'+i)+q_float('txtN11_'+i)+q_float('txtN12_'+i)
+						+q_float('txtN13_'+i)+q_float('txtN14_'+i);
+					t15 += t;
+					$('#txtN15_'+i).val(t);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
@@ -264,6 +271,7 @@
 				$('#textA12').val(t12);
 				$('#textA13').val(t13);
 				$('#textA14').val(t14);	
+				$('#textA15').val(t15);	
 			}
 
 			function readonly(t_para, empty) {
@@ -578,7 +586,7 @@
 			</div>
 			<img id="img" crossorigin="anonymous" style="float:left;display:none;"/> 
 		</div>
-		<div style="width: 1750px;">
+		<div style="width: 1900px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
@@ -590,10 +598,12 @@
 					<td align="center" colspan="2" rowspan="2"><a>IN<BR>HATCH<BR>SHIFT</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>SHIFT</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>RELOAD</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>小計</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>櫃型</a></td>
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
 					<!--  -->
@@ -607,10 +617,12 @@
 					<!-- IN HATCH SHIFT -->
 					<!-- SHIFT -->
 					<!-- RELOAD -->
+					<!-- 小計 -->
 					<!-- TIME -->
 					<!-- ADDR -->
 					<!-- ADDR2 -->
 					<!-- MEMO -->
+					<!-- CASETYPE -->
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
 					<!--  -->
@@ -636,11 +648,12 @@
 					<!-- ADDR -->
 					<!-- ADDR2 -->
 					<!-- MEMO -->
+					<!-- CASETYPE -->
 				</tr>
 			</table>
 		</div>
 		
-		<div class='dbbs' style="width: 1750px;">
+		<div class='dbbs' style="width: 1900px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px"> </td>
@@ -661,11 +674,13 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>MEMO</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>櫃型</a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
 					<td align="center" style="width:50px">
@@ -689,6 +704,7 @@
 					<td style="width:50px;"><input type="text" id="txtN12.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:50px;"><input type="text" id="txtN13.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:50px;"><input type="text" id="txtN14.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN15.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:100px;"><input type="text" id="txtIndate.*" style="width:95%;"/></td>
 					<td style="width:100px;"><input type="text" id="txtEdate.*" style="width:95%;"/></td>
 					<td style="width:200px">
@@ -702,10 +718,11 @@
 						<input type="button" id="btnAddr2.*" style="display:none;"/>
 					</td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
+					<td style="width:50px;"><input type="text" id="txtCasetype.*" style="width:95%;"/></td>
 				</tr>
 			</table>
 		</div>
-		<div style="width: 1750px;">
+		<div style="width: 1900px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
@@ -726,11 +743,13 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA12" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA13" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA14" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA15" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 				</tr>
 			</table>
 		</div>
