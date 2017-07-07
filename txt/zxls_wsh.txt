@@ -311,4 +311,4 @@ zxls_wsh:--zxls_wsh
 			,right('000'+cast(ROW_NUMBER()over(order by sel)+@nn as nvarchar),3)
 			,bayno,caseno,spec
 		from @tmpss
-	end
+	end;

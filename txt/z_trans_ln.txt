@@ -739,6 +739,7 @@ z_trans_ln01:--z_trans_ln01  z_trans_ln.txt
 	left join borrs b on a.noa=b.noa
 	where a.vccno='WORK'
 	and a.noa = @t_noa
+	and b.[sign]!='borrs'
 	order by a.noa,b.noq
 	
 	insert into @tmp(gno,pno,noa
