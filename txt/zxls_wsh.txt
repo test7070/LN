@@ -1,0 +1,308 @@
+zxls_wsh:--zxls_wsh
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @workerno nvarchar(max) = [1]
+	declare @worker nvarchar(max) = [2]
+	declare @filename nvarchar(max) = [3]
+	declare @curdate nvarchar(max) = convert(nvarchar,getDate(),120)
+	---------------------------------------------------------------------------------------------------------
+	declare @a nvarchar(max)
+	declare @b nvarchar(max)
+	declare @c nvarchar(max)
+	declare @d nvarchar(max)
+	declare @e nvarchar(max)
+	declare @f nvarchar(max)
+	declare @g nvarchar(max)
+	declare @h nvarchar(max)
+	declare @i nvarchar(max)
+	declare @j nvarchar(max)
+	declare @k nvarchar(max)
+	declare @l nvarchar(max)
+	declare @m nvarchar(max)
+	declare @n nvarchar(max)
+	declare @o nvarchar(max)
+	declare @p nvarchar(max)
+	declare @q nvarchar(max)
+	declare @r nvarchar(max)
+	declare @s nvarchar(max)
+	
+	declare @nn int
+	---- 表頭
+	if exists(select * from ztmpxls where b='WORKING SHEET')
+	begin
+		declare @tmp table(
+			mv nvarchar(20)
+			,voyage nvarchar(20)
+			,[service] nvarchar(20)
+			,[no] nvarchar(20)
+			
+			,arrival datetime
+			,pob datetime
+			,berth datetime
+			,wharf nvarchar(20)
+			
+			,unlashing datetime
+			,lashing datetime
+			
+			,[plan] datetime--departure
+			,act datetime--departure
+			
+			,hrs float
+			,worker nvarchar(20)
+		)
+		declare @tmps table(
+			sel int identity(1,1)
+			,noa nvarchar(20)
+			,noq nvarchar(10)
+			,bayno nvarchar(20)
+			,commence datetime
+			,complete datetime
+			
+			,laden_dis_20 float
+			,laden_dis_40 float
+			,laden_load_20 float
+			,laden_load_40 float
+			,empty_dis_20 float
+			,empty_dis_40 float
+			,empty_load_20 float
+			,empty_load_40 float
+			,in_hatch_shift_20 float
+			,in_hatch_shift_40 float
+			,shift_20 float
+			,shift_40 float
+			,reload_20 float
+			,reload_40 float
+		)
+	
+		insert into @tmp([no])values('')
+		declare @curbayno nvarchar(20) = ''
+		
+		declare cursor_table cursor for
+		select a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s from ztmpxls order by CAST(noa as int)
+		open cursor_table
+		fetch next from cursor_table
+		into @a,@b,@c,@d,@e,@f,@g,@h,@i,@j,@k,@l,@m,@n,@o,@p,@q,@r,@s
+		while(@@FETCH_STATUS <> -1)
+		begin
+			begin try	
+				if @b = 'MV.:'
+				begin
+					update @tmp set mv=@c
+				end
+				if @g = 'VOYAGE:'
+				begin
+					update @tmp set voyage=@i
+				end
+				if @l = 'SERVICE:'
+				begin
+					update @tmp set [service]=@n
+				end
+				if @p = 'NO:'
+				begin
+					update @tmp set [no]=@q
+				end
+				
+				if @b = 'ARRIVAL:'
+				begin
+					update @tmp set [arrival]= cast(case when charindex('上午',@d)>0 then replace(@d,'上午','')+' AM'
+						when charindex('下午',@d)>0 then replace(@d,'下午','')+' PM'
+						else @d end as datetime)
+				end
+				if @g = 'P.O.B:'
+				begin
+					update @tmp set [pob]= cast(case when charindex('上午',@h)>0 then replace(@h,'上午','')+' AM'
+						when charindex('下午',@h)>0 then replace(@h,'下午','')+' PM'
+						else @h end as datetime)
+				end
+				if @k = 'BERTH:'
+				begin
+					update @tmp set [berth]= cast(case when charindex('上午',@m)>0 then replace(@m,'上午','')+' AM'
+						when charindex('下午',@m)>0 then replace(@m,'下午','')+' PM'
+						else @m end as datetime)
+				end
+				if @p = 'WHARF NO:'
+				begin
+					update @tmp set [wharf]= @r
+				end
+				if @b = 'UNLASHING:'
+				begin
+					update @tmp set [unlashing]= cast(case when charindex('上午',@f)>0 then replace(@f,'上午','')+' AM'
+						when charindex('下午',@f)>0 then replace(@f,'下午','')+' PM'
+						else @f end as datetime)
+				end
+				if @i = 'LASHING:'
+				begin
+					update @tmp set [lashing]= cast(case when charindex('上午',@m)>0 then replace(@m,'上午','')+' AM'
+						when charindex('下午',@m)>0 then replace(@m,'下午','')+' PM'
+						else @m end as datetime)
+				end
+				if @b = 'DEPARTURE(PLAN):'
+				begin
+					update @tmp set [plan]= cast(case when charindex('上午',@f)>0 then replace(@f,'上午','')+' AM'
+						when charindex('下午',@f)>0 then replace(@f,'下午','')+' PM'
+						else @f end as datetime)
+				end
+				if @i = 'DEPARTURE(ACT):'
+				begin
+					update @tmp set [act]= cast(case when charindex('上午',@m)>0 then replace(@m,'上午','')+' AM'
+						when charindex('下午',@m)>0 then replace(@m,'下午','')+' PM'
+						else @f end as datetime)
+					update @tmp set hrs = CAST(@q as float)	
+				end
+				if @m = '理貨領班:'
+				begin
+					update @tmp set worker=ltrim(rtrim(@o))
+				end
+				
+				-- borrs
+				if @c = 'GC' and len(@d)>0
+				begin
+					insert into @tmps(bayno,commence,complete)
+					select @d
+						,cast(case when charindex('上午',@h)>0 then replace(@h,'上午','')+' AM'
+						when charindex('下午',@h)>0 then replace(@h,'下午','')+' PM'
+						else @h end as datetime)
+						,cast(case when charindex('上午',@n)>0 then replace(@n,'上午','')+' AM'
+						when charindex('下午',@n)>0 then replace(@n,'下午','')+' PM'
+						else @n end as datetime)
+						
+					set @curbayno = @d
+				end
+				if @c = 'SUB' 
+					and not( LEN(@d)=0 and LEN(@e)=0 and LEN(@f)=0 and LEN(@g)=0 and LEN(@h)=0 and LEN(@i)=0 and LEN(@j)=0
+						 and LEN(@k)=0 and LEN(@l)=0 and LEN(@m)=0 and LEN(@n)=0 and LEN(@o)=0 and LEN(@p)=0 and LEN(@q)=0)
+				begin
+					update @tmps set laden_dis_20 = CAST(@d as float)
+						,laden_dis_40 = CAST(@e as float)
+						,laden_load_20 = CAST(@f as float)
+						,laden_load_40 = CAST(@g as float)
+						,empty_dis_20 = CAST(@h as float)
+						,empty_dis_40 = CAST(@i as float)
+						,empty_load_20 = CAST(@j as float)
+						,empty_load_40 = CAST(@k as float)
+						,in_hatch_shift_20 = CAST(@l as float)
+						,in_hatch_shift_40 = CAST(@m as float)
+						,shift_20 = CAST(@n as float)
+						,shift_40 = CAST(@o as float)
+						,reload_20 = CAST(@p as float)
+						,reload_40 = CAST(@q as float)
+					where bayno=@curbayno
+				end
+			end try
+			begin catch 
+				--nothing
+			end catch
+
+			fetch next from cursor_table
+			into @a,@b,@c,@d,@e,@f,@g,@h,@i,@j,@k,@l,@m,@n,@o,@p,@q,@r,@s
+		end
+		close cursor_table
+		deallocate cursor_table
+	
+		-- 寫入BORR
+		declare @memo nvarchar(max)
+		declare @pob datetime
+		declare @unlashing datetime
+		declare @lashing datetime
+		declare @plan datetime
+		declare @act datetime
+		
+		declare @no nvarchar(20) = ''
+		select @no=[no] from @tmp where len([no])>0
+		select @pob=pob
+			,@unlashing=unlashing
+			,@lashing=lashing
+			,@plan=[plan]
+			,@act=act
+		from @tmp
+
+		set @memo = 'P.O.B.：'+convert(nvarchar,@pob,120)+CHAR(10)
+			+'UNLASHING：'+convert(nvarchar,@unlashing,120)+CHAR(10)
+			+'LASHING：'+convert(nvarchar,@lashing,120)+CHAR(10)
+			+'DEPARTURE(PLAN)：'+convert(nvarchar,@plan,120)+CHAR(10)
+			+'DEPARTURE(ACT):：'+convert(nvarchar,@act,120)
+				
+		if LEN(isnull(@no,''))>0 and not exists(select * from borr where noa=@no)
+		begin
+			insert into borr(vccno,noa,datea,v02,v03,v04,v01,begindate,v05,v06,memo,worker)
+			select 'WORK',[no],convert(nvarchar,arrival,111),mv,voyage,[service],[no]
+				,convert(nvarchar,arrival,111)
+				,convert(nvarchar,berth,111)
+				,wharf,@memo,worker
+			from @tmp
+		end
+		else if LEN(isnull(@no,''))>0 and exists(select * from borr where noa=@no)
+		begin
+			update borr set datea=convert(nvarchar,b.arrival,111)
+				,v02=b.mv,v03=b.voyage,v04=b.[service],v01=b.[no]
+				,begindate=convert(nvarchar,b.arrival,111)
+				,v05=convert(nvarchar,b.berth,111)
+				,v06=b.wharf,memo=@memo,worker=b.worker
+			from borr a
+			left join @tmp b on a.[noa]=b.[no]
+			where b.[no] is not null
+		end
+		
+		--寫入BORRS
+		delete borrs where noa=@no and [sign]='borr'
+		select @nn = MAX(cast(noq as int)) from borrs where noa=@no
+		set @nn = ISNULL(@nn,0)
+		insert into borrs([sign],noa,noq,typea,indate,edate
+			,n01,n02,n03,n04,n05,n06,n07
+			,n08,n09,n10,n11,n12,n13,n14)
+		select 'borr',@no
+			,right('000'+cast(ROW_NUMBER()over(order by sel)+@nn as nvarchar),3)
+			,bayno,convert(nvarchar,commence,120),convert(nvarchar,complete,120)
+			,laden_dis_20,laden_dis_40,laden_load_20,laden_load_40
+			,empty_dis_20,empty_dis_40,empty_load_20,empty_load_40
+			,in_hatch_shift_20,in_hatch_shift_40,shift_20,shift_40
+			,reload_20,reload_40
+		from @tmps
+	end
+	else
+	begin
+		-- 表身
+		declare @noa nvarchar(20) = ''
+		select @noa=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('_',@filename)-4)
+		
+		declare @tmpss table(
+			sel int identity(1,1)
+			,bayno nvarchar(20)
+			,caseno nvarchar(20)
+			,spec nvarchar(20)
+		)
+		
+		declare cursor_table cursor for
+		select a,b,c,d,e,f from ztmpxls order by CAST(noa as int)
+		open cursor_table
+		fetch next from cursor_table
+		into @a,@b,@c,@d,@e,@f
+		while(@@FETCH_STATUS <> -1)
+		begin
+			if @a!='Trailer_No' and CHARINDEX('計算',@b)=0
+			begin
+				if LEN(ISNULL(@a,''))>0
+				begin
+					set @curbayno = ltrim(rtrim(@a))
+				end
+				
+				insert into @tmpss(bayno,caseno,spec)
+				select @curbayno,@b,case @d when '2' then '20' when '4' then '40' end + "'"+@c
+			end
+
+			fetch next from cursor_table
+			into @a,@b,@c,@d,@e,@f
+		end
+		close cursor_table
+		deallocate cursor_table
+		
+		--寫入BORRS
+		delete borrs where noa=@noa and [sign]='borrs'
+		select @nn = MAX(cast(noq as int)) from borrs where noa=@noa
+		set @nn = ISNULL(@nn,0)
+		insert into borrs([sign],noa,noq,typea,memo,casetype)
+		select 'borrs',@noa
+			,right('000'+cast(ROW_NUMBER()over(order by sel)+@nn as nvarchar),3)
+			,bayno,caseno,spec
+		from @tmpss
+	end
