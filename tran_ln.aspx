@@ -42,7 +42,7 @@
 				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
 				,['txtCustno', 'lblCust', 'cust', 'noa,nick', 'txtCustno,txtCust', 'cust_b.aspx']
 				,['txtPartno', 'lblPart2', 'cust', 'noa,nick', 'txtPartno,txtPart', 'cust_b.aspx']
-				,['txtSalesno', 'lblSales', 'cardeal', 'noa,nick', 'txtSalesno,txtSales', 'cardeal_b.aspx']);
+				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']);
 			
 			var _status = {bbs:[]};	
 			function sum() {
@@ -87,7 +87,12 @@
 					}
                     if($('#btnMinus_' + i).hasClass('isAssign'))
                     	continue;
-                    	
+                    $('#txtCardealno_' + i).bind('contextmenu', function(e) {
+                        /*滑鼠右鍵*/
+                        e.preventDefault();
+                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
+                        $('#btnCardeal_'+n).click();
+                    });	
                     $('#txtAddrno_' + i).bind('contextmenu', function(e) {
                         /*滑鼠右鍵*/
                         e.preventDefault();
@@ -519,11 +524,11 @@
 						<td><input type="text" id="txtV08" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl" id="lblSales">車行</a></td>
+						<!--<td><span> </span><a class="lbl" id="lblSales">車行</a></td>
 						<td>
 							<input type="text" id="txtSalesno" class="txt" style="float:left;width:40%;"/>
 							<input type="text" id="txtSales" class="txt" style="float:left;width:60%;"/>
-						</td>
+						</td>-->
 						<td><span> </span><a class="lbl" id="lblCust">客戶</a></td>
 						<td>
 							<input type="text" id="txtCustno" class="txt" style="float:left;width:40%;"/>
@@ -586,12 +591,13 @@
 			</div>
 			<img id="img" crossorigin="anonymous" style="float:left;display:none;"/> 
 		</div>
-		<div style="width: 1900px;">
+		<div style="width: 2000px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:100px;"><a>車行</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:80px;"><a>BAY<BR>NO.</a></td>
 					<td align="center" colspan="4" rowspan="1"><a>LADEN</a></td>
 					<td align="center" colspan="4" rowspan="1"><a>EMPTY</a></td>
@@ -609,6 +615,7 @@
 					<!--  -->
 					<!--  -->
 					<!-- CHK1 -->
+					<!-- 車行 -->
 					<!-- BAY NO. -->
 					<td align="center" colspan="2" rowspan="1"><a>DIS</a></td>
 					<td align="center" colspan="2" rowspan="1"><a>LOAD</a></td>
@@ -628,6 +635,7 @@
 					<!--  -->
 					<!--  -->
 					<!-- CHK1 -->
+					<!-- 車行 -->
 					<!-- BAY NO. -->
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">20'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">40'</a></td>
@@ -653,12 +661,13 @@
 			</table>
 		</div>
 		
-		<div class='dbbs' style="width: 1900px;">
+		<div class='dbbs' style="width: 2000px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px"> </td>
 					<td align="center" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
@@ -689,6 +698,11 @@
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
+					<td style="width:100px">
+						<input type="text" id="txtCardealno.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtCardeal.*" style="float:left;width:55%;"/>
+						<input type="button" id="btnCardeal.*" style="display:none;"/>
+					</td>
 					<td style="width:80px"><input type="text" id="txtTypea.*" style="width:95%;"/></td>
 					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:50px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
@@ -722,12 +736,13 @@
 				</tr>
 			</table>
 		</div>
-		<div style="width: 1900px;">
+		<div style="width: 2000px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>TOTAL</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
