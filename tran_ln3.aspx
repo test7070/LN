@@ -14,8 +14,7 @@
 		<script src="css/jquery/ui/jquery.ui.widget.js"></script>
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
-			//萬海船邊
-			
+			//萬海移櫃
 			q_tables = 's';
 			var q_name = "borr";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2'
@@ -60,7 +59,7 @@
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
 				q_brwCount();
-				q_content = "where=^^ vccno='WORK'^^";
+				q_content = "where=^^ vccno='Y'^^";
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 			});
 			function main() {
@@ -74,7 +73,7 @@
 			function mainPost() {
 				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtV09',r_picd],['txtV10',r_picd]);
 				q_mask(bbmMask);
-				document.title = 'WORKING SHEET';
+				document.title = '移櫃';
 			}
             
 			function bbsAssign() {
@@ -518,12 +517,44 @@
 						<td class="tdZ"> </td>
 					</tr>
 					<tr>
+						<td><span> </span><a class="lbl">PLAN_ID</a></td>
+						<td><input type="text" id="txtV08" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">作業日期(起)</a></td>
+						<td><input type="text" id="txtBegindate" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">作業日期(迄)</a></td>
+						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
+					</tr>
+					<tr>
+						<td><span> </span><a class="lbl">船名</a></td>
+						<td><input type="text" id="txtV02" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">航次</a></td>
+						<td><input type="text" id="txtV03" class="txt c1"/></td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>
+						<td colspan="5">
+							<textarea id="txtMemo" class="txt c1" style="height:75px;"> </textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
+						<td><input id="txtWorker" type="text"  class="txt c1"/></td>
+						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
+						<td><input id="txtWorker2" type="text"  class="txt c1"/></td>
+						<td><span> </span><a id="lblNoa" class="lbl"> </a></td>
+						<td>
+							<input type="text" id="txtNoa" class="txt c1"/>
+							<input type="text" id="txtVccno" style="display:none;"/>
+						</td>
+					</tr>
+					
+						
+					<tr>
 						<td><span> </span><a class="lbl">工作單號</a></td>
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1" title="作業日期"/></td>
-						<td><span> </span><a class="lbl">PLAN_ID</a></td>
-						<td><input type="text" id="txtV08" class="txt c1"/></td>
+						
 					</tr>
 					<tr>
 						<!--<td><span> </span><a class="lbl" id="lblSales">車行</a></td>
@@ -543,24 +574,19 @@
 						</td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">M. V.</a></td>
-						<td><input type="text" id="txtV02" class="txt c1" title="船名"/></td>
-						<td><span> </span><a class="lbl">VOY NO.</a></td>
-						<td><input type="text" id="txtV03" class="txt c1" title="航次"/></td>
+						
 						<td><span> </span><a class="lbl">PORT.</a></td>
 						<td><input type="text" id="txtV04" class="txt c1"/ title="靠泊碼頭"></td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">ARRIVAL</a></td>
-						<td><input type="text" id="txtBegindate" class="txt c1"/></td>
+						
 						<td><span> </span><a class="lbl">BERTHED</a></td>
 						<td><input type="text" id="txtV05" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">WHARF NO</a></td>
 						<td><input type="text" id="txtV06" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">DEPARTURE</a></td>
-						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
+						
 						<td colspan="2"><span> </span><a class="lbl">ETA AT NEXT PORT</a></td>
 						<td colspan="2"><input type="text" id="txtV07" class="txt c1"/></td>
 					</tr>
@@ -572,126 +598,42 @@
 						<td><span> </span><a class="lbl">完工編號</a></td>
 						<td><input type="text" id="txtV11" class="txt c1"/></td>
 					</tr>
-					<tr>
-						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>
-						<td colspan="5">
-							<textarea id="txtMemo" class="txt c1" style="height:75px;"> </textarea>
-						</td>
-					</tr>
-					<tr>
-						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
-						<td><input id="txtWorker" type="text"  class="txt c1"/></td>
-						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
-						<td><input id="txtWorker2" type="text"  class="txt c1"/></td>
-						<td><span> </span><a id="lblNoa" class="lbl"> </a></td>
-						<td>
-							<input type="text" id="txtNoa" class="txt c1"/>
-							<input type="text" id="txtVccno" style="display:none;"/>
-						</td>
-					</tr>
+					
 				</table>
 			</div>
-			<img id="img" crossorigin="anonymous" style="float:left;display:none;"/> 
 		</div>
-		<div style="width: 2000px;">
+		<div style="width: 900px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 				
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:100px;"><a>車行</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:80px;"><a>BAY<BR>NO.</a></td>
-					<td align="center" colspan="4" rowspan="1"><a>LADEN</a></td>
-					<td align="center" colspan="4" rowspan="1"><a>EMPTY</a></td>
-					<td align="center" colspan="2" rowspan="2"><a>IN<BR>HATCH<BR>SHIFT</a></td>
-					<td align="center" colspan="2" rowspan="2"><a>SHIFT</a></td>
-					<td align="center" colspan="2" rowspan="2"><a>RELOAD</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>小計</a></td>
-					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起點</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>迄點</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>櫃型</a></td>
-				</tr>
-				<tr style='color:white; background:#003366;' > 	
-					<!--  -->
-					<!--  -->
-					<!-- CHK1 -->
-					<!-- 車行 -->
-					<!-- BAY NO. -->
-					<td align="center" colspan="2" rowspan="1"><a>DIS</a></td>
-					<td align="center" colspan="2" rowspan="1"><a>LOAD</a></td>
-					<td align="center" colspan="2" rowspan="1"><a>DIS</a></td>
-					<td align="center" colspan="2" rowspan="1"><a>LOAD</a></td>
-					<!-- IN HATCH SHIFT -->
-					<!-- SHIFT -->
-					<!-- RELOAD -->
-					<!-- 小計 -->
-					<!-- TIME -->
-					<!-- ADDR -->
-					<!-- ADDR2 -->
-					<!-- MEMO -->
-					<!-- CASETYPE -->
-				</tr>
-				<tr style='color:white; background:#003366;' > 	
-					<!--  -->
-					<!--  -->
-					<!-- CHK1 -->
-					<!-- 車行 -->
-					<!-- BAY NO. -->
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="E">20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="E">40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="E">20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="E">40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a title="F">40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
-					<!-- ADDR -->
-					<!-- ADDR2 -->
-					<!-- MEMO -->
-					<!-- CASETYPE -->
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
+					
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'E</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'E</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'F</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'F</a></td>
+					
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 			</table>
 		</div>
 		
-		<div class='dbbs' style="width: 2000px;">
+		<div class='dbbs' style="width: 900px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px"> </td>
 					<td align="center" style="width:50px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>MEMO</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>櫃型</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
+					
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'E</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'E</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'F</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'F</a></td>
+					
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
 					<td align="center" style="width:50px">
@@ -699,17 +641,29 @@
 						<input type="text" id="txtNoq.*" style="display:none;"/>
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
-					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
+					<td style="width:200px">
+						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
+						<input type="button" id="btnAddr.*" style="display:none;"/>
+					</td>
+					<td style="width:200px">
+						<input type="text" id="txtAddrno2.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtAddr2.*" style="float:left;width:55%;"/>
+						<input type="button" id="btnAddr2.*" style="display:none;"/>
+					</td>
+					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN03.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN04.*" style="width:95%;text-align:right;"/></td>
+					
+					
 					<td style="width:100px">
 						<input type="text" id="txtCardealno.*" style="float:left;width:35%;"/>
 						<input type="text" id="txtCardeal.*" style="float:left;width:55%;"/>
 						<input type="button" id="btnCardeal.*" style="display:none;"/>
 					</td>
 					<td style="width:80px"><input type="text" id="txtTypea.*" style="width:95%;"/></td>
-					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtN03.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtN04.*" style="width:95%;text-align:right;"/></td>
+					
 					<td style="width:50px;"><input type="text" id="txtN05.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:50px;"><input type="text" id="txtN06.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:50px;"><input type="text" id="txtN07.*" style="width:95%;text-align:right;"/></td>
@@ -723,22 +677,13 @@
 					<td style="width:50px;"><input type="text" id="txtN15.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:100px;"><input type="text" id="txtIndate.*" style="width:95%;"/></td>
 					<td style="width:100px;"><input type="text" id="txtEdate.*" style="width:95%;"/></td>
-					<td style="width:200px">
-						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
-						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
-						<input type="button" id="btnAddr.*" style="display:none;"/>
-					</td>
-					<td style="width:200px">
-						<input type="text" id="txtAddrno2.*" style="float:left;width:35%;"/>
-						<input type="text" id="txtAddr2.*" style="float:left;width:55%;"/>
-						<input type="button" id="btnAddr2.*" style="display:none;"/>
-					</td>
+					
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 					<td style="width:50px;"><input type="text" id="txtCasetype.*" style="width:95%;"/></td>
 				</tr>
 			</table>
 		</div>
-		<div style="width: 2000px;">
+		<div style="width: 900px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
