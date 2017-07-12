@@ -160,11 +160,10 @@
 			}
 
 			function btnOk() {
-				if($.trim($('#txtBegindate').val()).length==0){
-					alert('請輸入作業日期(起)');
+				if($.trim($('#txtDatea').val()).length==0){
+					alert('請輸入日期');
 					return;
 				}
-				$('#txtDatea').val($('#txtBegindate').val());
 				sum();
 				if(q_cur ==1){
 					$('#txtWorker').val(r_name);
@@ -450,6 +449,10 @@
 					<tr>
 						<td><span> </span><a class="lbl">PLAN_ID</a></td>
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">日期</a></td>
+						<td><input type="text" id="txtDatea" class="txt c1"/></td>
+					</tr>
+					<tr>
 						<td><span> </span><a class="lbl">作業日期(起)</a></td>
 						<td><input type="text" id="txtBegindate" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期(迄)</a></td>
@@ -476,7 +479,6 @@
 						<td>
 							<input type="text" id="txtNoa" class="txt c1"/>
 							<input type="text" id="txtVccno" style="display:none;"/>
-							<input type="text" id="txtDatea" style="display:none;"/>
 						</td>
 					</tr>
 				</table>
