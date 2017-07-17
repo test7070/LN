@@ -23,8 +23,7 @@
 			var q_readonlyt = [];
 			var bbmNum = new Array();
 			var bbmMask = [];
-			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0]
-				,['txtN03',10,0],['txtN04',10,0],['txtN05',10,0]);
+			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0]);
 			var bbsMask = new Array();
 			var bbtNum  = new Array(); 
 			var bbtMask = new Array();
@@ -37,7 +36,8 @@
 			q_desc = 1;
 			brwCount2 = 7;
 			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr2', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr2_b.aspx']
-				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']);
+				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
+				,['txtCardealno', 'lblCardeal', 'cardeal', 'noa,nick', 'txtCardealno,txtCardeal', 'cardeal_b.aspx']);
 			
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
@@ -90,9 +90,6 @@
                     
                     $('#txtN01_'+i).change(function(e){refreshBbs();});
                     $('#txtN02_'+i).change(function(e){refreshBbs();});
-                    $('#txtN03_'+i).change(function(e){refreshBbs();});
-                    $('#txtN04_'+i).change(function(e){refreshBbs();});
-                    $('#txtN05_'+i).change(function(e){refreshBbs();});
 				}
 				_bbsAssign();
 				$('#tbbs').find('tr.data').children().hover(function(e){
@@ -164,6 +161,7 @@
 					alert('請輸入日期');
 					return;
 				}
+				refreshBbs();
 				sum();
 				if(q_cur ==1){
 					$('#txtWorker').val(r_name);
@@ -200,22 +198,13 @@
 			}
 			
 			function refreshBbs(){
-				var t01=0,t02=0,t03=0,t04=0,t05=0;
+				var t01=0,t02=0;
 				for(var i=0;i<q_bbsCount;i++){
 					t01 += q_float('txtN01_'+i);
 					t02 += q_float('txtN02_'+i);
-					t03 += q_float('txtN03_'+i);
-					t04 += q_float('txtN04_'+i);
-					
-					t = q_float('txtN01_'+i)+q_float('txtN02_'+i)+q_float('txtN03_'+i)+q_float('txtN04_'+i);
-					t05 += t;
-					$('#txtN05_'+i).val(t);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
-				$('#textA03').val(t03);
-				$('#textA04').val(t04);
-				$('#textA05').val(t05);
 			}
 
 			function readonly(t_para, empty) {
@@ -346,9 +335,6 @@
 			.tbbm tr td {
 				width: 12%;
 			}
-			.tbbm .tr2, .tbbm .tr3, .tbbm .tr4 {
-				background-color: #FFEC8B;
-			}
 			.tbbm .tdZ {
 				width: 1%;
 			}
@@ -424,6 +410,7 @@
 						<td align="center" style="width:80px; color:black;"><a>作業日期(迄)</a></td>
 						<td align="center" style="width:80px; color:black;"><a>船名</a></td>
 						<td align="center" style="width:80px; color:black;"><a>航次</a></td>
+						<td align="center" style="width:80px; color:black;"><a>車行</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox"/></td>
@@ -432,6 +419,7 @@
 						<td id='enddate' style="text-align: center;">~enddate</td>
 						<td id='v02' style="text-align: center;">~v02</td>
 						<td id='v03' style="text-align: center;">~v03</td>
+						<td id='cardeal' style="text-align: center;">~cardeal</td>
 					</tr>
 				</table>
 			</div>
@@ -463,6 +451,11 @@
 						<td><input type="text" id="txtV02" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">航次</a></td>
 						<td><input type="text" id="txtV03" class="txt c1"/></td>
+						<td><span> </span><a id="lblCardeal" class="lbl btn">車行</a></td>
+						<td>
+							<input type="text" id="txtCardealno" class="txt" style="float:left;width:50%;"/>
+							<input type="text" id="txtCardeal" class="txt" style="float:left;width:50%;"/>
+						</td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>
@@ -484,37 +477,38 @@
 				</table>
 			</div>
 		</div>
-		<div style="width: 950px;">
+		<div style="width: 1260px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
-					
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'E</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'E</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'F</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'F</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>小計</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>加價</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 			</table>
 		</div>
-		
-		<div class='dbbs' style="width: 950px;">
+		<div class='dbbs' style="width: 1260px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
-					<td align="center" style="width:50px"> </td>
 					<td align="center" style="width:50px;"> </td>
+					<td align="center" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
-					
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'E</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'E</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'F</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'F</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>小計</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>加價</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
@@ -523,6 +517,11 @@
 						<input type="text" id="txtNoq.*" style="display:none;"/>
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
+					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
+					<td style="width:150px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
+					<td style="width:50px;"><input type="text" id="txtEf.*" style="width:95%;"/></td>
+					<td style="width:80px;"><input type="text" id="txtCasetype.*" style="width:95%;"/></td>
+					<td style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>
 					<td style="width:200px">
 						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
 						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
@@ -534,27 +533,25 @@
 						<input type="button" id="btnAddr2.*" style="display:none;"/>
 					</td>
 					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtN03.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtN04.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="txtN05.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:80px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
 			</table>
 		</div>
-		<div style="width: 950px;">
+		<div style="width: 1260px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>TOTAL</a></td>
-					
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA03" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA04" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA05" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 			</table>

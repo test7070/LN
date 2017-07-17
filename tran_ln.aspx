@@ -205,7 +205,7 @@
                     Unlock(1);
                     return;
                 }*/
-                
+                refreshBbs();
 				sum();
 				if(q_cur ==1){
 					$('#txtWorker').val(r_name);
@@ -593,7 +593,7 @@
 			</div>
 			<img id="img" crossorigin="anonymous" style="float:left;display:none;"/> 
 		</div>
-		<div style="width: 2000px;">
+		<div style="width: 2120px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
@@ -610,8 +610,9 @@
 					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>迄點</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:120px;"><a>櫃號</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>櫃型</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
 					<!--  -->
@@ -630,8 +631,9 @@
 					<!-- TIME -->
 					<!-- ADDR -->
 					<!-- ADDR2 -->
-					<!-- MEMO -->
+					<!-- CASENO -->
 					<!-- CASETYPE -->
+					<!-- MEMO -->
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
 					<!--  -->
@@ -657,16 +659,17 @@
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
 					<!-- ADDR -->
 					<!-- ADDR2 -->
-					<!-- MEMO -->
+					<!-- CASENO -->
 					<!-- CASETYPE -->
+					<!-- MEMO -->
 				</tr>
 			</table>
 		</div>
 		
-		<div class='dbbs' style="width: 2000px;">
+		<div class='dbbs' style="width: 2120px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
-					<td align="center" style="width:50px"> </td>
+					<td align="center" style="width:50px;"> </td>
 					<td align="center" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a> </a></td>
@@ -690,8 +693,9 @@
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>MEMO</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:120px;"><a>櫃號</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>櫃型</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>MEMO</a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
 					<td align="center" style="width:50px">
@@ -733,12 +737,13 @@
 						<input type="text" id="txtAddr2.*" style="float:left;width:55%;"/>
 						<input type="button" id="btnAddr2.*" style="display:none;"/>
 					</td>
-					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
+					<td style="width:120px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
 					<td style="width:50px;"><input type="text" id="txtCasetype.*" style="width:95%;"/></td>
+					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
 			</table>
 		</div>
-		<div style="width: 2000px;">
+		<div style="width: 2120px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
@@ -765,8 +770,9 @@
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:120px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 			</table>
 		</div>

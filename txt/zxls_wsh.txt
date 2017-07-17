@@ -306,7 +306,7 @@ zxls_wsh:--zxls_wsh
 		delete borrs where noa=@noa and [sign]='borrs'
 		select @nn = MAX(cast(noq as int)) from borrs where noa=@noa
 		set @nn = ISNULL(@nn,0)
-		insert into borrs([sign],noa,noq,typea,memo,casetype)
+		insert into borrs([sign],noa,noq,typea,caseno,casetype)
 		select 'borrs',@noa
 			,right('000'+cast(ROW_NUMBER()over(order by sel)+@nn as nvarchar),3)
 			,bayno,caseno,spec
