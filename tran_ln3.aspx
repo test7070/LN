@@ -37,7 +37,7 @@
 			brwCount2 = 7;
 			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr2', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr2_b.aspx']
 				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
-				,['txtCardealno', 'lblCardeal', 'cardeal', 'noa,nick', 'txtCardealno,txtCardeal', 'cardeal_b.aspx']);
+				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']);
 			
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
@@ -74,7 +74,12 @@
 					$('#lblNo_' + i).text(i + 1);
                     if($('#btnMinus_' + i).hasClass('isAssign'))
                     	continue;
-                    
+                    $('#txtCardealno_' + i).bind('contextmenu', function(e) {
+                        /*滑鼠右鍵*/
+                        e.preventDefault();
+                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
+                        $('#btnCardeal_'+n).click();
+                    });
                     $('#txtAddrno_' + i).bind('contextmenu', function(e) {
                         /*滑鼠右鍵*/
                         e.preventDefault();
@@ -294,7 +299,7 @@
 			}
 			.dview {
 				float: left;
-				width: 500px;
+				width: 400px;
 				border-width: 0px;
 			}
 			.tview {
@@ -405,21 +410,15 @@
 				<table class="tview" id="tview">
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
-						<td align="center" style="width:80px; color:black;"><a>PLAN_ID</a></td>
-						<td align="center" style="width:80px; color:black;"><a>作業日期(起)</a></td>
-						<td align="center" style="width:80px; color:black;"><a>作業日期(迄)</a></td>
-						<td align="center" style="width:80px; color:black;"><a>船名</a></td>
-						<td align="center" style="width:80px; color:black;"><a>航次</a></td>
-						<td align="center" style="width:80px; color:black;"><a>車行</a></td>
+						<td align="center" style="width:100px; color:black;"><a>PLAN_ID</a></td>
+						<td align="center" style="width:120px; color:black;"><a>進出站時間</a></td>
+						<td align="center" style="width:120px; color:black;"><a>代表航次</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox"/></td>
 						<td id='v01' style="text-align: center;">~v01</td>
-						<td id='begindate' style="text-align: center;">~begindate</td>
-						<td id='enddate' style="text-align: center;">~enddate</td>
+						<td id='datea' style="text-align: center;">~datea</td>
 						<td id='v02' style="text-align: center;">~v02</td>
-						<td id='v03' style="text-align: center;">~v03</td>
-						<td id='cardeal' style="text-align: center;">~cardeal</td>
 					</tr>
 				</table>
 			</div>
@@ -437,25 +436,22 @@
 					<tr>
 						<td><span> </span><a class="lbl">PLAN_ID</a></td>
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
-						<td><span> </span><a class="lbl">日期</a></td>
+						<td><span> </span><a class="lbl">進出站時間</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">作業日期(起)</a></td>
-						<td><input type="text" id="txtBegindate" class="txt c1"/></td>
-						<td><span> </span><a class="lbl">作業日期(迄)</a></td>
-						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">代表航次</a></td>
+						<td><input type="text" id="txtV02" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">抵達碼頭航次</a></td>
+						<td><input type="text" id="txtV03" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">離開碼頭航次</a></td>
+						<td><input type="text" id="txtV04" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">船名</a></td>
-						<td><input type="text" id="txtV02" class="txt c1"/></td>
-						<td><span> </span><a class="lbl">航次</a></td>
-						<td><input type="text" id="txtV03" class="txt c1"/></td>
-						<td><span> </span><a id="lblCardeal" class="lbl btn">車行</a></td>
-						<td>
-							<input type="text" id="txtCardealno" class="txt" style="float:left;width:50%;"/>
-							<input type="text" id="txtCardeal" class="txt" style="float:left;width:50%;"/>
-						</td>
+						<td><span> </span><a class="lbl">進出站</a></td>
+						<td><input type="text" id="txtV05" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">進出口別</a></td>
+						<td><input type="text" id="txtV06" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>
@@ -477,7 +473,7 @@
 				</table>
 			</div>
 		</div>
-		<div style="width: 1260px;">
+		<div style="width: 1360px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
@@ -487,6 +483,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
@@ -495,7 +492,7 @@
 				</tr>
 			</table>
 		</div>
-		<div class='dbbs' style="width: 1260px;">
+		<div class='dbbs' style="width: 1360px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px;"> </td>
@@ -505,6 +502,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
@@ -519,9 +517,14 @@
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
 					<td style="width:150px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
-					<td style="width:50px;"><input type="text" id="txtEf.*" style="width:95%;"/></td>
+					<td style="width:50px;"><input type="text" id="txtEf.*" list="listEf" style="width:95%;"/></td>
 					<td style="width:80px;"><input type="text" id="txtCasetype.*" style="width:95%;"/></td>
 					<td style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>
+					<td style="width:100px">
+						<input type="text" id="txtCardealno.*" style="float:left;width:45%;"/>
+						<input type="text" id="txtCardeal.*" style="float:left;width:45%;"/>
+						<input type="button" id="btnCardeal.*" style="display:none;"/>
+					</td>
 					<td style="width:200px">
 						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
 						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
@@ -538,7 +541,7 @@
 				</tr>
 			</table>
 		</div>
-		<div style="width: 1260px;">
+		<div style="width: 1360px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
@@ -548,6 +551,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>TOTAL</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
@@ -556,6 +560,10 @@
 				</tr>
 			</table>
 		</div>
+		<datalist id="listEf">
+			<option value="E"> </option>
+			<option value="F"> </option>
+		</datalist>
 		<input id="q_sys" type="hidden" />
 	</body>
 </html>
