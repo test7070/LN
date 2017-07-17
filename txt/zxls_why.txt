@@ -1,0 +1,183 @@
+zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @workerno nvarchar(max) = [1]
+	declare @worker nvarchar(max) = [2]
+	declare @filename nvarchar(max) = [3]
+	declare @curdate nvarchar(max) = convert(nvarchar,getDate(),120)
+		
+	declare @a nvarchar(max)
+	declare @b nvarchar(max)
+	declare @c nvarchar(max)
+	declare @d nvarchar(max)
+	declare @e nvarchar(max)
+	declare @f nvarchar(max)
+	declare @g nvarchar(max)
+	declare @h nvarchar(max)
+	declare @i nvarchar(max)
+	declare @j nvarchar(max)
+	declare @k nvarchar(max)
+	declare @l nvarchar(max)
+	declare @m nvarchar(max)
+
+	declare @tmpa table(
+		sel int identity(1,1)
+		,caseno nvarchar(20)
+		,ef nvarchar(20)
+		,casetype nvarchar(20)
+		,type1 nvarchar(20)
+		,datea nvarchar(20)
+		,carno nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(20)
+		,type2 nvarchar(20)
+		,addrno nvarchar(20)
+		,addr nvarchar(50)
+		,addrno2 nvarchar(20)
+		,addr2 nvarchar(50)
+		,voyage nvarchar(20) --代表航次
+		,voyage1 nvarchar(max)--抵達碼頭航次
+		,voyage2 nvarchar(max)--離開碼頭航次
+	)
+	
+	
+	declare cursor_table cursor for
+	select a,b,c,d,e,f,g,h,i,j,k,l,m from ztmpxls where  cast(noa as int)!=1 order by CAST(noa as int)
+	open cursor_table
+	fetch next from cursor_table
+	into @a,@b,@c,@d,@e,@f,@g,@h,@i,@j,@k,@l,@m
+	while(@@FETCH_STATUS <> -1)
+	begin
+		begin try
+			insert into @tmpa(caseno,ef,casetype,type1,datea
+				,carno,cardealno,cardeal,type2
+				,addrno,addr,addrno2,addr2,voyage,voyage1,voyage2)
+			select @a caseno,@b ef,@c casetype,@d type1,convert(nvarchar,cast(REPLACE(@e,'-','/') as datetime),111) datea
+				,@f carno,'' cardealno,@g cardeal,@h type2
+				,@i addrno,'' addr,@j addrno2,'' addr2
+				,@k voyage,LTRIM(rtrim(@l)) voyage1,LTRIM(rtrim(@m)) voyage2
+			
+		end try
+		begin catch 
+			--nothing
+		end catch
+
+		fetch next from cursor_table
+		into @a,@b,@c,@d,@e,@f,@g,@h,@i,@j,@k,@l,@m
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	update @tmpa set cardealno=isnull(b.noa,'')
+	from @tmpa a
+	left join cardeal b on a.cardeal=b.nick
+
+	update @tmpa set addr=ISNULL(b.namea,'')
+	from @tmpa a
+	left join addr3 b on a.addrno=b.noa
+	
+	update @tmpa set addr2=ISNULL(b.namea,'')
+	from @tmpa a
+	left join addr3 b on a.addrno2=b.noa
+	--------------------------------------------------------------------------------------------
+	-- 寫入BORR
+	declare @t_key nvarchar(10) = 'Y'
+	
+	declare @tmp table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,vccno nvarchar(20) -- default:  Y
+		,v01 nvarchar(20)   --PLAN_ID
+		,datea nvarchar(20) --進出站時間
+		,v02 nvarchar(20)   --代表航次
+		,v03 nvarchar(20)   --抵達碼頭航次
+		,v04 nvarchar(20)   --離開碼頭航次
+		,v05 nvarchar(20)   --進出站
+		,v06 nvarchar(20)   --進出口別
+		,memo nvarchar(max) --備註	
+	)
+	declare @tmps table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,chk1 bit              --請款
+		,caseno nvarchar(20)   --櫃號
+		,ef nvarchar(20)       --EF
+		,casetype nvarchar(20) --櫃型
+		,carno nvarchar(20)    --車牌
+		,cardealno nvarchar(20)--車行
+		,cardeal nvarchar(20)
+		,addrno nvarchar(20)   --起點
+		,addr nvarchar(50)
+		,addrno2 nvarchar(20)  --迄點
+		,addr2 nvarchar(50)
+		,n01 float             --數量
+		,n02 float             --加價
+		,memo nvarchar(max)    --備註
+	)
+	declare @datea nvarchar(20)
+	declare @voyage nvarchar(20)
+	declare @voyage1 nvarchar(20)
+	declare @voyage2 nvarchar(20)
+	declare @type1 nvarchar(20)
+	declare @type2 nvarchar(20)
+	
+	declare @string nvarchar(max) = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+	declare @noa nvarchar(20) = ''
+	declare @noq nvarchar(10) = ''
+	declare @nn int
+	declare @maxno1 nvarchar(20)
+	declare @maxno2 nvarchar(20)
+	
+	declare cursor_table cursor for
+	select datea,voyage,voyage1,voyage2,type1,type2 
+	from @tmpa
+	group by datea,voyage,voyage1,voyage2,type1,type2
+	open cursor_table
+	fetch next from cursor_table
+	into @datea,@voyage,@voyage1,@voyage2,@type1,@type2
+	while(@@FETCH_STATUS <> -1)
+	begin
+		set @noa = @t_key+replace(LEFT(@datea,7),'/','')+'[0-9,A-Z][0-9][0-9]'
+		select @maxno1='',@maxno2=''
+		select top 1 @maxno1=noa from @tmp where noa like @noa order by noa desc
+		select top 1 @maxno2=noa from borr where noa like @noa order by noa desc
+		if len(ISNULL(@maxno1,''))=0 and len(isnull(@maxno2,''))=0
+		begin
+			set @noa = @t_key+replace(LEFT(@datea,7),'/','') + '000'
+		end
+		else if @maxno1>=@maxno2
+		begin
+			set @noa = @maxno1
+		end
+		else
+		begin
+			set @noa= @maxno2
+		end
+		set @nn = (charindex(left(RIGHT(@noa,3),1),@string)-1) * 10 + CAST(RIGHT(@noa,2) as int) + 1
+		set @noa = @t_key+replace(LEFT(@datea,7),'/','') + SUBSTRING(@string,floor(@nn/100)+1,1) +  right('00'+CAST(@nn%100 as nvarchar),2)
+		
+		insert into @tmps(noa,noq,chk1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2)
+		select top 999 @noa,right('000'+cast(ROW_NUMBER()over(order by sel) as nvarchar),3)
+			,1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2
+		from @tmpa
+		where datea=@datea
+		and voyage=@voyage
+		and voyage1=@voyage1
+		and voyage2=@voyage2
+		and type1=@type1
+		and type2=@type2
+		order by sel
+		
+		fetch next from cursor_table
+		into @datea,@voyage,@voyage1,@voyage2,@type1,@type2
+	end
+	close cursor_table
+	deallocate cursor_table
+		
+		
+	
+	select * from @tmps
+		
+		
+	select * from @tmpa
