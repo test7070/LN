@@ -52,7 +52,7 @@
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
 				q_brwCount();
-				q_content = "where=^^ vccno='Y'^^";
+				q_content = "where=^^ vccno='tran_ln3'^^";
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 			});
 			function main() {
@@ -144,7 +144,7 @@
 			function btnIns() {
 				_btnIns();
 				$('#txtNoa').val('AUTO');
-				$('#txtVccno').val('Y');
+				$('#txtVccno').val('tran_ln3');
 			}
 
 			function btnModi() {
@@ -299,7 +299,7 @@
 			}
 			.dview {
 				float: left;
-				width: 400px;
+				width: 430px;
 				border-width: 0px;
 			}
 			.tview {
@@ -410,12 +410,14 @@
 				<table class="tview" id="tview">
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
+						<td align="center" style="width:100px; color:black;"><a>電腦編號</a></td>
 						<td align="center" style="width:100px; color:black;"><a>PLAN_ID</a></td>
-						<td align="center" style="width:120px; color:black;"><a>進出站時間</a></td>
-						<td align="center" style="width:120px; color:black;"><a>代表航次</a></td>
+						<td align="center" style="width:100px; color:black;"><a>進出站時間</a></td>
+						<td align="center" style="width:100px; color:black;"><a>代表航次</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox"/></td>
+						<td id='noa' style="text-align: center;">~noa</td>
 						<td id='v01' style="text-align: center;">~v01</td>
 						<td id='datea' style="text-align: center;">~datea</td>
 						<td id='v02' style="text-align: center;">~v02</td>

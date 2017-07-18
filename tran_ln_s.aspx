@@ -53,7 +53,7 @@
                 t_workno = $.trim($('#txtWorkno').val());
 				t_memo = $.trim($('#txtMemo').val());
 				
-                var t_where = " 1=1 and vccno='WORK'" 
+                var t_where = " 1=1 and vccno='tran_ln'" 
                 	+ q_sqlPara2("noa", t_noa)
                 	+ q_sqlPara2("datea", t_bdate,t_edate) 
                 	+ q_sqlPara2("begindate", t_bbegindate,t_ebegindate) 

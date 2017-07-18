@@ -15,12 +15,11 @@
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
 			//萬海船邊
-			
 			q_tables = 's';
 			var q_name = "borr";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2'
 				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'
-				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14','textA15'];
+				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14','textA15','textA16','textA17'];
 			var q_readonlys = [];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
@@ -28,7 +27,8 @@
 			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0]
 				,['txtN03',10,0],['txtN04',10,0],['txtN05',10,0],['txtN06',10,0]
 				,['txtN07',10,0],['txtN08',10,0],['txtN09',10,0],['txtN10',10,0]
-				,['txtN11',10,0],['txtN12',10,0],['txtN13',10,0],['txtN14',10,0],['txtN15',10,0]);
+				,['txtN11',10,0],['txtN12',10,0],['txtN13',10,0],['txtN14',10,0],['txtN15',10,0]
+				,['txtInteis',10,0],['txtArrerage',10,0]);
 			var bbsMask = new Array();
 			var bbtNum  = new Array(); 
 			var bbtMask = new Array();
@@ -60,7 +60,7 @@
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
 				q_brwCount();
-				q_content = "where=^^ vccno='WORK'^^";
+				q_content = "where=^^ vccno='tran_ln'^^";
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 			});
 			function main() {
@@ -122,6 +122,8 @@
                     $('#txtN12_'+i).change(function(e){refreshBbs();});
                     $('#txtN13_'+i).change(function(e){refreshBbs();});
                     $('#txtN14_'+i).change(function(e){refreshBbs();});
+                    $('#txtInteis_'+i).change(function(e){refreshBbs();});
+                    $('#txtArrerage_'+i).change(function(e){refreshBbs();});
 				}
 				_bbsAssign();
 				$('#tbbs').find('tr.data').children().hover(function(e){
@@ -171,7 +173,7 @@
 			function btnIns() {
 				_btnIns();
 				$('#txtNoa').val('AUTO');
-				$('#txtVccno').val('WORK');
+				$('#txtVccno').val('tran_ln');
 				//計價預設打勾
 				_status['bbs'] = new Array();
 				for(var i=0;i<q_bbsCount;i++){
@@ -215,9 +217,12 @@
 					alert("error: btnok!");
 				}
 				var t_noa = trim($('#txtNoa').val());
-				var t_date = trim($('#txtDate').val());
+				var t_date = trim($('#txtDatea').val());
+				t_date = t_date.length == 0 ? q_date() : t_date;
+				t_date = t_date.replace(/(\d+)\/(\d+)\/\d+/,'$1$2');
+				
 				if (t_noa.length == 0 || t_noa == "AUTO")
-					q_gtnoa(q_name, replaceAll(q_getPara('sys.key_B0rr') + (t_date.length == 0 ? q_date() : t_date), '/', ''));
+					q_gtnoa(q_name, 'S' + t_date);
 				else
 					wrServer(t_noa);
 			}
@@ -240,7 +245,7 @@
 			
 			function refreshBbs(){
 				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0
-					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0,t15=0;
+					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0,t15=0,t16=0,t17=0;
 				for(var i=0;i<q_bbsCount;i++){
 					t01 += q_float('txtN01_'+i);
 					t02 += q_float('txtN02_'+i);
@@ -263,6 +268,9 @@
 						+q_float('txtN13_'+i)+q_float('txtN14_'+i);
 					t15 += t;
 					$('#txtN15_'+i).val(t);
+					
+					t16 += q_float('txtInteis_'+i);
+					t17 += q_float('txtArrerage_'+i);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
@@ -278,7 +286,9 @@
 				$('#textA12').val(t12);
 				$('#textA13').val(t13);
 				$('#textA14').val(t14);	
-				$('#textA15').val(t15);	
+				$('#textA15').val(t15);
+				$('#textA16').val(t16);
+				$('#textA17').val(t17);	
 			}
 
 			function readonly(t_para, empty) {
@@ -376,7 +386,7 @@
 			}
 			.dview {
 				float: left;
-				width: 500px;
+				width: 410px;
 				border-width: 0px;
 			}
 			.tview {
@@ -490,19 +500,17 @@
 				<table class="tview" id="tview">
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
+						<td align="center" style="width:120px; color:black;"><a>電腦編號</a></td>
 						<td align="center" style="width:80px; color:black;"><a>M.V.</a></td>
 						<td align="center" style="width:80px; color:black;"><a>VOY NO.</a></td>
-						<td align="center" style="width:80px; color:black;"><a>ARRIVAL</a></td>
-						<td align="center" style="width:80px; color:black;"><a>WHARF NO</a></td>
-						<td align="center" style="width:80px; color:black;"><a>DEPARTURE</a></td>
+						<td align="center" style="width:100px; color:black;"><a>WHARF NO</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox"/></td>
+						<td id='noa' style="text-align: center;">~noa</td>
 						<td id='v02' style="text-align: center;">~v02</td>
 						<td id='v03' style="text-align: center;">~v03</td>
-						<td id='begindate' style="text-align: center;">~begindate</td>
 						<td id='v06' style="text-align: center;">~v06</td>
-						<td id='enddate' style="text-align: center;">~enddate</td>
 					</tr>
 				</table>
 			</div>
@@ -522,8 +530,8 @@
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1" title="作業日期"/></td>
-						<td><span> </span><a class="lbl">PLAN_ID</a></td>
-						<td><input type="text" id="txtV08" class="txt c1"/></td>
+						<!--<td><span> </span><a class="lbl">PLAN_ID</a></td>
+						<td><input type="text" id="txtV08" class="txt c1"/></td>-->
 					</tr>
 					<tr>
 						<!--<td><span> </span><a class="lbl" id="lblSales">車行</a></td>
@@ -608,8 +616,8 @@
 					<td align="center" colspan="2" rowspan="2"><a>RELOAD</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>小計</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>起點</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>迄點</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>超高<BR>吊架</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>鐳仔桶</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:120px;"><a>櫃號</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>櫃型</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
@@ -629,8 +637,8 @@
 					<!-- RELOAD -->
 					<!-- 小計 -->
 					<!-- TIME -->
-					<!-- ADDR -->
-					<!-- ADDR2 -->
+					<!--  -->
+					<!--  -->
 					<!-- CASENO -->
 					<!-- CASETYPE -->
 					<!-- MEMO -->
@@ -657,8 +665,8 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>40'</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
-					<!-- ADDR -->
-					<!-- ADDR2 -->
+					<!--  -->
+					<!--  -->
 					<!-- CASENO -->
 					<!-- CASETYPE -->
 					<!-- MEMO -->
@@ -691,8 +699,8 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a> </a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>超高<BR>吊架</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>鐳仔桶</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:120px;"><a>櫃號</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>櫃型</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>MEMO</a></td>
@@ -727,16 +735,8 @@
 					<td style="width:50px;"><input type="text" id="txtN15.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:100px;"><input type="text" id="txtIndate.*" style="width:95%;"/></td>
 					<td style="width:100px;"><input type="text" id="txtEdate.*" style="width:95%;"/></td>
-					<td style="width:200px">
-						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
-						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
-						<input type="button" id="btnAddr.*" style="display:none;"/>
-					</td>
-					<td style="width:200px">
-						<input type="text" id="txtAddrno2.*" style="float:left;width:35%;"/>
-						<input type="text" id="txtAddr2.*" style="float:left;width:55%;"/>
-						<input type="button" id="btnAddr2.*" style="display:none;"/>
-					</td>
+					<td style="width:60px;"><input type="text" id="txtInteis.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:60px;"><input type="text" id="txtArrerage.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:120px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
 					<td style="width:50px;"><input type="text" id="txtCasetype.*" style="width:95%;"/></td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
@@ -768,8 +768,8 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA15" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA16" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA17" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:120px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>

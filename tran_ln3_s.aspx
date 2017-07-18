@@ -29,36 +29,33 @@
             function q_gfPost() {
                 q_getFormat();
                 q_langShow();
-                bbmMask = [['txtDate', r_picd]];
+                bbmMask = [['txtBdate', r_picd], ['txtEdate', r_picd]];
                 q_mask(bbmMask);
                 $('#txtNoa').focus();
                 
                 $.datepicker.r_len=4;
 				$.datepicker.setDefaults($.datepicker.regional["ENG"]);
-                $('#txtDate').datepicker();
+                $('#txtBdate').datepicker();
+                $('#txtEdate').datepicker();
             }
 
             function q_seekStr() {
-            	t_date = $.trim($('#txtDate').val());
+            	t_bdate = $.trim($('#txtBdate').val());
+            	t_edate = $.trim($('#txtEdate').val());
             	t_noa = $.trim($('#txtNoa').val());
             	t_v01 = $.trim($('#txtV01').val());
-            	t_v02 = $.trim($('#txtV02').val());
-            	t_v03 = $.trim($('#txtV03').val());
-            	t_memo = $.trim($('#txtMemo').val());
+            	t_voyage = $.trim($('#txtVoyage').val());
+            	t_caseno = $.trim($('#txtCaseno').val());
             			
-				var t_where = " 1=1 and vccno='Y'" + q_sqlPara2("noa", t_noa);
-                
-                if(t_date.length>0)
-					t_where += " and ('" + t_date + "' between begindate and enddate)";                	
+				var t_where = " 1=1 and vccno='tran_ln3'" 
+					+ q_sqlPara2("noa", t_noa)
+					+ q_sqlPara2("datea", t_bdate,t_edate);;
                 if(t_v01.length > 0)
                 	t_where += " and charindex('" + t_v01 + "',v01)>0";
-                if(t_v02.length > 0)
-                    t_where += " and charindex('" + t_v02 + "',v02)>0";
-                if(t_v03.length > 0)
-                    t_where += " and charindex('" + t_v03 + "',v03)>0";
-                if(t_memo.length > 0){
-                	t_where += " and (charindex('" + t_memo + "',memo)>0"
-                		+" or exists(select noq from borrs where borrs.noa=borr.noa and  (charindex('" + t_memo + "',borrs.memo)>0)))";
+                if(t_voyage.length > 0)
+                	t_where += " and (charindex('" + t_voyage + "',v02)>0 or charindex('" + t_voyage + "',v03)>0 or charindex('" + t_voyage + "',v04)>0)";
+                if(t_caseno.length > 0){
+                	t_where += " and exists(select noq from borrs where borrs.noa=borr.noa and  (charindex('" + t_caseno + "',borrs.caseno)>0))";
                 }    
                 t_where = ' where=^^' + t_where + '^^ ';
                 return t_where;
@@ -77,6 +74,14 @@
 		<div style='width:400px; text-align:center;padding:15px;' >
 			<table id="seek"  border="1"   cellpadding='3' cellspacing='2' style='width:100%;' >
 				<tr class='seek_tr'>
+					<td style="width:35%;"><a id='lblDate'>進出站時間</a></td>
+					<td style="width:65%;  ">
+					<input class="txt" id="txtBdate" type="text" style="width:90px; font-size:medium;" />
+					<span style="display:inline-block; vertical-align:middle">&sim;</span>
+					<input class="txt" id="txtEdate" type="text" style="width:90px; font-size:medium;" />
+					</td>
+				</tr>
+				<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a id='lblNoa'>電腦編號</a></td>
 					<td><input class="txt" id="txtNoa" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
@@ -85,16 +90,12 @@
 					<td><input class="txt" id="txtV01" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
-					<td class='seek'  style="width:20%;"><a id='lblV02'>船名</a></td>
-					<td><input class="txt" id="txtV02" type="text" style="width:215px; font-size:medium;" /></td>
+					<td class='seek'  style="width:20%;"><a id='lblVoyage'>航次</a></td>
+					<td><input class="txt" id="txtVoyage" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
-					<td class='seek'  style="width:20%;"><a id='lblV03'>航次</a></td>
-					<td><input class="txt" id="txtV03" type="text" style="width:215px; font-size:medium;" /></td>
-				</tr>
-				<tr class='seek_tr'>
-					<td class='seek'  style="width:20%;"><a id='lblDate'>作業日期</a></td>
-					<td><input class="txt" id="txtDate" type="text" style="width:215px; font-size:medium;" /></td>
+					<td class='seek'  style="width:20%;"><a id='lblCaseno'>櫃號</a></td>
+					<td><input class="txt" id="txtCaseno" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 			</table>
 			<!--#include file="../inc/seek_ctrl.inc"-->

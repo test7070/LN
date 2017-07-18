@@ -95,6 +95,7 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		,v05 nvarchar(20)   --進出站
 		,v06 nvarchar(20)   --進出口別
 		,memo nvarchar(max) --備註	
+		,qtime nvarchar(max)
 	)
 	declare @tmps table(
 		sel int identity(1,1)
@@ -123,7 +124,7 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 	declare @type2 nvarchar(20)
 	
 	declare @string nvarchar(max) = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-	declare @noa nvarchar(20) = ''
+	declare @noa nvarchar(max) = ''
 	declare @noq nvarchar(10) = ''
 	declare @nn int
 	declare @maxno1 nvarchar(20)
@@ -142,6 +143,7 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		select @maxno1='',@maxno2=''
 		select top 1 @maxno1=noa from @tmp where noa like @noa order by noa desc
 		select top 1 @maxno2=noa from borr where noa like @noa order by noa desc
+
 		if len(ISNULL(@maxno1,''))=0 and len(isnull(@maxno2,''))=0
 		begin
 			set @noa = @t_key+replace(LEFT(@datea,7),'/','') + '000'
@@ -156,10 +158,14 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		end
 		set @nn = (charindex(left(RIGHT(@noa,3),1),@string)-1) * 10 + CAST(RIGHT(@noa,2) as int) + 1
 		set @noa = @t_key+replace(LEFT(@datea,7),'/','') + SUBSTRING(@string,floor(@nn/100)+1,1) +  right('00'+CAST(@nn%100 as nvarchar),2)
+		--bbm
+		insert into @tmp(noa,vccno,v01,datea,v02,v03,v04,v05,v06,memo,qtime)
+		select @noa,'tran_ln3' vccno,'' v01,@datea,@voyage v02,@voyage1 v03,@voyage2 v04,@type1 v05,@type2 v06,'' memo,@curdate
 		
-		insert into @tmps(noa,noq,chk1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2)
+		--bbs
+		insert into @tmps(noa,noq,chk1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2,n01)
 		select top 999 @noa,right('000'+cast(ROW_NUMBER()over(order by sel) as nvarchar),3)
-			,1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2
+			,1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2,1
 		from @tmpa
 		where datea=@datea
 		and voyage=@voyage
@@ -175,9 +181,9 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 	close cursor_table
 	deallocate cursor_table
 		
-		
+	insert into borr(noa,vccno,v01,datea,v02,v03,v04,v05,v06,memo,qtime)
+	select noa,vccno,v01,datea,v02,v03,v04,v05,v06,memo,qtime from @tmp
+	insert into borrs(noa,noq,chk1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2,n01,n02,memo)
+	select noa,noq,chk1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2,n01,n02,memo from @tmps
 	
-	select * from @tmps
-		
-		
-	select * from @tmpa
+	return;

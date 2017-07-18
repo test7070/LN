@@ -1,4 +1,4 @@
-zxls_wsh:--zxls_wsh
+zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @workerno nvarchar(max) = [1]
@@ -225,7 +225,7 @@ zxls_wsh:--zxls_wsh
 		if LEN(isnull(@no,''))>0 and not exists(select * from borr where noa=@no)
 		begin
 			insert into borr(vccno,noa,datea,v02,v03,v04,v01,begindate,v05,v06,memo,worker)
-			select 'WORK',[no],convert(nvarchar,arrival,111),mv,voyage,[service],[no]
+			select 'tran_ln',[no],convert(nvarchar,arrival,111),mv,voyage,[service],[no]
 				,convert(nvarchar,arrival,111)
 				,convert(nvarchar,berth,111)
 				,wharf,@memo,worker
