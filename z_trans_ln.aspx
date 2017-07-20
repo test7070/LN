@@ -48,11 +48,11 @@
                         type : '6',
                         name : 'xworkno'
                     },
-					{//[7]              2
+					{//[7]              3
                         type : '6',
                         name : 'mon'
                     },
-					{//[7]              2
+					{//[7]              4
                         type : '1',
                         name : 'date'
                     }]
