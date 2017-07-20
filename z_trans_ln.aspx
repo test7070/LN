@@ -52,7 +52,7 @@
                         type : '6',
                         name : 'mon'
                     },
-					{//[7]              4
+					{//[8]              4
                         type : '1',
                         name : 'date'
                     }]
