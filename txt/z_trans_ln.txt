@@ -53,114 +53,68 @@ deallocate cursor_table
 ------------------------------------------------------------------------
 select a.*,(@t_user) as worker from @tmp a order by datea,gno;
 ------------------------------------------------------------------------
-z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
-declare @t_user nvarchar(max) = '[4]'
-declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
-declare @tmp table(
-	gno nvarchar(1),
-	yy nvarchar(10),
-	mm nvarchar(10),
-	d1 nvarchar(10),
-	d2 nvarchar(10),
-	ww nvarchar(10),
+   
+z_trans_ln06:--z_trans_ln.txt/z_trans_ln06 	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	-------------------------------------------------------------------------------------------
+	declare @tmp table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,noa nvarchar(20)
+		,plan_id nvarchar(50)
+		,begindate nvarchar(20)
+		,enddate nvarchar(20)
+		,mv nvarchar(10)
+		,voyage nvarchar(20)
+		,straddrno nvarchar(20)
+		,straddr nvarchar(20)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+		,memo nvarchar(max)
+		,mount float
+	)
 	
-	ED2 float,
-	ED4 float,
-	EL2 float,
-	EL4 float,
-	SH2 float,
-	SH4 float,
-	TTE2 float,
-	TTE4 float,
-	LD2 float,
-	LD4 float,
-	LL2 float,
-	LL4 float,
-	RE2 float,
-	RE4 float,
-	TTL2 float,
-	TTL4 float,
-	TD2 float,
-	TD4 float,
-	TL2 float,
-	TL4 float,
-	TSR2 float,
-	TSR4 float,
-	TT2 float,
-	TT4 float,
-	total float,
-	total2 float,
-	total3 float,
+	insert into @tmp(gno,pno,noa, plan_id,begindate,enddate,mv,voyage,straddrno,straddr,endaddrno,endaddr,memo)
+	select '1',1,noa,v01 plan_id,begindate,enddate,v02,v03 voyage,'' straddrno,'' straddr,'' endaddrno,'' endaddr,memo 
+	from borr
+	where vccno='tran_ln3'
+	and LEFT(datea,7) = @t_mon
+	order by datea,v01
 	
-	bbay nvarchar(100),
-	ebay nvarchar(100),
-	ship int
-)
-insert into @tmp (gno,yy,mm,d1,d2,ww)
-select '0',SUBSTRING(a.datea,1,3),SUBSTRING(a.datea,5,2),
-	 case 
-	 when SUBSTRING(a.datea,8,2) between '01' and '07' then 01
-	 when SUBSTRING(a.datea,8,2) between '08' and '14' then 08
-	 when SUBSTRING(a.datea,8,2) between '15' and '21' then 15
-	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 22
-	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 29 end,
-	 case 
-	 when SUBSTRING(a.datea,8,2) between '01' and '07' then 07
-	 when SUBSTRING(a.datea,8,2) between '08' and '14' then 14
-	 when SUBSTRING(a.datea,8,2) between '15' and '21' then 21
-	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 28
-	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 31 end,
-	 case 
-	 when SUBSTRING(a.datea,8,2) between '01' and '07' then 1
-	 when SUBSTRING(a.datea,8,2) between '08' and '14' then 2
-	 when SUBSTRING(a.datea,8,2) between '15' and '21' then 3
-	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 4
-	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 5 end
-from borr a
-where a.vccno='tran_ln' and SUBSTRING(@t_mon,1,6) = SUBSTRING(a.datea,1,6)
-
-insert into @tmp (gno,ww,ED2,ED4,EL2,EL4,SH2,SH4,TTE2,TTE4,LD2,LD4,LL2,LL4,RE2,RE4,TTL2,TTL4
-,TD2,TD4,TL2,TL4,TSR2,TSR4,TT2,TT4,total,total2,total3,bbay,ebay,ship)
-select '1',	 case 
-	 when SUBSTRING(a.datea,8,2) between '01' and '07' then 1
-	 when SUBSTRING(a.datea,8,2) between '08' and '14' then 2
-	 when SUBSTRING(a.datea,8,2) between '15' and '21' then 3
-	 when SUBSTRING(a.datea,8,2) between '22' and '28' then 4
-	 when SUBSTRING(a.datea,8,2) between '29' and '31' then 5 end,
-SUM(b.n05)/*ED2*/,SUM(b.n06)/*ED4*/,SUM(b.n07)/*EL2*/
-,SUM(b.n08)/*EL4*/,SUM(b.n11)/*SH2*/,SUM(b.n12),--SH4
-SUM(b.n05)+SUM(b.n07)+SUM(b.n11)/*TTE2*/,SUM(b.n06)+SUM(b.n08)+SUM(b.n12)/*TTE4*/,
-SUM(b.n01)/*LD2*/,SUM(b.n02)/*LD4*/,SUM(b.n03)/*LL2*/
-,SUM(b.n04)/*LL4*/,SUM(b.n13)/*RE2*/,SUM(b.n14),--RE4
-SUM(b.n01)+SUM(b.n03)+SUM(b.n13)/*TTL2*/,SUM(b.n02)+SUM(b.n04)+SUM(b.n14),/*TTL4*/
-SUM(b.n01)+SUM(b.n05)/*TD2*/,SUM(b.n02)+SUM(b.n06)/*TD4*/,SUM(b.n03)+SUM(b.n07)/*TL2*/,
-SUM(b.n04)+SUM(b.n08)/*TL4*/,SUM(b.n11)+SUM(b.n13)/*TSR2*/,SUM(b.n12)+SUM(b.n14)/*TSR4*/,
-SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13),--TT2
-SUM(b.n06)+SUM(b.n08)+SUM(b.n12)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--TT4
-SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n06)+SUM(b.n08)+SUM(b.n12),--total
-SUM(b.n01)+SUM(b.n03)+SUM(b.n13)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--total2
-SUM(b.n05)+SUM(b.n07)+SUM(b.n11)+SUM(b.n06)+SUM(b.n08)+SUM(b.n12)+SUM(b.n01)+SUM(b.n03)+SUM(b.n13)+SUM(b.n02)+SUM(b.n04)+SUM(b.n14),--total3
-min(a.v02),max(a.v02),count(1)
-from borr a
-left join borrs b on a.noa=b.noa
-where a.vccno='tran_ln' and SUBSTRING(@t_mon,1,6) = SUBSTRING(a.datea,1,6)
-group by a.datea
-
-insert into @tmp (gno,ww)
-select '2',ww from @tmp
-
-insert into @tmp (gno,ww)
-select '3',ww from @tmp
-
-insert into @tmp (gno,ww)
-select '4',ww from @tmp
-
-
-insert into @tmp (gno,ww)
-select '5',ww from @tmp
-group by ww
-
-select DISTINCT a.*,(@t_user) as worker from @tmp a order by ww,gno;
+	update @tmp set straddrno=b.addrno,straddr=b.addr
+		,endaddrno=b.addrno2,endaddr=b.addr2
+	from @tmp a
+	outer apply(select top 1 * from borrs where noa=a.noa order by noq) b 
+	
+	update @tmp set mount=b.mount
+	from @tmp a
+	outer apply (select SUM(ISNULL(n01,0)) mount from borrs where noa=a.noa) b
+	
+	select gno 
+		,sel rr
+		,@t_mon a01
+		,plan_id b01
+		,case when len(ISNULL(begindate,''))>0 and len(ISNULL(enddate,''))>0 then begindate+'~'+enddate
+			else isnull(begindate,'')+ISNULL(enddate,'') end b02
+		,mv b03
+		,voyage b04
+		,straddr b05
+		,endaddr b06
+		,mount b07
+		,memo b08
+		,* 
+	from @tmp
+	order by sel;
+	
 ---------------------------------------------------------------------------------
 z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
 declare @t_user nvarchar(max) = '[4]'
@@ -291,7 +245,8 @@ z_trans_ln04:--z_trans_ln04 z_trans_ln.txt
 	update @tmp set memo = N'不含超高吊架共'+CAST(mount02 as nvarchar)+N'車. 鐳仔桶共'+CAST(mount03 as nvarchar)+N'車'
 	where not(mount02=0 and mount03=0)
 	
-	select sel rr
+	select gno 
+		,sel rr
 		,@t_mon a01
 		,datea b01
 		,mv b02

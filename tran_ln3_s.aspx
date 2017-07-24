@@ -53,7 +53,7 @@
                 if(t_v01.length > 0)
                 	t_where += " and charindex('" + t_v01 + "',v01)>0";
                 if(t_voyage.length > 0)
-                	t_where += " and (charindex('" + t_voyage + "',v02)>0 or charindex('" + t_voyage + "',v03)>0 or charindex('" + t_voyage + "',v04)>0)";
+                	t_where += " and (charindex('" + t_voyage + "',v03)>0 or charindex('" + t_voyage + "',v04)>0 or charindex('" + t_voyage + "',v05)>0)";
                 if(t_caseno.length > 0){
                 	t_where += " and exists(select noq from borrs where borrs.noa=borr.noa and  (charindex('" + t_caseno + "',borrs.caseno)>0))";
                 }    

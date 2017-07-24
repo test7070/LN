@@ -35,6 +35,7 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		,addr nvarchar(50)
 		,addrno2 nvarchar(20)
 		,addr2 nvarchar(50)
+		,mv nvarchar(20) --船名
 		,voyage nvarchar(20) --代表航次
 		,voyage1 nvarchar(max)--抵達碼頭航次
 		,voyage2 nvarchar(max)--離開碼頭航次
@@ -51,11 +52,11 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		begin try
 			insert into @tmpa(caseno,ef,casetype,type1,datea
 				,carno,cardealno,cardeal,type2
-				,addrno,addr,addrno2,addr2,voyage,voyage1,voyage2)
+				,addrno,addr,addrno2,addr2,mv,voyage,voyage1,voyage2)
 			select @a caseno,@b ef,@c casetype,@d type1,convert(nvarchar,cast(REPLACE(@e,'-','/') as datetime),111) datea
 				,@f carno,'' cardealno,@g cardeal,@h type2
 				,@i addrno,'' addr,@j addrno2,'' addr2
-				,@k voyage,LTRIM(rtrim(@l)) voyage1,LTRIM(rtrim(@m)) voyage2
+				,'' mv,@k voyage,LTRIM(rtrim(@l)) voyage1,LTRIM(rtrim(@m)) voyage2
 			
 		end try
 		begin catch 
@@ -89,11 +90,12 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		,vccno nvarchar(20) -- default:  Y
 		,v01 nvarchar(20)   --PLAN_ID
 		,datea nvarchar(20) --進出站時間
-		,v02 nvarchar(20)   --代表航次
-		,v03 nvarchar(20)   --抵達碼頭航次
-		,v04 nvarchar(20)   --離開碼頭航次
-		,v05 nvarchar(20)   --進出站
-		,v06 nvarchar(20)   --進出口別
+		,v02 nvarchar(20)   --船名
+		,v03 nvarchar(20)   --代表航次
+		,v04 nvarchar(20)   --抵達碼頭航次
+		,v05 nvarchar(20)   --離開碼頭航次
+		,v06 nvarchar(20)   --進出站
+		,v07 nvarchar(20)   --進出口別
 		,memo nvarchar(max) --備註	
 		,qtime nvarchar(max)
 	)
@@ -117,6 +119,7 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		,memo nvarchar(max)    --備註
 	)
 	declare @datea nvarchar(20)
+	declare @mv nvarchar(20)
 	declare @voyage nvarchar(20)
 	declare @voyage1 nvarchar(20)
 	declare @voyage2 nvarchar(20)
@@ -131,12 +134,12 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 	declare @maxno2 nvarchar(20)
 	
 	declare cursor_table cursor for
-	select datea,voyage,voyage1,voyage2,type1,type2 
+	select datea,mv,voyage,voyage1,voyage2,type1,type2 
 	from @tmpa
-	group by datea,voyage,voyage1,voyage2,type1,type2
+	group by datea,mv,voyage,voyage1,voyage2,type1,type2
 	open cursor_table
 	fetch next from cursor_table
-	into @datea,@voyage,@voyage1,@voyage2,@type1,@type2
+	into @datea,@mv,@voyage,@voyage1,@voyage2,@type1,@type2
 	while(@@FETCH_STATUS <> -1)
 	begin
 		set @noa = @t_key+replace(LEFT(@datea,7),'/','')+'[0-9,A-Z][0-9][0-9]'
@@ -159,8 +162,8 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		set @nn = (charindex(left(RIGHT(@noa,3),1),@string)-1) * 10 + CAST(RIGHT(@noa,2) as int) + 1
 		set @noa = @t_key+replace(LEFT(@datea,7),'/','') + SUBSTRING(@string,floor(@nn/100)+1,1) +  right('00'+CAST(@nn%100 as nvarchar),2)
 		--bbm
-		insert into @tmp(noa,vccno,v01,datea,v02,v03,v04,v05,v06,memo,qtime)
-		select @noa,'tran_ln3' vccno,'' v01,@datea,@voyage v02,@voyage1 v03,@voyage2 v04,@type1 v05,@type2 v06,'' memo,@curdate
+		insert into @tmp(noa,vccno,v01,datea,v01,v02,v03,v04,v05,v06,memo,qtime)
+		select @noa,'tran_ln3' vccno,'' v01,@datea,@mv v01,@voyage v02,@voyage1 v03,@voyage2 v04,@type1 v05,@type2 v06,'' memo,@curdate
 		
 		--bbs
 		insert into @tmps(noa,noq,chk1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2,n01)
@@ -176,13 +179,13 @@ zxls_wsy:--zxls_wsy   萬海  移櫃  匯入
 		order by sel
 		
 		fetch next from cursor_table
-		into @datea,@voyage,@voyage1,@voyage2,@type1,@type2
+		into @datea,@mv,@voyage,@voyage1,@voyage2,@type1,@type2
 	end
 	close cursor_table
 	deallocate cursor_table
 		
-	insert into borr(noa,vccno,v01,datea,v02,v03,v04,v05,v06,memo,qtime)
-	select noa,vccno,v01,datea,v02,v03,v04,v05,v06,memo,qtime from @tmp
+	insert into borr(noa,vccno,v01,datea,v01,v02,v03,v04,v05,v06,memo,qtime)
+	select noa,vccno,v01,datea,v01,v02,v03,v04,v05,v06,memo,qtime from @tmp
 	insert into borrs(noa,noq,chk1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2,n01,n02,memo)
 	select noa,noq,chk1,caseno,ef,casetype,carno,cardealno,cardeal,addrno,addr,addrno2,addr2,n01,n02,memo from @tmps
 	
