@@ -54,7 +54,7 @@ deallocate cursor_table
 select a.*,(@t_user) as worker from @tmp a order by datea,gno;
 ------------------------------------------------------------------------
    
-z_trans_ln06:--z_trans_ln.txt/z_trans_ln06 	
+z_trans_ln08:--z_trans_ln.txt/z_trans_ln08 	
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
@@ -190,7 +190,7 @@ declare @tmp table(
 	------------------------------------------------------------------------
 	select a.*,(@t_user) as worker from @tmp a order by gno,noq;
 	-------------------------------------------------------------------
-z_trans_ln04:--z_trans_ln04 z_trans_ln.txt	
+z_trans_ln06:--z_trans_ln06 z_trans_ln.txt	
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
@@ -396,6 +396,108 @@ z_trans_ln03:--z_trans_ln03  z_trans_ln.txt
 	from @tmpa 
 	order by workno,custno,recno;
 
+z_trans_ln04:--z_trans_ln.txt	/z_trans_ln04  
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_planid nvarchar(20) = case when '#non' = [10] then '' else [10] end
+	-------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,datea nvarchar(20)
+		,workno nvarchar(20)   -- PLAN_ID
+		,vocc nvarchar(50)
+		,voyage nvarchar(20)
+		,port nvarchar(20)
+		
+		,custno nvarchar(20)
+		,cust nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,addrno nvarchar(20)
+		,addr nvarchar(50)
+		,addrno2 nvarchar(20)
+		,addr2 nvarchar(50)
+		,memo nvarchar(max)
+		
+		,casetype nvarchar(20)
+		,[empty] float
+		,fill float
+	)
+	insert into @tmpa(gno,pno,datea,workno,vocc,voyage,port
+		,custno,cust,cardealno,cardeal
+		,addrno,addr,addrno2,addr2,memo
+		,casetype,[empty],fill)
+	select '1',1,b.datea,b.v01 workno,b.v02 vocc,b.v03 voyage,b.v06 port
+		,'' custno,'' cust,a.cardealno,a.cardeal
+		,a.addrno,a.addr,a.addrno2,a.addr2,a.memo 
+		,case when CHARINDEX('20',a.casetype)>0 then "20'"
+			when CHARINDEX('40',a.casetype)>0 or CHARINDEX('45',a.casetype)>0 then "40'"
+			else '' end 		
+		,sum(case when ef='E' then isnull(a.n01,0) else 0 end)
+		,sum(case when ef='F' then isnull(a.n01,0) else 0 end)
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.noa is not null
+	and b.vccno='tran_ln3'
+	and b.v01=@t_planid
+	group by b.datea,b.v01,b.v02,b.v03,b.v06
+		,a.cardealno,a.cardeal
+		,a.addrno,a.addr,a.addrno2,a.addr2,a.memo 
+		,case when CHARINDEX('20',a.casetype)>0 then "20'"
+			when CHARINDEX('40',a.casetype)>0 or CHARINDEX('45',a.casetype)>0 then "40'"
+			else '' end
+	
+	update @tmpa set pno=b.recno
+	from @tmpa a
+	left join (select sel,ROW_NUMBER()over(partition by workno,custno,cardealno order by casetype,sel) recno from @tmpa) b on a.sel=b.sel
+	------------------------------------------------------------------------------
+	declare @pagecount int = 37
+	declare @workno nvarchar(20)
+	declare @n int
+	
+	declare cursor_table cursor for	
+	select workno,count(1) from @tmpa group by workno
+	open cursor_table
+	fetch next from cursor_table
+	into @workno,@n
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		while @n%@pagecount!=0
+		begin
+			insert into @tmpa(gno,pno,workno)values('2',2,@workno)
+			set @n = @n + 1
+		end
+		
+		fetch next from cursor_table
+		into @workno,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	select gno
+		,workno a01
+		,ISNULL(vocc,'')+' '+ISNULL(voyage,'') a02
+		,port a03
+		,datea a04
+		
+		,cust b01
+		,cardeal b02
+		,casetype b03
+		,[empty] b04
+		,fill b05
+		,case when len(addr)>0 and len(addr2)>0 then addr+'-'+addr2 else isnull(addr,'')+ISNULL(addr2,'') end b06
+		,memo b07
+		,@t_user worker
+	from @tmpa
+	order by workno,gno,custno,cardealno,pno;
+	
 z_trans_ln02:--z_trans_ln02  z_trans_ln.txt	
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
@@ -437,7 +539,7 @@ z_trans_ln02:--z_trans_ln02  z_trans_ln.txt
 		,laden_dis_20,laden_dis_40,laden_load_20,laden_load_40
 		,empty_dis_20,empty_dis_40,empty_load_20,empty_load_40)
 	select b.datea,b.v01,b.v02,b.v03,b.v06
-		,b.custno,b.cust,b.salesno,b.sales,a.addrno,a.addr,a.memo
+		,b.custno,b.cust,a.cardealno,a.cardeal,a.addrno,a.addr,a.memo
 		,a.n01,a.n02,a.n03,a.n04
 		,a.n05,a.n06,a.n07,a.n08
 	from borrs a

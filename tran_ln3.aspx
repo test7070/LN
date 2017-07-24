@@ -157,7 +157,7 @@
 				q_box('z_trans_ln.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + JSON.stringify({
 		                    form : 'tran_ln'
 		                    ,noa : trim($('#txtNoa').val())
-		                    ,workno : trim($('#txtV01').val())
+		                    ,planid : trim($('#txtV01').val())
 		                }) + ";" + r_accy + "_" + r_cno, 'trans', "95%", "95%", m_print);
 			}
 

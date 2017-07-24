@@ -41,20 +41,21 @@
 						type : '0', //[4]
 						name : 'user',
 						value : r_name
-					}, {//[5]              1
+					}, {//[5]               1
                         type : '6',
                         name : 'xnoa'
-                    }, {//[6]              2
+                    }, {//[6]               2
                         type : '6',
                         name : 'xworkno'
-                    },
-					{//[7]              3
+                    },{//[7]                3
                         type : '6',
                         name : 'mon'
-                    },
-					{//[8]              4
+                    },{//[8][9]                4
                         type : '1',
                         name : 'date'
+                    }, {//[10]               5
+                        type : '6',
+                        name : 'xplanid'
                     }]
                 });
                 q_popAssign();
@@ -77,6 +78,10 @@
 	            if(t_para.length==0 || t_para.workno==undefined){
 	            }else{
 	            	$('#txtXworkno').val(t_para.workno);
+	            }
+	            if(t_para.length==0 || t_para.planid==undefined){
+	            }else{
+	            	$('#txtXplanid').val(t_para.planid);
 	            }
             }
 
