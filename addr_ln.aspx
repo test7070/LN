@@ -33,9 +33,10 @@
             brwList = [];
             brwNowPage = 0;
             brwKey = 'Noa';
-            aPop = new Array(['txtCustno_', 'BtnCust_', 'cust', 'noa,nick', 'txtCustno_,txtCust_', 'cust_b.aspx'],
-				['txtStraddrno', 'lblStraddr', 'addr2', 'noa,addr', 'txtStraddrno,txtStraddr', 'addr2_b.aspx'],
-				['txtEndaddrno', 'lblEndaddr', 'addr2', 'noa,addr', 'txtEndaddrno,txtEndaddr', 'addr2_b.aspx']);
+            aPop = new Array(['txtCustno_', 'BtnCust_', 'cust', 'noa,nick', 'txtCustno_,txtCust_', 'cust_b.aspx']
+				,['txtStraddrno', 'lblStraddr', 'addr2', 'noa,addr', 'txtStraddrno,txtStraddr', 'addr2_b.aspx']
+				,['txtEndaddrno', 'lblEndaddr', 'addr2', 'noa,addr', 'txtEndaddrno,txtEndaddr', 'addr2_b.aspx']
+				,['txtSalesno_', 'btnSales_', 'cardeal', 'noa,nick', 'txtSalesno_,txtSales_', 'cardeal_b.aspx']);
             $(document).ready(function() {
                 bbmKey = ['noa'];
                 bbsKey = ['noa', 'noq'];
@@ -164,7 +165,12 @@
                         var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
                         $('#btnCust_'+n).click();
                     });	
-                    	
+                    $('#txtSalesno_' + i).bind('contextmenu', function(e) {
+                        /*滑鼠右鍵*/
+                        e.preventDefault();
+                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
+                        $('#btnSales_'+n).click();
+                    });		
                 }
                 _bbsAssign();
                 $('#tbbs').find('tr.data').children().hover(function(e){
@@ -386,7 +392,7 @@
                 font-size: medium;
             }
             .dbbs {
-                width: 950px;
+                width: 1100px;
             }
             .tbbs a {
                 font-size: medium;
@@ -470,9 +476,10 @@
 					</td>
 					<td style="width:20px;"> </td>
 					<td align="center" style="width:80px;"><a>生效日期</a></td>
-					<td align="center" style="width:150px;"><a>客戶</a></td>
 					<td align="center" style="width:80px;"><a>規格</a></td>
+					<td align="center" style="width:150px;"><a>客戶</a></td>
 					<td align="center" style="width:80px;"><a>應收單價</a></td>
+					<td align="center" style="width:150px;"><a>車行</a></td>
 					<td align="center" style="width:80px;"><a>應付單價</a></td>
 					<td align="center" style="width:200px;"><a>備註</a></td>
 				</tr>
@@ -483,13 +490,18 @@
 					</td>
 					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
 					<td><input type="text" id="txtDatea.*" style="width:95%;" /></td>
+					<td><input type="text" id="txtCustunit.*" style="width:95%;" list="listUnit"/></td>
 					<td>
 						<input type="text" id="txtCustno.*" style="width:45%;float:left;" />
 						<input type="text" id="txtCust.*" style="width:50%;"float:left;/>
 						<input type="button" id="btnCust.*" style="display:none;" />
 					</td>
-					<td><input type="text" id="txtCustunit.*" style="width:95%;" list="listUnit"/></td>
 					<td><input type="text" id="txtCustprice.*" style="width:95%;text-align:right;" /></td>
+					<td>
+						<input type="text" id="txtSalesno.*" style="width:45%;float:left;" />
+						<input type="text" id="txtSales.*" style="width:50%;"float:left;/>
+						<input type="button" id="btnSales.*" style="display:none;" />
+					</td>
 					<td><input type="text" id="txtDriverprice.*" style="width:95%;text-align:right;" /></td>
 					<td><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
