@@ -436,10 +436,16 @@
 						<td class="tdZ"> </td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">PLAN_ID</a></td>
+						<td><span> </span><a class="lbl"> </a></td>
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
-						<td><span> </span><a class="lbl">進出站時間</a></td>
+						<td><span> </span><a class="lbl">日期</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1"/></td>
+					</tr>
+					<tr>
+						<td><span> </span><a class="lbl">作業日期(起)</a></td>
+						<td><input type="text" id="txtBegindate" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">作業日期(迄)</a></td>
+						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">代表航次</a></td>
