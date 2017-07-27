@@ -479,6 +479,7 @@
 					<td align="center" style="width:80px;"><a>規格</a></td>
 					<td align="center" style="width:150px;"><a>客戶</a></td>
 					<td align="center" style="width:80px;"><a>應收單價</a></td>
+					<td align="center" style="width:80px;"><a>請款金額</a></td>
 					<td align="center" style="width:150px;"><a>車行</a></td>
 					<td align="center" style="width:80px;"><a>應付單價</a></td>
 					<td align="center" style="width:200px;"><a>備註</a></td>
@@ -497,6 +498,7 @@
 						<input type="button" id="btnCust.*" style="display:none;" />
 					</td>
 					<td><input type="text" id="txtCustprice.*" style="width:95%;text-align:right;" /></td>
+					<td><input type="text" id="txtTggprice.*" style="width:95%;text-align:right;" /></td>
 					<td>
 						<input type="text" id="txtSalesno.*" style="width:45%;float:left;" />
 						<input type="text" id="txtSales.*" style="width:50%;"float:left;/>
