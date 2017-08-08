@@ -263,7 +263,12 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 	begin
 		-- 表身
 		declare @noa nvarchar(20) = ''
-		select @noa=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('_',@filename)-4)
+		if charindex('_',@filename)>0
+			select @noa=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('_',@filename)-4)
+		else
+		begin
+			select @noa=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('.',@filename)-5)
+		end
 		
 		if not exists(select * from borr where noa=@noa)
 		begin
