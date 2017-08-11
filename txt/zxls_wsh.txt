@@ -104,9 +104,12 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 				
 				if @b = 'ARRIVAL:'
 				begin
+					select @d
 					update @tmp set [arrival]= cast(case when charindex('上午',@d)>0 then replace(@d,'上午','')+' AM'
 						when charindex('下午',@d)>0 then replace(@d,'下午','')+' PM'
 						else @d end as datetime)
+					select 'x'
+					select * from @tmp
 				end
 				if @g = 'P.O.B:'
 				begin
@@ -198,7 +201,7 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		end
 		close cursor_table
 		deallocate cursor_table
-	
+
 		-- 寫入BORR
 		declare @memo nvarchar(max)
 		declare @pob datetime
@@ -308,12 +311,15 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		deallocate cursor_table
 		
 		--寫入BORRS
+		declare @string nvarchar(max) = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
 		delete borrs where noa=@noa and [sign]='borrs'
 		select @nn = MAX(cast(noq as int)) from borrs where noa=@noa
 		set @nn = ISNULL(@nn,0)
+		
 		insert into borrs([sign],noa,noq,typea,caseno,casetype)
 		select 'borrs',@noa
-			,right('000'+cast(ROW_NUMBER()over(order by sel)+@nn as nvarchar),3)
+			,substring(@string,floor((ROW_NUMBER()over(order by sel)+@nn)/100)+1,1) + RIGHT('00'+CAST(ROW_NUMBER()over(order by sel)+@nn as nvarchar),2)
 			,bayno,caseno,spec
 		from @tmpss
 	end;
