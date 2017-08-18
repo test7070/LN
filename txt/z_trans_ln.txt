@@ -119,76 +119,108 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
 declare @t_user nvarchar(max) = '[4]'
 declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
-declare @tmp table(
-	gno nvarchar(1),
-	noa nvarchar(100),
-	yy nvarchar(10),
-	mm nvarchar(10),
-	noq INT IDENTITY PRIMARY KEY,
-	workdate nvarchar(100),
-	MV nvarchar(100),
-	VN nvarchar(100),
-	LD2 float,
-	LD4 float,
-	LL2 float,
-	LL4 float,
-	ED2 float,
-	ED4 float,
-	EL2 float,
-	EL4 float,
-	SH float,
-	RE float,
-	T2 float,
-	T4 float,
-	G2 float,
-	G4 float,
-	G21 float,
-	G41 float,
-	T21 float,
-	T41 float,
-	total float
-)
-	insert into @tmp (gno,noa,workdate,MV,VN,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total)
-	select '0',a.noa,a.datea,a.v02,a.v03,n01,n02,n03,n04,n05,n06,n07,n08,
-		(b.n11+b.n13)/*SHIFT*/,(b.n12+b.n14)/*RELOAD*/,(b.n01+b.N03+b.N05+b.n07+b.n11+b.n13)/*T2*/,(b.n02+b.n04+b.n06+b.n08+b.n12+b.n14)/*T4*/,
-		(b.n01+b.n02+b.n03+b.n04+b.n05+b.n06+b.n07+b.n08+b.n11+b.n12+b.n13+b.n14)/*Total*/
-	from borr a
-	left join borrs b on a.noa=b.noa
-	where a.vccno='tran_ln' 
-	and left(a.datea,7) = @t_mon 
-	and b.[sign]!='borrs'
+	declare @t_xsela nvarchar(10) = case when '#non' = [11] then '' else [11] end
+	declare @t_xselb nvarchar(10) = case when '#non' = [12] then '' else [12] end
 	
-	if(@t_mon!='')
-	insert into @tmp (gno,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total)
-	select '2',SUM(LD2),SUM(LD4),SUM(LL2),SUM(LL4),SUM(ED2),SUM(ED4),SUM(EL2),SUM(EL4),SUM(SH),SUM(RE),
-	SUM(T2),SUM(T4),SUM(total)
-	from @tmp
-	------------------------------------------------------------------------
-	declare @t_pageline int = 20 --一頁幾行
-	declare @yy nvarchar(10)
-	declare @mm nvarchar(10)
-	declare @n int =0
-	declare cursor_table cursor for 
-	select yy,mm,count(1) from @tmp where gno='0' group by yy,mm
-	open cursor_table 
-	fetch next from cursor_table 
-	into @yy,@mm,@n
-	while(@@FETCH_STATUS <> -1) 
-	begin
-		while @n%@t_pageline !=0
-		begin 
-			set @n = @n + 1
-			insert into @tmp(gno,yy,mm) 
-			values('1',@yy,@mm)
-		end 
+	--**********************************************************
+	declare @t_bsel int = 0
+	declare @t_esel int = 0
+	begin try
+		set @t_bsel = cast(@t_xsela as int)
+		set @t_esel = cast(@t_xselb as int)
+	end try
+	begin catch
+		set @t_bsel = 0
+		set @t_esel = 0
+	end catch
 	
-	fetch next from cursor_table 
-	into @yy,@mm,@n
-	end 
-	close cursor_table
-	deallocate cursor_table
-	------------------------------------------------------------------------
-	select a.*,(@t_user) as worker from @tmp a order by gno,noq;
+	declare @tmp table(
+		sel int identity(1,1),
+		recno int,
+		pp int,
+		qq int,
+		gno nvarchar(1),
+		noa nvarchar(100),
+		v01 nvarchar(20),
+		workdate nvarchar(100),
+		MV nvarchar(100),
+		VN nvarchar(100),
+		LD2 float,
+		LD4 float,
+		LL2 float,
+		LL4 float,
+		ED2 float,
+		ED4 float,
+		EL2 float,
+		EL4 float,
+		SH float,
+		RE float,
+		T2 float,
+		T4 float,
+		G2 float,
+		G4 float,
+		G21 float,
+		G41 float,
+		T21 float,
+		T41 float,
+		inteis float,--超高吊架
+		arrerage float,--鐳仔桶
+		total float
+	)
+		insert into @tmp (gno,noa,workdate,v01,MV,VN,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE			
+			,T2,T4
+			,inteis,arrerage,total)
+		select '1',a.noa,a.datea,a.v01,a.v02,a.v03,n01,n02,n03,n04,n05,n06,n07,n08,
+			(b.n11+b.n13)/*SHIFT*/,(b.n12+b.n14)/*RELOAD*/
+			,(b.n01+b.N03+b.N05+b.n07+b.n11+b.n13)/*T2*/
+			,(b.n02+b.n04+b.n06+b.n08+b.n12+b.n14)/*T4*/
+			,b.inteis,b.arrerage
+			,(b.n01+b.n02+b.n03+b.n04+b.n05+b.n06+b.n07+b.n08+b.n11+b.n12+b.n13+b.n14+isnull(b.inteis,0)+isnull(b.arrerage,0))/*Total*/
+		from borr a
+		left join borrs b on a.noa=b.noa
+		where a.vccno='tran_ln' 
+		and left(a.datea,7) = @t_mon 
+		and b.[sign]!='borrs'
+		order by a.v01,b.noq
+		
+		delete @tmp where not sel between @t_bsel and @t_esel 
+		-------------------------------------------------------------------------------------------------------
+		-- 40筆一個合計
+		declare @t_pagecount int = 40
+		update @tmp set recno=b.recno
+		from @tmp a
+		left join (select sel,ROW_NUMBER()over(order by sel) recno from @tmp ) b on a.sel=b.sel
+
+		update @tmp set pp = (recno-1)%@t_pagecount + 1, qq = floor((recno-1)/@t_pagecount) + 1
+		----合計
+		insert into @tmp (qq,recno,gno,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total,inteis,arrerage)
+		select qq,999,'2',SUM(LD2),SUM(LD4),SUM(LL2),SUM(LL4),SUM(ED2),SUM(ED4),SUM(EL2),SUM(EL4),SUM(SH),SUM(RE),
+		SUM(T2),SUM(T4),SUM(total),SUM(isnull(inteis,0)),sum(isnull(arrerage,0))
+		from @tmp
+		group by qq
+		--*************************************************************************************
+		select gno
+			,sel rr
+			,v01 a01	 
+			,workdate a02	
+			,MV +'/' + VN a03	
+			,LD2 a04	
+			,LD4 a05	
+			,LL2 a06	
+			,LL4 a07	
+			,ED2 a08	 
+			,ED4 a09	
+			,EL2 a10	
+			,EL4 a11	
+			,SH	 a12 
+			,RE	 a13
+			,T2	 a14
+			,T4	 a15
+			,inteis a16
+			,arrerage a17
+			,Total a18
+			,(@t_user) as worker 
+		from @tmp a order by qq,recno;
 	-------------------------------------------------------------------
 z_trans_ln06:--z_trans_ln06 z_trans_ln.txt	
 	SET QUOTED_IDENTIFIER OFF

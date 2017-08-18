@@ -56,6 +56,9 @@
                     }, {//[10]               5
                         type : '6',
                         name : 'xplanid'
+                    },{//[11][12]               6
+                        type : '1',
+                        name : 'xsel'
                     }]
                 });
                 q_popAssign();
