@@ -63,7 +63,11 @@
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
 				q_brwCount();
-				q_content = "where=^^ vccno='tran_ln'^^";
+				if(q_getId()[3].length>0){
+					q_content = "where=^^ vccno='tran_ln' and "+q_getId()[3]+"^^";	
+				}else{
+					q_content = "where=^^ vccno='tran_ln'^^";	
+				}
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 			});
 			function main() {
@@ -204,14 +208,14 @@
 		                    ,workno : trim($('#txtV01').val())
 		                }) + ";" + r_accy + "_" + r_cno, 'trans', "95%", "95%", m_print);
 			}
-
+			function q_stPost() {
+				if (!(q_cur == 1 || q_cur == 2))
+					return false;
+				Unlock(1);
+			}
+			
 			function btnOk() {
-				/*$('#txtTrandate').val($.trim($('#txtTrandate').val()));
-				if ($('#txtTrandate').val().length == 0 || !q_cd($('#txtTrandate').val())) {
-                    alert(q_getMsg('lblTrandate') + '錯誤。');
-                    Unlock(1);
-                    return;
-                }*/
+				Lock(1,{opacity:0.5});
                 refreshBbs();
 				sum();
 				if(q_cur ==1){
@@ -238,11 +242,6 @@
 				_btnOk(key_value, bbmKey[0], '', '', 2);
 			}
 			
-			function q_stPost() {
-				if (!(q_cur == 1 || q_cur == 2))
-					return false;
-			}
-
 			function refresh(recno) {
 				_refresh(recno);
 				refreshBbs();

@@ -117,8 +117,9 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	
 ---------------------------------------------------------------------------------
 z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
-declare @t_user nvarchar(max) = '[4]'
-declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	SET QUOTED_IDENTIFIER OFF
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	declare @t_xsela nvarchar(10) = case when '#non' = [11] then '' else [11] end
 	declare @t_xselb nvarchar(10) = case when '#non' = [12] then '' else [12] end
 	
@@ -167,11 +168,13 @@ declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 		arrerage float,--鐳仔桶
 		total float
 	)
-		insert into @tmp (gno,noa,workdate,v01,MV,VN
+		insert into @tmp (gno,noa,workdate
+			,v01,MV,VN
 			,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE			
 			,T2,T4
 			,inteis,arrerage,total)
-		select '1',a.noa,a.datea,a.v01,a.v02,a.v03
+		select '1',a.noa,a.datea
+			,a.v01,a.v02,a.v03
 			,sum(isnull(n01,0)),sum(isnull(n02,0)),sum(isnull(n03,0)),sum(isnull(n04,0))
 			,sum(isnull(n05,0)),sum(isnull(n06,0)),sum(isnull(n07,0)),sum(isnull(n08,0))
 			,sum(isnull(b.n11,0)+isnull(b.n13,0))/*SHIFT*/
@@ -186,7 +189,7 @@ declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 		from borr a
 		left join borrs b on a.noa=b.noa
 		where a.vccno='tran_ln' 
-		and left(a.datea,7) = @t_mon 
+		and substring(a.datea,1,len(a.datea)-3) = @t_mon 
 		and b.[sign]!='borrs'
 		group by a.noa,a.datea,a.v01,a.v02,a.v03
 		
@@ -210,7 +213,7 @@ declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 		select @minsel=min(sel),@maxsel = MAX(sel) from @tmp where gno='1'
 
 		select gno
-			,sel rr
+			,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"v01=\'"+v01+"\'','95%','95%','')"+char(34)+">"+cast(sel as nvarchar)+"</a>" rr --序
 			,'新安運輸 '+@t_mon+' 船邊作業量統計表('+cast(@minsel as nvarchar)+'~'+cast(@maxsel as nvarchar)+')' titlea
 			,v01 a01	 
 			,right(workdate,5) a02	
