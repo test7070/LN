@@ -50,7 +50,8 @@
             	t_benddate = $('#txtBenddate').val();
             	t_eenddate = $('#txtEenddate').val();
                 t_noa = $.trim($('#txtNoa').val());
-                t_workno = $.trim($('#txtWorkno').val());
+                t_workno = $.trim($('#txtV01').val());
+                t_caseno = $.trim($('#txtCaseno').val());
 				t_memo = $.trim($('#txtMemo').val());
 				
                 var t_where = " 1=1 and vccno='tran_ln'" 
@@ -63,7 +64,10 @@
                 if (t_memo.length > 0){
                 	t_where += " and (charindex('" + t_memo + "',memo)>0"
                 		+" or exists(select noq from borrs where borrs.noa=borr.noa and  (charindex('" + t_memo + "',borrs.memo)>0)))";
-                }    
+                }  
+                if (t_caseno.length > 0){
+                	t_where += " and exists(select noq from borrs where borrs.noa=borr.noa and  (charindex('" + t_caseno + "',borrs.caseno)>0))";
+                }   
                 t_where = ' where=^^' + t_where + '^^ ';
                 return t_where;
             }
@@ -109,7 +113,7 @@
 					<td><input class="txt" id="txtNoa" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
-					<td class='seek'  style="width:20%;"><a>工作單號</a></td>
+					<td class='seek'  style="width:20%;"><a>船隻編號</a></td>
 					<td><input class="txt" id="txtV01" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
@@ -119,6 +123,10 @@
 				<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a>VOY NO.</a></td>
 					<td><input class="txt" id="txtV03" type="text" style="width:215px; font-size:medium;" /></td>
+				</tr>
+				<tr class='seek_tr'>
+					<td class='seek'  style="width:20%;"><a>櫃號</a></td>
+					<td><input class="txt" id="txtCaseno" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a>備註</a></td>

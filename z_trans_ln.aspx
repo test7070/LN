@@ -86,6 +86,9 @@
 	            }else{
 	            	$('#txtXplanid').val(t_para.planid);
 	            }
+	            
+	            $('#txtXsel1').val(1);
+	            $('#txtXsel2').val(999);
             }
 
             function q_boxClose(s2) {

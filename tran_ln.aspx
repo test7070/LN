@@ -19,8 +19,8 @@
 			var q_name = "borr";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2'
 				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'
-				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14','textA15','textA16','textA17'];
-			var q_readonlys = [];
+				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14','textA15','textA16','textA17','textA18'];
+			var q_readonlys = ['txtN15'];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
 			var bbmMask = [];
@@ -246,7 +246,7 @@
 			
 			function refreshBbs(){
 				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0
-					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0,t15=0,t16=0,t17=0;
+					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0,t15=0,t16=0,t17=0,t18=0;
 				for(var i=0;i<q_bbsCount;i++){
 					t01 += q_float('txtN01_'+i);
 					t02 += q_float('txtN02_'+i);
@@ -272,6 +272,7 @@
 					
 					t16 += q_float('txtInteis_'+i);
 					t17 += q_float('txtArrerage_'+i);
+					t18 += t + q_float('txtInteis_'+i) + q_float('txtArrerage_'+i);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
@@ -290,6 +291,7 @@
 				$('#textA15').val(t15);
 				$('#textA16').val(t16);
 				$('#textA17').val(t17);	
+				$('#textA18').val(t18);	
 			}
 
 			function readonly(t_para, empty) {
@@ -501,14 +503,15 @@
 				<table class="tview" id="tview">
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
-						<td align="center" style="width:120px; color:black;"><a>電腦編號</a></td>
+						<td align="center" style="width:120px; color:black;"><a>船隻編號</a></td>
 						<td align="center" style="width:80px; color:black;"><a>M.V.</a></td>
 						<td align="center" style="width:80px; color:black;"><a>VOY NO.</a></td>
 						<td align="center" style="width:100px; color:black;"><a>WHARF NO</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox"/></td>
-						<td id='noa' style="text-align: center;">~noa</td>
+						<td id='noa' style="text-align: center; display:none;">~noa</td>
+						<td id='v01' style="text-align: center;">~v01</td>
 						<td id='v02' style="text-align: center;">~v02</td>
 						<td id='v03' style="text-align: center;">~v03</td>
 						<td id='v06' style="text-align: center;">~v06</td>
@@ -527,7 +530,7 @@
 						<td class="tdZ"> </td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">工作單號</a></td>
+						<td><span> </span><a class="lbl">船隻編號</a></td>
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1" title="作業日期"/></td>
@@ -618,7 +621,6 @@
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>小計</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>超高<BR>吊架</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>鐳仔桶</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>合計</a></td>
 					<td align="center" colspan="2" rowspan="2"><a>TIME</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:120px;"><a>櫃號</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>櫃型</a></td>
@@ -700,8 +702,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA15" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA16" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA17" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA18" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><input id="textA18" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:120px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
@@ -734,7 +735,6 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>超高<BR>吊架</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>鐳仔桶</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>FROM</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>TO</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:120px;"><a>櫃號</a></td>
@@ -771,7 +771,6 @@
 					<td style="width:50px;"><input type="text" id="txtN15.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:60px;"><input type="text" id="txtInteis.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:60px;"><input type="text" id="txtArrerage.*" style="width:95%;text-align:right;"/></td>
-					<td style="width:50px;"><input type="text" id="textAmount.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:100px;"><input type="text" id="txtIndate.*" style="width:95%;"/></td>
 					<td style="width:100px;"><input type="text" id="txtEdate.*" style="width:95%;"/></td>
 					<td style="width:120px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
