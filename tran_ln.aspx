@@ -46,13 +46,15 @@
 				,['txtCustno', 'lblCust', 'cust', 'noa,nick', 'txtCustno,txtCust', 'cust_b.aspx']
 				,['txtPartno', 'lblPart2', 'cust', 'noa,nick', 'txtPartno,txtPart', 'cust_b.aspx']
 				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']);
-			
+
 			var _status = {bbs:[]};	
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
 					return;
 			}
-			
+			//q_bbsShow = -1;
+            //q_bbsShowTxt = ['txtCardeal', 'txtCardealno','txtInteis','txtArrerage'];
+            
 			$(document).ready(function() {
 				$.datepicker.r_len=4;
 				$.datepicker.setDefaults($.datepicker.regional["ENG"]);
@@ -132,6 +134,8 @@
 				},function(e){
 					$(this).parent().css('background','#cad3ff');
 				});
+				
+				
 				refreshBbs();
 			}
 
@@ -247,6 +251,8 @@
 			function refreshBbs(){
 				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0
 					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0,t15=0,t16=0,t17=0,t18=0;
+				
+				
 				for(var i=0;i<q_bbsCount;i++){
 					t01 += q_float('txtN01_'+i);
 					t02 += q_float('txtN02_'+i);
@@ -753,7 +759,7 @@
 						<input type="text" id="txtCardeal.*" style="float:left;width:55%;"/>
 						<input type="button" id="btnCardeal.*" style="display:none;"/>
 					</td>
-					<td style="width:80px"><input type="text" id="txtTypea.*" style="width:95%;"/></td>
+					<td style="width:80px"><input type="text" id="txtTypea.*" style="width:95%"/></td>
 					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:50px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:50px;"><input type="text" id="txtN03.*" style="width:95%;text-align:right;"/></td>
