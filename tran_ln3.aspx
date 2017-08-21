@@ -37,7 +37,8 @@
 			brwCount2 = 7;
 			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr2', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr2_b.aspx']
 				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
-				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']);
+				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']
+				,['txtV02', 'btnBoat', 'boat', 'boat,noa', 'txtV02', 'boat_b.aspx']);
 			
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
@@ -67,6 +68,16 @@
 				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd]);
 				q_mask(bbmMask);
 				document.title = '移櫃';
+				
+				$('#lblV02').click(function(e){
+					q_box('boat.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + "" + ";" + r_accy + "_" + r_cno, 'trans', "95%", "95%", m_print);
+				});
+				$('#txtV02').bind('contextmenu', function(e) {
+                    /*滑鼠右鍵*/
+                    e.preventDefault();
+                    $('#btnBoat').click();
+                });	
+				
 			}
             
 			function bbsAssign() {
@@ -448,8 +459,11 @@
 						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lblV02">船名</a></td>
-						<td><input type="text" id="txtV02" class="txt c1"/></td>
+						<td><span> </span><a id="lblV02" class="lbl btn">船名</a></td>
+						<td>
+							<input type="text" id="txtV02" class="txt c1"/>
+							<input type="button" id="btnBoat" style="display:none;" />
+						</td>
 						<td><span> </span><a class="lbl">代表航次</a></td>
 						<td><input type="text" id="txtV03" class="txt c1"/></td>
 					</tr>
