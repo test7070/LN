@@ -448,7 +448,7 @@
 						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">船名</a></td>
+						<td><span> </span><a class="lblV02">船名</a></td>
 						<td><input type="text" id="txtV02" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">代表航次</a></td>
 						<td><input type="text" id="txtV03" class="txt c1"/></td>
