@@ -38,7 +38,7 @@
 			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr2', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr2_b.aspx']
 				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
 				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']
-				,['txtV02', 'btnBoat', 'boat', 'noa,boat', 'txtV02', 'boat_b.aspx']);
+				,['txtV02', 'btnBoat', 'boat', 'noa,boat,conn', 'txtV02', 'boat_b.aspx']);
 			
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
@@ -518,6 +518,25 @@
 				</tr>
 			</table>
 		</div>
+		<div style="width: 1360px;">
+			<table>
+				<tr style='color:white; background:#003366;' > 	
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>TOTAL</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+				</tr>
+			</table>
+		</div>
 		<div class='dbbs' style="width: 1360px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
@@ -564,25 +583,6 @@
 					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:80px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
-				</tr>
-			</table>
-		</div>
-		<div style="width: 1360px;">
-			<table>
-				<tr style='color:white; background:#003366;' > 	
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>TOTAL</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:80px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 			</table>
 		</div>
