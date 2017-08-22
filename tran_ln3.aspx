@@ -38,7 +38,7 @@
 			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr2', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr2_b.aspx']
 				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
 				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']
-				,['txtV02', 'btnBoat', 'boat', 'boat,noa', 'txtV02', 'boat_b.aspx']);
+				,['txtV02', 'btnBoat', 'boat', 'noa,boat', 'txtV02', 'boat_b.aspx']);
 			
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
