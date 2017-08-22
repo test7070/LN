@@ -204,10 +204,18 @@ z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
 		update @tmp set pp = (recno-1)%@t_pagecount + 1, qq = floor((recno-1)/@t_pagecount) + 1
 		----合計
 		insert into @tmp (qq,recno,gno,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total,inteis,arrerage)
-		select qq,999,'2',SUM(LD2),SUM(LD4),SUM(LL2),SUM(LL4),SUM(ED2),SUM(ED4),SUM(EL2),SUM(EL4),SUM(SH),SUM(RE),
+		select qq,998,'2',SUM(LD2),SUM(LD4),SUM(LL2),SUM(LL4),SUM(ED2),SUM(ED4),SUM(EL2),SUM(EL4),SUM(SH),SUM(RE),
 		SUM(T2),SUM(T4),SUM(total),SUM(isnull(inteis,0)),sum(isnull(arrerage,0))
 		from @tmp
 		group by qq
+		--累計
+		insert into @tmp (qq,recno,gno,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total,inteis,arrerage)
+		select a.qq,999,'3',SUM(b.LD2),SUM(b.LD4),SUM(b.LL2),SUM(b.LL4),SUM(b.ED2),SUM(b.ED4),SUM(b.EL2),SUM(b.EL4)
+			,SUM(b.SH),SUM(b.RE),SUM(b.T2),SUM(b.T4),SUM(b.total),SUM(isnull(b.inteis,0)),sum(isnull(b.arrerage,0))
+		from @tmp a
+		left join @tmp b on b.gno='2' and a.qq>=b.qq
+		where a.gno='2'
+		group by a.qq
 		--*************************************************************************************
 		declare @minsel int = 0 , @maxsel int = 0
 		select @minsel=min(sel),@maxsel = MAX(sel) from @tmp where gno='1'
