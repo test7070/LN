@@ -120,10 +120,11 @@ z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
 	SET QUOTED_IDENTIFIER OFF
 	declare @t_user nvarchar(max) = '[4]'
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	declare @t_bdate nvarchar(10) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(10) = case when '#non' = [9] then char(255) else [9] end
 	declare @t_xsela nvarchar(10) = case when '#non' = [11] then '' else [11] end
 	declare @t_xselb nvarchar(10) = case when '#non' = [12] then '' else [12] end
-	
-	--**********************************************************
+	--**********************************************************************************
 	declare @t_bsel int = 0
 	declare @t_esel int = 0
 	begin try
@@ -189,7 +190,8 @@ z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
 		from borr a
 		left join borrs b on a.noa=b.noa
 		where a.vccno='tran_ln' 
-		and substring(a.datea,1,len(a.datea)-3) = @t_mon 
+		and (len(@t_mon)=0 or substring(a.datea,1,len(a.datea)-3) = @t_mon ) 
+		and a.datea between @t_bdate and @t_edate
 		and b.[sign]!='borrs'
 		group by a.noa,a.datea,a.v01,a.v02,a.v03
 		
