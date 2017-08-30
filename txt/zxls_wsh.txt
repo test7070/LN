@@ -108,8 +108,6 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 					update @tmp set [arrival]= cast(case when charindex('上午',@d)>0 then replace(@d,'上午','')+' AM'
 						when charindex('下午',@d)>0 then replace(@d,'下午','')+' PM'
 						else @d end as datetime)
-					select 'x'
-					select * from @tmp
 				end
 				if @g = 'P.O.B:'
 				begin
@@ -261,6 +259,18 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 			,in_hatch_shift_20,in_hatch_shift_40,shift_20,shift_40
 			,reload_20,reload_40
 		from @tmps
+		
+		--BORR.DATEA 由 BORRS.indate
+		begin try
+			update borr set datea=convert(nvarchar,cast(left(b.indate,10) as datetime),111)
+			from borr a
+			outer apply (select top 1 indate from borrs b where noa=@no order by noq ) b
+			where a.noa=@no and len(isnull(b.indate,''))>0
+		end try
+		begin catch
+			select @no+' 日期轉換異常'
+		end catch
+		
 	end
 	else
 	begin
