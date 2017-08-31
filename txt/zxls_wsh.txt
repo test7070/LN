@@ -270,7 +270,7 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		begin catch
 			select @no+' 日期轉換異常'
 		end catch
-		
+	
 	end
 	else
 	begin
@@ -286,36 +286,31 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		if not exists(select * from borr where noa=@noa)
 		begin
 			-- 找不到表頭
+			print '找不到表頭'+@noa
 			return
 		end
 		
 		declare @tmpss table(
 			sel int identity(1,1)
+			,gcno nvarchar(20)
 			,bayno nvarchar(20)
 			,caseno nvarchar(20)
 			,spec nvarchar(20)
 		)
 		
 		declare cursor_table cursor for
-		select a,b,c,d,e,f from ztmpxls order by CAST(noa as int)
+		select ltrim(rtrim(a)),ltrim(rtrim(b)),ltrim(rtrim(c)),ltrim(rtrim(d)),ltrim(rtrim(e)),f,g 
+			from ztmpxls where CAST(noa as int)!=1 order by CAST(noa as int)
 		open cursor_table
 		fetch next from cursor_table
-		into @a,@b,@c,@d,@e,@f
+		into @a,@b,@c,@d,@e,@f,@g
 		while(@@FETCH_STATUS <> -1)
 		begin
-			if @a!='Trailer_No' and CHARINDEX('計算',@b)=0
-			begin
-				if LEN(ISNULL(@a,''))>0
-				begin
-					set @curbayno = ltrim(rtrim(@a))
-				end
-				
-				insert into @tmpss(bayno,caseno,spec)
-				select @curbayno,@b,case @d when '2' then '20' when '4' then '40' end + "'"+@c
-			end
-
+			insert into @tmpss(gcno,bayno,caseno,spec)
+			select @a,@b,@c,case @e when '2' then '20' when '4' then '40' end + "'"+@d
+			
 			fetch next from cursor_table
-			into @a,@b,@c,@d,@e,@f
+			into @a,@b,@c,@d,@e,@f,@g
 		end
 		close cursor_table
 		deallocate cursor_table
@@ -327,9 +322,10 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		select @nn = MAX(cast(noq as int)) from borrs where noa=@noa
 		set @nn = ISNULL(@nn,0)
 		
-		insert into borrs([sign],noa,noq,typea,caseno,casetype)
+		insert into borrs([sign],noa,noq,vo,typea,caseno,casetype)
 		select 'borrs',@noa
 			,substring(@string,floor((ROW_NUMBER()over(order by sel)+@nn)/100)+1,1) + RIGHT('00'+CAST(ROW_NUMBER()over(order by sel)+@nn as nvarchar),2)
-			,bayno,caseno,spec
+			,gcno,bayno,caseno,spec
 		from @tmpss
+		
 	end;

@@ -616,6 +616,7 @@
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>GCNO</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:100px;"><a>車行</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:80px;"><a>BAY<BR>NO.</a></td>
 					<td align="center" colspan="4" rowspan="1"><a>LADEN</a></td>
@@ -688,6 +689,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>TOTAL</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
@@ -721,6 +723,7 @@
 					<td align="center" style="width:50px;"> </td>
 					<td align="center" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>20'</a></td>
@@ -753,6 +756,7 @@
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
+					<td style="width:50px"><input type="text" id="txtVo.*" style="width:95%;"/></td>
 					<td style="width:100px">
 						<input type="text" id="txtCardealno.*" style="float:left;width:35%;"/>
 						<input type="text" id="txtCardeal.*" style="float:left;width:55%;"/>
