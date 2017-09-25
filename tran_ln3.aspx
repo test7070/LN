@@ -506,7 +506,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>
+					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
@@ -525,7 +525,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
@@ -544,7 +544,7 @@
 					<td align="center" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>
+					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
@@ -562,8 +562,8 @@
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
 					<td style="width:150px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
-					<td style="width:50px;"><input type="text" id="txtEf.*" list="listEf" style="width:95%;"/></td>
-					<td style="width:80px;"><input type="text" id="txtCasetype.*" style="width:95%;"/></td>
+					<!--<td style="width:50px;"><input type="text" id="txtEf.*" list="listEf" style="width:95%;"/></td>-->
+					<td style="width:80px;"><input type="text" id="txtCasetype.*" list="listCasetype" style="width:95%;"/></td>
 					<td style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>
 					<td style="width:100px">
 						<input type="text" id="txtCardealno.*" style="float:left;width:45%;"/>
@@ -589,6 +589,14 @@
 		<datalist id="listEf">
 			<option value="E"> </option>
 			<option value="F"> </option>
+		</datalist>
+		<datalist id="listCasetype">
+			<option>20'E</option>
+			<option>40'E</option>
+			<option>20'F</option>
+			<option>40'F</option>
+			<option>20'押運</option>
+			<option>40'押運</option>
 		</datalist>
 		<input id="q_sys" type="hidden" />
 	</body>

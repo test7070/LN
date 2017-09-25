@@ -151,7 +151,7 @@
             function _btnSeek() {
                 if (q_cur > 0 && q_cur < 4)
                     return;
-                q_box('addr_ln_s.aspx', q_name + '_s', "500px", "330px", q_getMsg("popSeek"));
+                q_box('addr_ln_s.aspx', q_name + '_s', "500px", "400px", q_getMsg("popSeek"));
             }
 
             function bbsAssign() {
@@ -417,13 +417,15 @@
 				<table class="tview" id="tview">
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
-						<td align="center" style="width:200px; color:black;"><a id='vewNoa'> </a></td>
-						<td align="center" style="width:200px; color:black;"><a id='vewStraddr'> </a></td>
-						<td align="center" style="width:200px; color:black;"><a id='vewEndaddr'> </a></td>
+						<td align="center" style="width:150px; color:black;"><a id='vewNoa'> </a></td>
+						<td align="center" style="width:150px; color:black;"><a>科目</a></td>
+						<td align="center" style="width:150px; color:black;"><a id='vewStraddr'> </a></td>
+						<td align="center" style="width:150px; color:black;"><a id='vewEndaddr'> </a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox" /></td>
 						<td style="text-align: center;" id='noa'>~noa</td>
+						<td style="text-align: left;" id='addr'>~addr</td>
 						<td style="text-align: left;" id='straddr'>~straddr</td>
 						<td style="text-align: left;" id='endaddr'>~endaddr</td>
 					</tr>
@@ -442,6 +444,12 @@
 						<td><span> </span><a id='lblNoa' class="lbl"> </a></td>
 						<td colspan="3">
 						<input id="txtNoa" type="text" class="txt c1" />
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a class="lbl">科目</a></td>
+						<td colspan="3">
+						<input id="txtAddr" type="text" class="txt c1" />
 						</td>
 					</tr>
 					<tr>
@@ -514,6 +522,9 @@
 			<option>40'E</option>
 			<option>20'F</option>
 			<option>40'F</option>
+			<option>油桶櫃</option>
+			<option>20'押運</option>
+			<option>40'押運</option>
 		</datalist>
 		<input id="q_sys" type="hidden" />
 	</body>

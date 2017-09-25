@@ -36,11 +36,14 @@
 
             function q_seekStr() {
                 t_noa = $('#txtNoa').val();
+                t_addr = $.trim($('#txtAddr').val());
                 t_straddr = $.trim($('#txtStraddr').val());
                 t_endaddr = $.trim($('#txtEndaddr').val());
 				t_memo = $.trim($('#txtMemo').val());
                 var t_where = " 1=1 " 
                 	+ q_sqlPara2("noa", t_noa);
+            	if (t_addr.length > 0)
+                    t_where += " and charindex(N'" + t_addr + "',addr)>0";
                 if (t_straddr.length > 0)
                     t_where += " and charindex(N'" + t_straddr + "',straddr)>0";
                 if (t_endaddr.length > 0)
@@ -69,6 +72,12 @@
 					<td class='seek'  style="width:20%;"><a id='lblNoa'></a></td>
 					<td>
 					<input class="txt" id="txtNoa" type="text" style="width:215px; font-size:medium;" />
+					</td>
+				</tr>
+				<tr class='seek_tr'>
+					<td class='seek'  style="width:20%;"><a>科目</a></td>
+					<td>
+					<input class="txt" id="txtAddr" type="text" style="width:215px; font-size:medium;" />
 					</td>
 				</tr>
 				<tr class='seek_tr'>
