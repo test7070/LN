@@ -106,6 +106,7 @@
                     
                     $('#txtN01_'+i).change(function(e){refreshBbs();});
                     $('#txtN02_'+i).change(function(e){refreshBbs();});
+                    $('#txtN03_'+i).change(function(e){refreshBbs();});
 				}
 				_bbsAssign();
 				$('#tbbs').find('tr.data').children().hover(function(e){
@@ -214,13 +215,15 @@
 			}
 			
 			function refreshBbs(){
-				var t01=0,t02=0;
+				var t01=0,t02=0,t03=0;
 				for(var i=0;i<q_bbsCount;i++){
 					t01 += q_float('txtN01_'+i);
 					t02 += q_float('txtN02_'+i);
+					t03 += q_float('txtN03_'+i);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
+				$('#textA03').val(t03);
 			}
 
 			function readonly(t_para, empty) {
@@ -508,11 +511,13 @@
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
 					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>油桶櫃</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>油桶櫃<br>數量</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>加價</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
@@ -527,11 +532,13 @@
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
 					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>TOTAL</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA03" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
@@ -546,11 +553,13 @@
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
 					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
+					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>油桶櫃</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>油桶櫃<br>數量</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>加價</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
@@ -564,6 +573,7 @@
 					<td style="width:150px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
 					<!--<td style="width:50px;"><input type="text" id="txtEf.*" list="listEf" style="width:95%;"/></td>-->
 					<td style="width:80px;"><input type="text" id="txtCasetype.*" list="listCasetype" style="width:95%;"/></td>
+					<td style="width:60px"><input type="checkbox" id="chkChk2.*" style="width:95%;"/></td>
 					<td style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>
 					<td style="width:100px">
 						<input type="text" id="txtCardealno.*" style="float:left;width:45%;"/>
@@ -581,6 +591,7 @@
 						<input type="button" id="btnAddr2.*" style="display:none;"/>
 					</td>
 					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
+					<td style="width:60px;"><input type="text" id="txtN03.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:80px;"><input type="text" id="txtN02.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
