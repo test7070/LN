@@ -62,6 +62,7 @@
                         q_gt('addr', t_where, 0, 0, 0, "checkAddrno_change", r_accy);
                     }
                 });
+                q_cmbParse("cmbCustunit", " ,20'E,40'E,20'F,40'F,油桶櫃,20'押運,40'押運","s");
             }
 
             function q_funcPost(t_func, result) {
@@ -499,7 +500,7 @@
 					</td>
 					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
 					<td><input type="text" id="txtDatea.*" style="width:95%;" /></td>
-					<td><input type="text" id="txtCustunit.*" style="width:95%;" list="listUnit"/></td>
+					<td><select id="cmbCustunit.*" style="width:95%;"> </select></td>
 					<td>
 						<input type="text" id="txtCustno.*" style="width:45%;float:left;" />
 						<input type="text" id="txtCust.*" style="width:50%;"float:left;/>
@@ -517,15 +518,7 @@
 				</tr>
 			</table>
 		</div>
-		<datalist id="listUnit"> 
-			<option>20'E</option>
-			<option>40'E</option>
-			<option>20'F</option>
-			<option>40'F</option>
-			<option>油桶櫃</option>
-			<option>20'押運</option>
-			<option>40'押運</option>
-		</datalist>
+		
 		<input id="q_sys" type="hidden" />
 	</body>
 </html>

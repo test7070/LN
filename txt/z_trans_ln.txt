@@ -65,55 +65,116 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	-------------------------------------------------------------------------------------------
-	declare @tmp table(
+	declare @tmpa table(
 		sel int identity(1,1)
-		,gno nvarchar(20)
-		,pno int
 		,noa nvarchar(20)
-		,plan_id nvarchar(50)
-		,begindate nvarchar(20)
-		,enddate nvarchar(20)
-		,mv nvarchar(10)
-		,voyage nvarchar(20)
+		,planid nvarchar(30)
+		,datea nvarchar(50)
+		,v02 nvarchar(20)--船名
+		,v03 nvarchar(30)--航次
 		,straddrno nvarchar(20)
-		,straddr nvarchar(20)
+		,straddr nvarchar(50)
 		,endaddrno nvarchar(20)
 		,endaddr nvarchar(50)
-		,memo nvarchar(max)
-		,mount float
+		
+		,e20 float
+		,e40 float
+		,f20 float
+		,f40 float
+		,h01 float --油桶櫃
+		,h02 float --20'押運
+		,h03 float --40'押運
+		,h20c nvarchar(max)--20'OOG附加費	
+		,h20 float
+		,h40c nvarchar(max)--40'OOG附加費
+		,h40 float
 	)
+	insert into @tmpa(noa,planid,datea,v02,v03,straddrno,straddr,endaddrno,endaddr
+		,e20,e40,f20,f40,h01,h02,h03,h20c,h20,h40c,h40)
+	select a.noa,isnull(b.v01,'') planid
+		,case when len(isnull(b.begindate,''))=0 then b.datea 
+			when isnull(b.begindate,'')=isnull(b.enddate,'') then b.begindate 
+			else isnull(b.begindate,'')+'~'+isnull(b.enddate,'') end datea
+		,isnull(v02,''),isnull(v03,'')
+		,isnull(a.addrno,'') straddrno,isnull(a.addr,'') straddr
+		,isnull(a.addrno2,'') endaddrno,isnull(a.addr2,'') endaddr
+		,case when a.casetype = "20'E" or a.casetype ="20~#$E" then isnull(a.n01,0) else 0 end
+		,case when a.casetype = "40'E" or a.casetype ="40~#$E" then isnull(a.n01,0) else 0 end
+		,case when a.casetype = "20'F" or a.casetype ="20~#$F" then isnull(a.n01,0) else 0 end
+		,case when a.casetype = "40'F" or a.casetype ="40~#$F" then isnull(a.n01,0) else 0 end
+		,isnull(n02,0) h01
+		,isnull(n03,0) h02
+		,isnull(n04,0) h03
+		,isnull(m01,'') h20
+		,isnull(n03,0) h20a
+		,isnull(m02,'') h40
+		,isnull(n04,0) h40a
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.vccno='tran_ln3' 
+	and LEFT(b.datea,7) = @t_mon
+	order by b.datea,b.v01,a.noa,a.noq
+
+	-----------------------------------------------------------------------------------------------
+	declare @tmpb table(
+		sel int identity(1,1)
+		,gno nvarchar(10)
+		,recno int
+		,noa nvarchar(20)
+		,planid nvarchar(30)
+		,datea nvarchar(50)
+		,v02 nvarchar(20)--船名
+		,v03 nvarchar(30)--航次
+		,straddrno nvarchar(20)
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+		
+		,e20 float
+		,e40 float
+		,f20 float
+		,f40 float
+		,h01 float --油桶櫃
+		,h02 float --20'押運
+		,h03 float --40'押運
+		,h20 float--20'OOG附加費
+		,h40 float--40'OOG附加費
+	)
+	insert into @tmpb(noa,planid,datea,v02,v03,straddrno,straddr,endaddrno,endaddr
+		,e20,e40,f20,f40,h01,h02,h03,h20,h40)
+	select noa,planid
+		,datea,v02,v03,straddrno,straddr,endaddrno,endaddr
+		,sum(isnull(e20,'')),sum(isnull(e40,'')),sum(isnull(f20,'')),sum(isnull(f40,''))
+		,sum(isnull(h01,'')),sum(isnull(h02,'')),sum(isnull(h03,'')),sum(isnull(h20,'')),sum(isnull(h40,''))
+	from @tmpa
+	group by noa,planid,datea,v02,v03,straddrno,straddr,endaddrno,endaddr	
 	
-	insert into @tmp(gno,pno,noa, plan_id,begindate,enddate,mv,voyage,straddrno,straddr,endaddrno,endaddr,memo)
-	select '1',1,noa,v01 plan_id,begindate,enddate,v02,v03 voyage,'' straddrno,'' straddr,'' endaddrno,'' endaddr,memo 
-	from borr
-	where vccno='tran_ln3'
-	and LEFT(datea,7) = @t_mon
-	order by datea,v01
-	
-	update @tmp set straddrno=b.addrno,straddr=b.addr
-		,endaddrno=b.addrno2,endaddr=b.addr2
-	from @tmp a
-	outer apply(select top 1 * from borrs where noa=a.noa order by noq) b 
-	
-	update @tmp set mount=b.mount
-	from @tmp a
-	outer apply (select SUM(ISNULL(n01,0)) mount from borrs where noa=a.noa) b
-	
-	select gno 
-		,sel rr
-		,@t_mon a01
-		,plan_id b01
-		,case when len(ISNULL(begindate,''))>0 and len(ISNULL(enddate,''))>0 then begindate+'~'+enddate
-			else isnull(begindate,'')+ISNULL(enddate,'') end b02
-		,mv b03
-		,voyage b04
-		,straddr b05
-		,endaddr b06
-		,mount b07
-		,memo b08
-		,* 
-	from @tmp
-	order by sel;
+	update @tmpb set recno=b.recno
+	from @tmpb a
+	left join (select datea,planid,ROW_NUMBER()over(order by datea,planid) recno from @tmpb group by datea,planid) b on a.datea=b.datea and a.planid=b.planid
+
+	update @tmpb set gno=case b.recno when 1 then '1' else '2' end
+	from @tmpb a
+	left join (select sel,ROW_NUMBER()over(partition by noa order by sel) recno from @tmpb ) b on a.sel=b.sel
+
+	select gno
+		,recno rr
+		,planid a01
+		,datea a02
+		,v02 a03
+		,v03 a04
+		,straddr a05
+		,endaddr a06
+		,f20 b01
+		,f40 b02
+		,e20 b03
+		,e40 b04
+		,h01 b05
+		,h02 b06
+		,h03 b07
+		,h20 b08
+		,h40 b09 
+	from @tmpb order by recno,sel;
 	
 ---------------------------------------------------------------------------------
 z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
