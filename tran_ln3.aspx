@@ -34,7 +34,7 @@
 			brwKey = 'noa';
 			q_alias = '';
 			q_desc = 1;
-			brwCount2 = 7;
+			brwCount2 = 10;
 			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr2', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr2_b.aspx']
 				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
 				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']
@@ -512,6 +512,12 @@
 						</td>
 					</tr>
 					<tr>
+						<td><span> </span><a id="lblMemo2" class="lbl">備註(請款憑證)</a></td>
+						<td colspan="5">
+							<textarea id="txtMemo2" class="txt c1" style="height:75px;"> </textarea>
+						</td>
+					</tr>
+					<tr>
 						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
 						<td><input id="txtWorker" type="text"  class="txt c1"/></td>
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
@@ -605,8 +611,7 @@
 					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
 					<td style="width:150px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
 					<!--<td style="width:50px;"><input type="text" id="txtEf.*" list="listEf" style="width:95%;"/></td>-->
-					<td style="width:80px;">
-						<select id="cmbCasetype.*" style="width:95%;"> </select>
+					<td style="width:80px;"><select id="cmbCasetype.*" style="width:95%;"> </select></td>
 						<!--<input type="text" id="txtCasetype.*" list="listCasetype" style="width:95%;"/></td>-->
 					<!--<td style="width:60px"><input type="checkbox" id="chkChk2.*" style="width:95%;"/></td>-->
 					<td style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>

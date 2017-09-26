@@ -72,6 +72,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,datea nvarchar(50)
 		,v02 nvarchar(20)--船名
 		,v03 nvarchar(30)--航次
+		,memo2 nvarchar(max)
 		,straddrno nvarchar(20)
 		,straddr nvarchar(50)
 		,endaddrno nvarchar(20)
@@ -89,13 +90,13 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,h40c nvarchar(max)--40'OOG附加費
 		,h40 float
 	)
-	insert into @tmpa(noa,planid,datea,v02,v03,straddrno,straddr,endaddrno,endaddr
+	insert into @tmpa(noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
 		,e20,e40,f20,f40,h01,h02,h03,h20c,h20,h40c,h40)
 	select a.noa,isnull(b.v01,'') planid
 		,case when len(isnull(b.begindate,''))=0 then b.datea 
 			when isnull(b.begindate,'')=isnull(b.enddate,'') then b.begindate 
 			else isnull(b.begindate,'')+'~'+isnull(b.enddate,'') end datea
-		,isnull(v02,''),isnull(v03,'')
+		,isnull(b.v02,''),isnull(b.v03,''),isnull(b.memo2,'')
 		,isnull(a.addrno,'') straddrno,isnull(a.addr,'') straddr
 		,isnull(a.addrno2,'') endaddrno,isnull(a.addr2,'') endaddr
 		,case when a.casetype = "20'E" or a.casetype ="20~#$E" then isnull(a.n01,0) else 0 end
@@ -125,6 +126,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,datea nvarchar(50)
 		,v02 nvarchar(20)--船名
 		,v03 nvarchar(30)--航次
+		,memo2 nvarchar(max)
 		,straddrno nvarchar(20)
 		,straddr nvarchar(50)
 		,endaddrno nvarchar(20)
@@ -140,14 +142,14 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,h20 float--20'OOG附加費
 		,h40 float--40'OOG附加費
 	)
-	insert into @tmpb(noa,planid,datea,v02,v03,straddrno,straddr,endaddrno,endaddr
+	insert into @tmpb(noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
 		,e20,e40,f20,f40,h01,h02,h03,h20,h40)
 	select noa,planid
-		,datea,v02,v03,straddrno,straddr,endaddrno,endaddr
+		,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
 		,sum(isnull(e20,'')),sum(isnull(e40,'')),sum(isnull(f20,'')),sum(isnull(f40,''))
 		,sum(isnull(h01,'')),sum(isnull(h02,'')),sum(isnull(h03,'')),sum(isnull(h20,'')),sum(isnull(h40,''))
 	from @tmpa
-	group by noa,planid,datea,v02,v03,straddrno,straddr,endaddrno,endaddr	
+	group by noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr	
 	
 	update @tmpb set recno=b.recno
 	from @tmpb a
@@ -174,6 +176,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,h03 b07
 		,h20 b08
 		,h40 b09 
+		,memo2 b10
 	from @tmpb order by recno,sel;
 	
 ---------------------------------------------------------------------------------
