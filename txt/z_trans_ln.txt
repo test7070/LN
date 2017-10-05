@@ -1,7 +1,7 @@
 ﻿z_trans_ln09:--z_trans_ln09 z_trans_ln.txt
 	SET QUOTED_IDENTIFIER OFF 
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
-	declare @t_edate nvarchar(20) = case when '#non' = [9] then '' else [9] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
 	--------------------------------------------------------------------------------------------------------------
 	declare @tmp table(
 		sel int identity(1,1)
