@@ -1,4 +1,72 @@
-﻿z_trans_ln07:--z_trans_ln07 z_trans_ln.txt
+﻿z_trans_ln09:--z_trans_ln09 z_trans_ln.txt
+	SET QUOTED_IDENTIFIER OFF 
+	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then '' else [9] end
+	--------------------------------------------------------------------------------------------------------------
+	declare @tmp table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,noa nvarchar(20)
+		,v01 nvarchar(30)
+		,v02 nvarchar(30)
+		,v03 nvarchar(30)
+		,v06 nvarchar(30)
+		
+		,N01 float
+		,N02 float
+		,N03 float
+		,N04 float
+		,N05 float
+		,N06 float
+		,N07 float
+		,N08 float
+		,N09 float
+		,N10 float
+		,N11 float
+		,N12 float
+		,N13 float
+		,N14 float
+		,N15 float
+		
+		,inteis float
+		,arrerage float
+		
+		,casecount float
+	)
+	insert into @tmp(gno,pno,noa,v01,v02,v03,v06
+		,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,N15,inteis,arrerage,casecount)
+	select '1',1,a.noa,a.v01,a.v02,a.v03,a.v06  
+		,SUM(ISNULL(b.n01,0)),SUM(ISNULL(b.n02,0)),SUM(ISNULL(b.n03,0)),SUM(ISNULL(b.n04,0)),SUM(ISNULL(b.n05,0))
+		,SUM(ISNULL(b.n06,0)),SUM(ISNULL(b.n07,0)),SUM(ISNULL(b.n08,0)),SUM(ISNULL(b.n09,0)),SUM(ISNULL(b.n10,0))
+		,SUM(ISNULL(b.n11,0)),SUM(ISNULL(b.n12,0)),SUM(ISNULL(b.n13,0)),SUM(ISNULL(b.n14,0)),SUM(ISNULL(b.n15,0))
+		,SUM(ISNULL(b.inteis,0)),SUM(ISNULL(b.arrerage,0))
+		,SUM(case when len(isnull(b.caseno,''))>0 then 1 else 0 end)
+	from borr a 
+	left join borrs b on a.noa=b.noa
+	where a.vccno='tran_ln'
+	and a.datea between @t_bdate and @t_edate
+	group by a.noa,a.v01,a.v02,a.v03,a.v06
+	order by a.v01
+	
+	insert into @tmp(gno,pno,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,N15,inteis,arrerage,casecount)
+	select '2',2,SUM(ISNULL(n01,0)),SUM(ISNULL(n02,0)),SUM(ISNULL(n03,0)),SUM(ISNULL(n04,0)),SUM(ISNULL(n05,0))
+		,SUM(ISNULL(n06,0)),SUM(ISNULL(n07,0)),SUM(ISNULL(n08,0)),SUM(ISNULL(n09,0)),SUM(ISNULL(n10,0))
+		,SUM(ISNULL(n11,0)),SUM(ISNULL(n12,0)),SUM(ISNULL(n13,0)),SUM(ISNULL(n14,0)),SUM(ISNULL(n15,0))
+		,SUM(ISNULL(inteis,0)),SUM(ISNULL(arrerage,0)),SUM(ISNULL(casecount,0))
+	from @tmp 
+	where pno=1
+	
+	select "<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"noa=\'"+noa+"\'','95%','95%','')"+char(34)+">"+cast(sel as nvarchar)+"</a>" rr
+		,*
+		,inteis m01
+		,arrerage m02
+		,casecount m03
+	from @tmp
+	order by pno,sel;
+
+
+z_trans_ln07:--z_trans_ln07 z_trans_ln.txt
 declare @t_user nvarchar(max) = '[4]'
 declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 declare @t_edate nvarchar(20) = case when '#non' = [9] then '' else [9] end
