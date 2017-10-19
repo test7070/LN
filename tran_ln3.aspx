@@ -96,12 +96,16 @@
                     $('#txtAddrno_' + i).bind('contextmenu', function(e) {
                         /*滑鼠右鍵*/
                         e.preventDefault();
+                        //20171019 按右鍵重新選擇
+                        $(this).val('');
                         var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
                         $('#btnAddr_'+n).click();
                     });
                     $('#txtAddrno2_' + i).bind('contextmenu', function(e) {
                         /*滑鼠右鍵*/
                         e.preventDefault();
+                        //20171019 按右鍵重新選擇
+                        $(this).val('');
                         var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
                         $('#btnAddr2_'+n).click();
                     });
