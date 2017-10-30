@@ -62,6 +62,7 @@
 		,inteis m01
 		,arrerage m02
 		,casecount m03
+		,n15+inteis+arrerage m04
 	from @tmp
 	order by pno,sel;
 
