@@ -158,6 +158,13 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,h20 float
 		,h40c nvarchar(max)--40'OOG附加費
 		,h40 float
+		
+		,m_e20 float
+		,m_e40 float
+		,m_f20 float
+		,m_f40 float
+		,m_h01 float --油桶櫃
+		,total float
 	)
 	insert into @tmpa(noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
 		,e20,e40,f20,f40,h01,h02,h03,h20c,h20,h40c,h40)
@@ -184,10 +191,53 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	where b.vccno='tran_ln3' 
 	and LEFT(b.datea,7) = @t_mon
 	order by b.datea,b.v01,a.noa,a.noq
+	
+	
+	--限定客戶: 萬海
+	update @tmpa set m_e20 = e20 * ISNULL(c.custprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddr=y.straddr and a.endaddr=y.endaddr
+			and x.custno='001' and x.custunit="20~#$E" and x.datea<=a.datea order by x.datea desc) c
+	update @tmpa set m_f20 = f20 * ISNULL(c.custprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddr=y.straddr and a.endaddr=y.endaddr
+			and x.custno='001' and x.custunit="20~#$F" and x.datea<=a.datea order by x.datea desc) c
+	update @tmpa set m_e40 = e40 * ISNULL(c.custprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddr=y.straddr and a.endaddr=y.endaddr
+			and x.custno='001' and x.custunit="40~#$E" and x.datea<=a.datea order by x.datea desc) c
+	update @tmpa set m_f40 = f40 * ISNULL(c.custprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddr=y.straddr and a.endaddr=y.endaddr
+			and x.custno='001' and x.custunit="40~#$F" and x.datea<=a.datea order by x.datea desc) c
+
+	update @tmpa set m_h01 = h01 * ISNULL(c.custprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddr=y.straddr and a.endaddr=y.endaddr
+			and x.custno='001' and x.custunit="油桶櫃" and x.datea<=a.datea order by x.datea desc) c
+	
+	update @tmpa set total = ISNULL(m_e20,0)+ISNULL(m_e40,0)+ISNULL(m_f20,0)+ISNULL(m_f40,0)+ISNULL(m_h01,0)
+		+ISNULL(h02,0)+ISNULL(h03,0)+ISNULL(h20,0)+ISNULL(h40,0)
 
 	-----------------------------------------------------------------------------------------------
 	declare @tmpb table(
 		sel int identity(1,1)
+		,pno int
 		,gno nvarchar(10)
 		,recno int
 		,noa nvarchar(20)
@@ -210,13 +260,23 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,h03 float --40'押運
 		,h20 float--20'OOG附加費
 		,h40 float--40'OOG附加費
+		
+		,m_e20 float
+		,m_e40 float
+		,m_f20 float
+		,m_f40 float
+		,m_h01 float --油桶櫃
+		,total float
 	)
-	insert into @tmpb(noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
-		,e20,e40,f20,f40,h01,h02,h03,h20,h40)
-	select noa,planid
+	insert into @tmpb(pno,noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
+		,e20,e40,f20,f40,h01,h02,h03,h20,h40
+		,m_e20,m_e40,m_f20,m_f40,m_h01,total)
+	select 1,noa,planid
 		,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
 		,sum(isnull(e20,'')),sum(isnull(e40,'')),sum(isnull(f20,'')),sum(isnull(f40,''))
 		,sum(isnull(h01,'')),sum(isnull(h02,'')),sum(isnull(h03,'')),sum(isnull(h20,'')),sum(isnull(h40,''))
+		,sum(isnull(m_e20,'')),sum(isnull(m_e40,'')),sum(isnull(m_f20,'')),sum(isnull(m_f40,''))
+		,sum(isnull(m_h01,'')),sum(isnull(total,''))
 	from @tmpa
 	group by noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr	
 	
@@ -227,6 +287,15 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	update @tmpb set gno=case b.recno when 1 then '1' else '2' end
 	from @tmpb a
 	left join (select sel,ROW_NUMBER()over(partition by noa order by sel) recno from @tmpb ) b on a.sel=b.sel
+	
+	insert into @tmpb(gno,pno,f20,f40,e20,e40,h01,h02,h03,h20,h40
+		,m_e20,m_e40,m_f20,m_f40,m_h01,total)
+	select '3',2,SUM(ISNULL(f20,0)),SUM(ISNULL(f40,0)),SUM(ISNULL(e20,0)),SUM(ISNULL(e40,0))
+		,SUM(ISNULL(h01,0)),SUM(ISNULL(h02,0)),SUM(ISNULL(h03,0))
+		,SUM(ISNULL(h20,0)),SUM(ISNULL(h40,0))
+		,SUM(ISNULL(m_e20,0)),SUM(ISNULL(m_e40,0)),SUM(ISNULL(m_f20,0)),SUM(ISNULL(m_f40,0))
+		,SUM(ISNULL(m_h01,0)),SUM(ISNULL(total,0))
+	from @tmpb 
 
 	select gno
 		,recno rr
@@ -246,7 +315,14 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,h20 b08
 		,h40 b09 
 		,memo2 b10
-	from @tmpb order by recno,sel;
+		
+		,dbo.getComma(m_f20,-1) c01
+		,dbo.getComma(m_f40,-1) c02
+		,dbo.getComma(m_e20,-1) c03
+		,dbo.getComma(m_e40,-1) c04
+		,dbo.getComma(m_h01,-1) c05
+		,dbo.getComma(total,-1) c06
+	from @tmpb order by pno,recno,sel;
 	
 ---------------------------------------------------------------------------------
 z_trans_ln05:--z_trans_ln05 z_trans_ln.txt

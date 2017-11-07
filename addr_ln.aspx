@@ -38,6 +38,9 @@
 				,['txtEndaddrno', 'lblEndaddr', 'addr2', 'noa,addr', 'txtEndaddrno,txtEndaddr', 'addr2_b.aspx']
 				,['txtSalesno_', 'btnSales_', 'cardeal', 'noa,nick', 'txtSalesno_,txtSales_', 'cardeal_b.aspx']);
             $(document).ready(function() {
+            	$.datepicker.r_len=4;
+				$.datepicker.setDefaults($.datepicker.regional["ENG"]);
+				
                 bbmKey = ['noa'];
                 bbsKey = ['noa', 'noq'];
                 q_brwCount();
