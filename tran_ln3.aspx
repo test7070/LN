@@ -481,6 +481,8 @@
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">日期</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">發票號碼</a></td>
+						<td><input type="text" id="txtAccno" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">作業日期(起)</a></td>

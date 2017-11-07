@@ -46,6 +46,7 @@
             	t_v01 = $.trim($('#txtV01').val());
             	t_voyage = $.trim($('#txtVoyage').val());
             	t_caseno = $.trim($('#txtCaseno').val());
+            	t_accno = $.trim($('#txtAccno').val());
             			
 				var t_where = " 1=1 and vccno='tran_ln3'" 
 					+ q_sqlPara2("noa", t_noa)
@@ -56,7 +57,9 @@
                 	t_where += " and (charindex('" + t_voyage + "',v03)>0 or charindex('" + t_voyage + "',v04)>0 or charindex('" + t_voyage + "',v05)>0)";
                 if(t_caseno.length > 0){
                 	t_where += " and exists(select noq from borrs where borrs.noa=borr.noa and  (charindex('" + t_caseno + "',borrs.caseno)>0))";
-                }    
+                }   
+                if (t_accno.length > 0)
+                    t_where += " and charindex('" + t_accno + "',accno)>0";  
                 t_where = ' where=^^' + t_where + '^^ ';
                 return t_where;
             }
@@ -96,6 +99,10 @@
 				<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a id='lblCaseno'>櫃號</a></td>
 					<td><input class="txt" id="txtCaseno" type="text" style="width:215px; font-size:medium;" /></td>
+				</tr>
+				<tr class='seek_tr'>
+					<td class='seek'  style="width:20%;"><a>發票號碼</a></td>
+					<td><input class="txt" id="txtAccno" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 			</table>
 			<!--#include file="../inc/seek_ctrl.inc"-->

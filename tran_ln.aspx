@@ -541,6 +541,8 @@
 						<td><input type="text" id="txtDatea" class="txt c1" title="作業日期"/></td>
 						<!--<td><span> </span><a class="lbl">PLAN_ID</a></td>
 						<td><input type="text" id="txtV08" class="txt c1"/></td>-->
+						<td><span> </span><a class="lbl">發票號碼</a></td>
+						<td><input type="text" id="txtAccno" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<!--<td><span> </span><a class="lbl" id="lblSales">車行</a></td>
