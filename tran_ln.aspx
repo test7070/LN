@@ -79,7 +79,7 @@
 			}
 
 			function mainPost() {
-				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtV09',r_picd],['txtV10',r_picd]);
+				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtV09',r_picd],['txtV10',r_picd],['txtCheckno',r_picd]);
 				q_mask(bbmMask);
 				document.title = 'WORKING SHEET';
 			}
@@ -307,12 +307,14 @@
 					$('#txtEnddate').datepicker('destroy');
 					$('#txtV09').datepicker('destroy');
 					$('#txtV10').datepicker('destroy');
+					$('#txtCheckno').datepicker('destroy');
 				}else{
 					$('#txtDatea').datepicker();
 					$('#txtBegindate').datepicker();
 					$('#txtEnddate').datepicker();
 					$('#txtV09').datepicker();
 					$('#txtV10').datepicker();
+					$('#txtCheckno').datepicker();
 				}
 			}
 
@@ -560,6 +562,8 @@
 							<input type="text" id="txtPartno" class="txt" style="float:left;width:40%;"/>
 							<input type="text" id="txtPart" class="txt" style="float:left;width:60%;"/>
 						</td>
+						<td><span> </span><a class="lbl">發票日期</a></td>
+						<td><input type="text" id="txtCheckno" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">M. V.</a></td>

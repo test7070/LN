@@ -65,7 +65,7 @@
 			}
 
 			function mainPost() {
-				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd]);
+				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtCheckno',r_picd]);
 				q_mask(bbmMask);
 				document.title = '移櫃';
 				
@@ -259,10 +259,12 @@
 					$('#txtDatea').datepicker('destroy');
 					$('#txtBegindate').datepicker('destroy');
 					$('#txtEnddate').datepicker('destroy');
+					$('#txtCheckno').datepicker('destroy');
 				}else{
 					$('#txtDatea').datepicker();
 					$('#txtBegindate').datepicker();
 					$('#txtEnddate').datepicker();
+					$('#txtCheckno').datepicker();
 				}
 			}
 
@@ -489,6 +491,8 @@
 						<td><input type="text" id="txtBegindate" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期(迄)</a></td>
 						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">發票日期</a></td>
+						<td><input type="text" id="txtCheckno" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblV02" class="lbl btn">船名</a></td>
