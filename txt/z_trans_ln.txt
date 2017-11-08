@@ -327,6 +327,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,straddr nvarchar(50)
 		,endaddrno nvarchar(20)
 		,endaddr nvarchar(50)
+		,memo nvarchar(max)
 		
 		,e20 float
 		,e40 float
@@ -347,7 +348,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,m_h03 float --40'押運
 		,total float
 	)
-	insert into @tmpa(noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
+	insert into @tmpa(noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr,memo
 		,e20,e40,f20,f40,h01,h02,h03,h20,h40)
 	select a.noa,isnull(b.v01,'') planid
 		,case when len(isnull(b.begindate,''))=0 then b.datea 
@@ -356,6 +357,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,isnull(b.v02,''),isnull(b.v03,''),isnull(b.memo2,'')
 		,isnull(a.addrno,'') straddrno,isnull(a.addr,'') straddr
 		,isnull(a.addrno2,'') endaddrno,isnull(a.addr2,'') endaddr
+		,isnull(a.memo,'')
 		,case when a.casetype = "20'E" or a.casetype ="20~#$E" then isnull(a.n01,0) else 0 end
 		,case when a.casetype = "40'E" or a.casetype ="40~#$E" then isnull(a.n01,0) else 0 end
 		,case when a.casetype = "20'F" or a.casetype ="20~#$F" then isnull(a.n01,0) else 0 end
@@ -444,6 +446,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,straddr nvarchar(50)
 		,endaddrno nvarchar(20)
 		,endaddr nvarchar(50)
+		,memo nvarchar(max)
 		
 		,e20 float
 		,e40 float
@@ -464,11 +467,11 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,m_h03 float
 		,total float
 	)
-	insert into @tmpb(pno,noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
+	insert into @tmpb(pno,noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr,memo
 		,e20,e40,f20,f40,h01,h02,h03,h20,h40
 		,m_e20,m_e40,m_f20,m_f40,m_h01,m_h02,m_h03,total)
 	select 1,noa,planid
-		,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr
+		,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr,memo
 		,sum(isnull(e20,0)),sum(isnull(e40,0)),sum(isnull(f20,0)),sum(isnull(f40,0))
 		,sum(isnull(h01,0)),sum(isnull(h02,0)),sum(isnull(h03,0)),sum(isnull(h20,0)),sum(isnull(h40,0))
 		,sum(isnull(m_e20,0)),sum(isnull(m_e40,0)),sum(isnull(m_f20,0)),sum(isnull(m_f40,0))
@@ -511,6 +514,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,dbo.getComma(h20,-1) b08
 		,dbo.getComma(h40,-1) b09 
 		,memo2 b10
+		,memo b11
 		
 		,dbo.getComma(m_f20,-1) c01
 		,dbo.getComma(m_f40,-1) c02
