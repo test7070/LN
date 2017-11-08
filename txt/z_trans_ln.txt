@@ -131,7 +131,7 @@
 	
 	select gno
 		,id a01
-		,[no] ano2
+		,[no] a02
 		,[certificate] a03
 		,[date] a04
 		,amount a05
@@ -309,7 +309,7 @@ z_trans_ln10: -- z_trans_ln10
 	order by a.invokey,a.sel
 	
 	select gno
-		,invoKey 
+		,invoKey invokey
 		,[id] a01
 		,[no] a02
 		,[certificate] a03
@@ -327,7 +327,7 @@ z_trans_ln10: -- z_trans_ln10
 		,amount_s b07
 		,vendor_code b08
 	from @tmpb 
-	order by sel;
+	order by invokey,sel;
 
 z_trans_ln09:--z_trans_ln09 z_trans_ln.txt
 	SET QUOTED_IDENTIFIER OFF 
