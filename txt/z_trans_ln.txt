@@ -307,6 +307,16 @@ z_trans_ln10: -- z_trans_ln10
 	left join borr b on a.noa=b.noa
 	left join (select invoKey,SUM([money]) [money] from @tmpa group by invoKey) c on a.invoKey=c.invoKey
 	order by a.invokey,a.sel
+-------------------------------------------------------------------------------
+	declare @pageCount int = 70
+	--第一頁因為最多只有50筆,要補空白行到70筆,以便換頁
+	declare @n int = 0
+	select @n = count(1) from @tmpb where invoKey = 1	
+	while @n<@pageCount
+	begin
+		insert into @tmpb(gno,pno,invokey)values('2',2,1)
+		set @n = @n + 1
+	end
 	
 	select gno
 		,invoKey invokey
