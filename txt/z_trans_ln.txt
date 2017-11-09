@@ -231,7 +231,8 @@ z_trans_ln10: -- z_trans_ln10
 		,[money] float
 	)
 	insert into @tmpa (noa,datea,[money])
-	select noa,datea,SUM(m_f20+m_f40+m_e20+m_e20+m_h01+m_h02) [money] from @tmp group by noa,datea
+	select noa,datea,SUM(m_f20+m_f40+m_e20+m_e20+m_h01+m_h02) [money] 
+	from @tmp group by noa,datea
 	-- 一個月原則上只會有2張發票
 	-- 1~50筆開立一張,剩下的開一張,不管剩下的是否超過50筆
 	update @tmpa set invoKey=case when sel<=50 then 1 else 2 end
@@ -300,7 +301,7 @@ z_trans_ln10: -- z_trans_ln10
 		,ROW_NUMBER()over(partition by a.invokey order by a.sel) invoice_seq
 		,'TWKHH' place_code
 		,'Y205' new_item
-		,'' tfc_code
+		,b.v03+b.v04 tfc_code
 		,b.datea date_s
 		,'D' dc,a.[money] amount_s,'84735168' vendor_code
 	from @tmpa a
@@ -475,18 +476,19 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	-------------------------------------------------------------------------------------------
+	-------------------------------------------------------------------------------------------
 	declare @tmpa table(
 		sel int identity(1,1)
 		,noa nvarchar(20)
-		,planid nvarchar(30)
+		,planid nvarchar(max)
 		,datea nvarchar(50)
-		,v02 nvarchar(20)--船名
-		,v03 nvarchar(30)--航次
+		,v02 nvarchar(max)--船名
+		,v03 nvarchar(max)--航次
 		,memo2 nvarchar(max)
 		,straddrno nvarchar(20)
-		,straddr nvarchar(50)
+		,straddr nvarchar(max)
 		,endaddrno nvarchar(20)
-		,endaddr nvarchar(50)
+		,endaddr nvarchar(max)
 		,memo nvarchar(max)
 		
 		,e20 float
@@ -597,7 +599,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,gno nvarchar(10)
 		,recno int
 		,noa nvarchar(20)
-		,planid nvarchar(30)
+		,planid nvarchar(max)
 		,datea nvarchar(50)
 		,v02 nvarchar(20)--船名
 		,v03 nvarchar(30)--航次
@@ -637,7 +639,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,sum(isnull(m_e20,0)),sum(isnull(m_e40,0)),sum(isnull(m_f20,0)),sum(isnull(m_f40,0))
 		,SUM(ISNULL(m_h01,0)),SUM(ISNULL(m_h02,0)),SUM(ISNULL(m_h03,0)),sum(isnull(total,0))
 	from @tmpa
-	group by noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr	
+	group by noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr	,memo
 	
 	update @tmpb set recno=b.recno
 	from @tmpb a
