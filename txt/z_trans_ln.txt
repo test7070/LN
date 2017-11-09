@@ -308,10 +308,10 @@
 		,total float
 	)
 	insert into @tmpc(datea,custno,cust,nick,typea,cardealno,cardeal,total)
-	select b.datea,b.custno,b.cust,b.nick,b.typea,a.cardealno,a.cardeal,ISNULL(a.total,0)
+	select a.trandate,b.custno,b.cust,b.nick,b.typea,a.cardealno,a.cardeal,ISNULL(a.total,0)
 	from tboats a
 	left join tboat b on a.noa=b.noa
-	where LEFT(b.datea,7)=@t_mon
+	where LEFT(a.trandate,7)=@t_mon
 	------------------------------------------------------------------------------------------------------------------
 	declare @tmp table(
 		sel int identity(1,1)
