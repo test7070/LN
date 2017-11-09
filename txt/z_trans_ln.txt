@@ -91,11 +91,12 @@
 		,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,n16)
 	select b.datea,a.cardealno,a.cardeal
 		,a.n01,a.n02,a.n03,a.n04,a.n05,a.n06,a.n07,a.n08,a.n09,a.n10,a.n11,a.n12,a.n13,a.n14
-		,a.interest,a.arrerage
+		,a.inteis,a.arrerage
 	from borrs a
 	left join borr b on a.noa=b.noa
 	where b.vccno='tran_ln'
 	and a.[sign]='borr'
+	and LEFT(b.datea,7) = @t_mon
 	---------------------------------------------------------------------
 	-- 20'F n01
 	update @tmpa set m01=round(n01*c.custprice,0),p01=round(n01*c.tggprice,0),q01=round(q01*c.driverprice,0)
@@ -200,14 +201,14 @@
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and datea<=a.datea and custunit="超高吊架" and salesno=a.cardealno order by datea desc,noq desc) c
+		where noa=b.noa and datea<=a.datea and custunit=N'超高吊架' and salesno=a.cardealno order by datea desc,noq desc) c
 		
 	--鐳仔桶 n16	
 	update @tmpa set m16=round(n16*c.custprice,0),p16=round(n16*c.tggprice,0),q16=round(q16*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and datea<=a.datea and custunit="鐳仔桶" and salesno=a.cardealno order by datea desc,noq desc) c
+		where noa=b.noa and datea<=a.datea and custunit=N'鐳仔桶' and salesno=a.cardealno order by datea desc,noq desc) c
 	
 	update @tmpa set total01=ISNULL(m01,0)+ISNULL(m02,0)+ISNULL(m03,0)+ISNULL(m04,0)+ISNULL(m05,0)+ISNULL(m06,0)
 		+ISNULL(m07,0)+ISNULL(m08,0)+ISNULL(m09,0)+ISNULL(m10,0)+ISNULL(m11,0)+ISNULL(m12,0)+ISNULL(m13,0)+ISNULL(m14,0)+ISNULL(m15,0)+ISNULL(m16,0)
@@ -265,33 +266,34 @@
 	from @tmpb a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and casetype=a.casetype and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	--油桶櫃數量 n02
 	update @tmpb set m02= round(n02 * c.custprice,0),p02= round(p02 * c.tggprice,0),q02= round(q02 * c.driverprice,0)
 	from @tmpb a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and casetype='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	--20'押運 n03
 	update @tmpb set m03= round(n03 * c.custprice,0),p03= round(p03 * c.tggprice,0),q03= round(q03 * c.driverprice,0)
 	from @tmpb a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and casetype='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	--40'押運 n04
 	update @tmpb set m04= round(n04 * c.custprice,0),p04= round(p04 * c.tggprice,0),q04= round(q04 * c.driverprice,0)
 	from @tmpb a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and casetype='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and salesno=a.cardealno and custunit='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null	
 	
 	update @tmpb set total01 = ISNULL(m01,0)+ ISNULL(m02,0)+ ISNULL(m03,0)+ ISNULL(m04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
 		,total02 = ISNULL(p01,0)+ ISNULL(p02,0)+ ISNULL(p03,0)+ ISNULL(p04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
 		,total03 = ISNULL(q01,0)+ ISNULL(q02,0)+ ISNULL(q03,0)+ ISNULL(q04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
+
 	--==============================================
 	-- tboat OTHER
 	declare @tmpc table(
@@ -383,128 +385,126 @@ z_trans_ln12: -- z_trans_ln12
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
 	-------------------------------------------------------------------------------------------------------------
-	-------------------------------------------------------------------------------------------------------------
 	declare @tmp table(
 		sel int identity(1,1)
 		,noa nvarchar(20)
-		,datea nvarchar(20)
-		,v02 nvarchar(20)
-		,v03 nvarchar(20)
-		,invoice nvarchar(max)
-		,invoiceDate nvarchar(max)
-		
-		,casetype nvarchar(20)
 		,cardealno nvarchar(20)
-		,straddrno nvarchar(20)
-		,straddr nvarchar(50)
-		,endaddrno nvarchar(20)
-		,endaddr nvarchar(50)
-		,mount01 float
-		,mount02 float --油桶櫃
-		,mount03 float --20'押運
-		,mount04 float --40'押運
+		,cardeal nvarchar(50)
+		,datea nvarchar(20)
+		,f20 float
+		,f40 float
+		,e20 float
+		,e40 float
+		,h01 float --超高吊架
+		,h02 float --鐳仔桶
 		
-		,m01 float
-		,m02 float --油桶櫃
-		,m03 float --20'押運
-		,m04 float --40'押運
-		,m05 float --20'OOG附加費
-		,m06 float --40'OOG附加費
-		,total float 
-		
-		,new_item nvarchar(20)
+		,m_f20 float
+		,m_f40 float
+		,m_e20 float
+		,m_e40 float
+		,m_h01 float --超高吊架
+		,m_h02 float --鐳仔桶
 	)
-	insert into @tmp(noa,datea,v02,v03,invoice,invoiceDate
-		,casetype,cardealno,straddrno,straddr,endaddrno,endaddr
-		,mount01,mount02,mount03,mount04,m05,m06)
-	select b.noa,b.datea,b.v02,b.v03,isnull(b.accno,''),isnull(b.checkno,'')
-		,a.casetype,a.cardealno,a.addrno,a.addr,a.addrno2,a.addr2
-		,a.n01,a.n02,a.n03,a.n04,a.m01,a.m02
+	insert into @tmp(noa,cardealno,cardeal,datea
+		,f20,f40,e20,e40,h01,h02)
+	select a.noa,isnull(a.cardealno,''),isnull(a.cardeal,''),ISNULL(b.datea,'')
+		,SUM(ISNULL(n01,0)+isnull(n03,0)+isnull(n11,0)+isnull(n13,0)) f20
+		,SUM(ISNULL(n02,0)+isnull(n04,0)+isnull(n12,0)+isnull(n14,0)) f40
+		,SUM(ISNULL(n05,0)+isnull(n07,0)) e20
+		,SUM(ISNULL(n06,0)+isnull(n08,0)) e40
+		,SUM(ISNULL(inteis,0)) h01
+		,SUM(ISNULL(arrerage,0)) h02
 	from borrs a
 	left join borr b on a.noa=b.noa
-	where b.vccno='tran_ln3' 
-	and b.datea between @t_bdate and @t_edate
+	where b.vccno='tran_ln' 
+	and LEFT(b.datea,7) = @t_mon
+	and a.[sign]='borr'
+	group by a.noa,isnull(a.cardealno,''),isnull(a.cardeal,''),ISNULL(b.datea,'')
 	
-	update @tmp set m01 = ROUND( isnull( a.mount01,0) * ISNULL(c.custprice,0),0)
-		,new_item = b.addr
+	update @tmp set m_f20 = ISNULL(f20,0)*ISNULL(b.custprice,0)
 	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=a.casetype order by datea desc,noq desc) c
-	where c.noa is not null
-	
-	update @tmp set m02 = ROUND( isnull( a.mount02,0) * ISNULL(c.custprice,0),0)
-		,new_item = b.addr
+	outer apply(select top 1 * from addrs 
+		where noa='001' and custunit='20~#$F' and salesno=a.cardealno and datea<=a.datea order by datea desc,noa desc) b
+	update @tmp set m_f40 = ISNULL(f40,0)*ISNULL(b.custprice,0)
 	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' order by datea desc,noq desc) c
-	where c.noa is not null
-	
-	update @tmp set m03 = ROUND( isnull( a.mount03,0) * ISNULL(c.custprice,0),0)
-		,new_item = b.addr
+	outer apply(select top 1 * from addrs 
+		where noa='001' and custunit='40~#$F' and salesno=a.cardealno and datea<=a.datea order by datea desc,noa desc) b
+	update @tmp set m_e20 = ISNULL(e20,0)*ISNULL(b.custprice,0)
 	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=N'20~#$押運' order by datea desc,noq desc) c
-	where c.noa is not null
-	
-	update @tmp set m04 = ROUND( isnull( a.mount04,0) * ISNULL(c.custprice,0),0)
-		,new_item = b.addr
+	outer apply(select top 1 * from addrs 
+		where noa='001' and custunit='20~#$E' and salesno=a.cardealno and datea<=a.datea order by datea desc,noa desc) b
+	update @tmp set m_e40 = ISNULL(e40,0)*ISNULL(b.custprice,0)
 	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=N'40~#$押運' order by datea desc,noq desc) c
-	where c.noa is not null
-	
-	update @tmp set total = ISNULL(m01,0)+ISNULL(m02,0)+ISNULL(m03,0)+ISNULL(m04,0)+ISNULL(m05,0)
-	--------------------------------------------------------------------------------------------------------------------
+	outer apply(select top 1 * from addrs 
+		where noa='001' and custunit='40~#$E' and salesno=a.cardealno and datea<=a.datea order by datea desc,noa desc) b
+	update @tmp set m_h01 = ISNULL(h01,0)*ISNULL(b.custprice,0)
+	from @tmp a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and custunit=N'超高吊架' and salesno=a.cardealno and datea<=a.datea order by datea desc,noa desc) b
+	update @tmp set m_h02 = ISNULL(h02,0)*ISNULL(b.custprice,0)
+	from @tmp a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and custunit=N'鐳仔桶' and salesno=a.cardealno and datea<=a.datea order by datea desc,noa desc) b	
+	-------------------------------------------------------------------------------------------------------------------
 	declare @tmpa table(
 		sel int identity(1,1)
-		,noa nvarchar(20)
+		,invoKey int
 		,invoice nvarchar(max)
 		,invoiceDate nvarchar(max)
-		,new_item nvarchar(20)
-		,tfc_code nvarchar(50)
+		,noa nvarchar(20)
 		,datea nvarchar(20)
-		,amount float
+		,[money] float
 	)
-	insert into @tmpa(noa,invoice,invoiceDate,new_item,tfc_code,datea,amount)
-	select noa,invoice,invoiceDate,new_item,isnull(v03,'')+isnull(v02,''),datea,SUM(ISNULL(total,0))
-	from @tmp
-	group by noa,invoice,invoiceDate,new_item,isnull(v03,'')+isnull(v02,''),datea
-	----------------------------------------------------------------------------------------------	
-	declare @invoice nvarchar(max) = ''
-	declare @invoiceDate nvarchar(max) = ''
-	declare @t_invoice nvarchar(max) = ''
-	declare @t_invoiceDate nvarchar(max) = ''
-	declare @t_amount float = 0
-	select @t_amount = SUM(isnull(amount,0)) from @tmpa
+	insert into @tmpa (noa,datea,[money])
+	select noa,datea,SUM(m_f20+m_f40+m_e20+m_e20+m_h01+m_h02) [money] 
+	from @tmp group by noa,datea
+	-- 一個月原則上只會有2張發票
+	-- 1~50筆開立一張,剩下的開一張,不管剩下的是否超過50筆
+	update @tmpa set invoKey=case when sel<=50 then 1 else 2 end
+	
+	declare @key nvarchar(max)
+	declare @invoice nvarchar(max)
+	declare @date nvarchar(max)
 	
 	declare cursor_table cursor for
-	select invoice,invoiceDate from @tmpa group by invoice,invoiceDate
+	select a.invoKey,b.accno,b.checkno
+	from @tmpa a
+	left join borr b on a.noa=b.noa
+	where len(ISNULL(b.accno,''))>0
+	group by a.invoKey,b.accno,b.checkno
 	open cursor_table
 	fetch next from cursor_table
-	into @invoice,@invoiceDate
+	into @key,@invoice,@date
 	while(@@FETCH_STATUS <> -1)
 	begin
-		set @t_invoice = @t_invoice + case when len(@invoice)>0 then ',' else '' end + @invoice
-		set @t_invoiceDate = @t_invoiceDate + case when len(@invoiceDate)>0 then ',' else '' end + @invoiceDate
+		update @tmpa set invoice = isnull(invoice,'') + case when len(ISNULL(invoice,''))=0 then '' else ',' end + @invoice
+			,invoiceDate = isnull(invoiceDate,'') + case when len(ISNULL(invoiceDate,''))=0 then '' else ',' end + @date
+		where invoKey=@key
 		
 		fetch next from cursor_table
-		into @invoice,@invoiceDate
+		into @key,@invoice,@date
 	end
 	close cursor_table
 	deallocate cursor_table
 	
-
+	-------------------------------------------------------------------------------------------------------------------
 	declare @tmpb table(
 		sel int identity(1,1)
+		,invoKey int
+		,recno int 
 		,gno nvarchar(20)
-		,pno nvarchar(20)
+		,pno int
+		,ref_date nvarchar(20)
+		,supply_code nvarchar(20) --84735168 新安運輸股份有限公司
 		,id nvarchar(20)
 		,[no] nvarchar(20)
 		,[certificate] nvarchar(20)
 		,[date] nvarchar(20)
+		,reg_no nvarchar(20) --84735168 新安運輸股份有限公司
 		,amount float
 		,tax_amount float
 		,tol_amount float
+		,area nvarchar(20) --11395000 萬海航運股份有限公司
 		
 		,invoice_seq int
 		,place_code nvarchar(20)
@@ -513,23 +513,40 @@ z_trans_ln12: -- z_trans_ln12
 		,date_s nvarchar(20)
 		,dc nvarchar(20)
 		,amount_s float
-		,vendor_code nvarchar(max)
+		,vendor_code nvarchar(20)--84735168 新安運輸股份有限公司
 	)
-	insert into @tmpb(gno,pno,id,[no],[certificate],[date],amount,tax_amount,tol_amount
+	insert into @tmpb(gno,pno,invoKey,ref_date,id,[no],[certificate],[date],amount,tax_amount,tol_amount
 		,invoice_seq,place_code,new_item,tfc_code,date_s,dc,amount_s,vendor_code)
-	select '1',1
-		,LEFT(@t_invoice,2) id,right(LEFT(@t_invoice,10),8) [no]
-		,@t_invoice [certificate],@t_invoiceDate [date]
-		,@t_amount
-		,ROUND(@t_amount*0.05,0) tax_amount
-		,@t_amount+ROUND(@t_amount*0.05,0) tol_amount
-		,row_number()over(order by sel) invoice_seq
-		,'TWKHH' place_code,new_item,tfc_code,[datea] date_s
-		,'D' dc,amount amount_s,'12493583'
-	from @tmpa  
+	select '1',1,a.invoKey
+		,'' ref_date
+		,left(a.invoice,2) id,right(LEFT(a.invoice,10),8) [no]
+		,a.invoice [certificate]
+		,a.invoiceDate [date]
+		,round(c.[money],0) amount,round(c.[money]*0.05,0) tax_amount,round(c.[money],0)+round(c.[money]*0.05,0) tol_amount
+		,ROW_NUMBER()over(partition by a.invokey order by a.sel) invoice_seq
+		,'TWKHH' place_code
+		,'Y205' new_item
+		,b.v03+b.v04 tfc_code
+		,b.datea date_s
+		,'D' dc,a.[money] amount_s,'84735168' vendor_code
+	from @tmpa a
+	left join borr b on a.noa=b.noa
+	left join (select invoKey,SUM([money]) [money] from @tmpa group by invoKey) c on a.invoKey=c.invoKey
+	order by a.invokey,a.sel
+-------------------------------------------------------------------------------
+	declare @pageCount int = 70
+	--第一頁因為最多只有50筆,要補空白行到70筆,以便換頁
+	declare @n int = 0
+	select @n = count(1) from @tmpb where invoKey = 1	
+	while @n<@pageCount
+	begin
+		insert into @tmpb(gno,pno,invokey)values('2',2,1)
+		set @n = @n + 1
+	end
 	
 	select gno
-		,id a01
+		,invoKey invokey
+		,[id] a01
 		,[no] a02
 		,[certificate] a03
 		,[date] a04
@@ -541,11 +558,12 @@ z_trans_ln12: -- z_trans_ln12
 		,place_code b02
 		,new_item b03
 		,tfc_code b04
-		,date_s b05
+		,[date_s] b05
 		,dc b06
 		,amount_s b07
 		,vendor_code b08
-	from @tmpb;
+	from @tmpb 
+	order by invokey,sel;
 
 z_trans_ln10: -- z_trans_ln10
 	SET QUOTED_IDENTIFIER OFF
