@@ -1,4 +1,369 @@
-﻿z_trans_ln12: -- z_trans_ln12
+﻿z_trans_ln14: -- z_trans_ln14
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	--------------------------------------------------------------------------------------------------------
+	--==============================================
+	-- tran_ln  船邊(萬海) 
+	declare @tmpa table(
+		sel int identity(1,1)
+		,datea nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(20)
+		,n01 float -- 20'F
+		,n02 float -- 40'F
+		,n03 float -- 20'F
+		,n04 float -- 40'F
+		,n05 float -- 20'E
+		,n06 float -- 40'E
+		,n07 float -- 20'E
+		,n08 float -- 40'E
+		,n09 float -- 20'E
+		,n10 float -- 40'E
+		,n11 float -- 20'E
+		,n12 float -- 40'E
+		,n13 float -- 20'F
+		,n14 float -- 40'F
+		,n15 float --超高吊架
+		,n16 float --鐳仔桶	 
+		
+		,m01 float
+		,m02 float
+		,m03 float
+		,m04 float
+		,m05 float
+		,m06 float
+		,m07 float
+		,m08 float
+		,m09 float
+		,m10 float
+		,m11 float
+		,m12 float
+		,m13 float
+		,m14 float
+		,m15 float
+		,m16 float
+		
+		,p01 float
+		,p02 float
+		,p03 float
+		,p04 float
+		,p05 float
+		,p06 float
+		,p07 float
+		,p08 float
+		,p09 float
+		,p10 float
+		,p11 float
+		,p12 float
+		,p13 float
+		,p14 float
+		,p15 float
+		,p16 float
+		
+		,q01 float
+		,q02 float
+		,q03 float
+		,q04 float
+		,q05 float
+		,q06 float
+		,q07 float
+		,q08 float
+		,q09 float
+		,q10 float
+		,q11 float
+		,q12 float
+		,q13 float
+		,q14 float
+		,q15 float
+		,q16 float
+		,total01 float
+		,total02 float
+		,total03 float
+	)
+	insert into @tmpa(datea,cardealno,cardeal
+		,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,n16)
+	select b.datea,a.cardealno,a.cardeal
+		,a.n01,a.n02,a.n03,a.n04,a.n05,a.n06,a.n07,a.n08,a.n09,a.n10,a.n11,a.n12,a.n13,a.n14
+		,a.interest,a.arrerage
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.vccno='tran_ln'
+	and a.[sign]='borr'
+	---------------------------------------------------------------------
+	-- 20'F n01
+	update @tmpa set m01=round(n01*c.custprice,0),p01=round(n01*c.tggprice,0),q01=round(q01*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="20~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
+		
+	-- 40'F n02
+	update @tmpa set m02=round(n02*c.custprice,0),p02=round(n02*c.tggprice,0),q02=round(q02*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="40~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 20'F n03
+	update @tmpa set m03=round(n03*c.custprice,0),p03=round(n03*c.tggprice,0),q03=round(q03*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="20~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 40'F n04
+	update @tmpa set m04=round(n04*c.custprice,0),p04=round(n04*c.tggprice,0),q04=round(q04*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="40~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 20'E n05
+	update @tmpa set m05=round(n05*c.custprice,0),p05=round(n05*c.tggprice,0),q05=round(q05*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="20~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 40'E n06
+	update @tmpa set m06=round(n06*c.custprice,0),p06=round(n06*c.tggprice,0),q06=round(q06*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="40~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 20'E n07
+	update @tmpa set m07=round(n07*c.custprice,0),p07=round(n07*c.tggprice,0),q07=round(q07*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="20~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 40'E n08
+	update @tmpa set m08=round(n08*c.custprice,0),p08=round(n08*c.tggprice,0),q08=round(q08*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="40~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 20'E n09
+	update @tmpa set m09=round(n09*c.custprice,0),p09=round(n09*c.tggprice,0),q09=round(q09*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="20~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 40'E
+	update @tmpa set m10=round(n10*c.custprice,0),p10=round(n10*c.tggprice,0),q10=round(q10*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="40~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 20'E n11
+	update @tmpa set m11=round(n11*c.custprice,0),p11=round(n11*c.tggprice,0),q11=round(q11*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="20~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 40'E n12
+	update @tmpa set m12=round(n12*c.custprice,0),p12=round(n12*c.tggprice,0),q12=round(q12*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="40~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 20'F n13
+	update @tmpa set m13=round(n13*c.custprice,0),p13=round(n13*c.tggprice,0),q13=round(q13*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="20~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
+
+	-- 40'F n14
+	update @tmpa set m14=round(n14*c.custprice,0),p14=round(n14*c.tggprice,0),q14=round(q14*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="40~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
+	
+	--超高吊架 n15
+	update @tmpa set m15=round(n15*c.custprice,0),p15=round(n15*c.tggprice,0),q15=round(q15*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="超高吊架" and salesno=a.cardealno order by datea desc,noq desc) c
+		
+	--鐳仔桶 n16	
+	update @tmpa set m16=round(n16*c.custprice,0),p16=round(n16*c.tggprice,0),q16=round(q16*c.driverprice,0)
+	from @tmpa a
+	left join addr b on b.noa='001' --固定是這個
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and datea<=a.datea and custunit="鐳仔桶" and salesno=a.cardealno order by datea desc,noq desc) c
+	
+	update @tmpa set total01=ISNULL(m01,0)+ISNULL(m02,0)+ISNULL(m03,0)+ISNULL(m04,0)+ISNULL(m05,0)+ISNULL(m06,0)
+		+ISNULL(m07,0)+ISNULL(m08,0)+ISNULL(m09,0)+ISNULL(m10,0)+ISNULL(m11,0)+ISNULL(m12,0)+ISNULL(m13,0)+ISNULL(m14,0)+ISNULL(m15,0)+ISNULL(m16,0)
+		,total02=ISNULL(p01,0)+ISNULL(p02,0)+ISNULL(p03,0)+ISNULL(p04,0)+ISNULL(p05,0)+ISNULL(p06,0)
+		+ISNULL(p07,0)+ISNULL(p08,0)+ISNULL(p09,0)+ISNULL(p10,0)+ISNULL(p11,0)+ISNULL(p12,0)+ISNULL(p13,0)+ISNULL(p14,0)+ISNULL(p15,0)+ISNULL(p16,0)
+		,total03=ISNULL(q01,0)+ISNULL(q02,0)+ISNULL(q03,0)+ISNULL(q04,0)+ISNULL(q05,0)+ISNULL(q06,0)
+		+ISNULL(q07,0)+ISNULL(q08,0)+ISNULL(q09,0)+ISNULL(q10,0)+ISNULL(q11,0)+ISNULL(q12,0)+ISNULL(q13,0)+ISNULL(q14,0)+ISNULL(q15,0)+ISNULL(q16,0)
+	--==============================================
+	-- tran_ln3 移櫃(萬海) 
+	declare @tmpb table(
+		sel int identity(1,1)
+		,datea nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,straddrno nvarchar(20)
+		,endaddrno nvarchar(20)
+		,casetype nvarchar(20)
+		,n01 float --數量
+		,n02 float --油桶櫃數量
+		,n03 float --20'押運
+		,n04 float --40'押運
+		
+		,m01 float --數量
+		,m02 float --油桶櫃數量
+		,m03 float --20'押運
+		,m04 float --40'押運
+		,m05 float --20'OOG附加費
+		,m06 float --40'OOG附加費
+		
+		,p01 float --數量
+		,p02 float --油桶櫃數量
+		,p03 float --20'押運
+		,p04 float --40'押運
+		,q01 float --數量
+		,q02 float --油桶櫃數量
+		,q03 float --20'押運
+		,q04 float --40'押運
+		
+		,total float
+	)
+	insert into @tmpb(datea,cardealno,cardeal,straddrno,endaddrno,casetype
+		,n01,n02,n03,n04,m05,m06)
+	select b.datea,a.cardealno,a.cardeal,a.addrno,a.addrno2,a.casetype
+		,a.n01,a.n02,a.n03,a.n04,a.m01,a.m02
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where LEFT(b.datea,7)=@t_mon
+	and b.vccno='tran_ln3'
+	
+	--數量 n01
+	update @tmpb set m01= round(n01 * c.custprice,0),p01= round(p01 * c.tggprice,0),q01= round(q01 * c.driverprice,0)
+	from @tmpb a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and casetype=a.casetype and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+	--油桶櫃數量 n02
+	update @tmpb set m02= round(n02 * c.custprice,0),p02= round(p02 * c.tggprice,0),q02= round(q02 * c.driverprice,0)
+	from @tmpb a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and casetype='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+	--20'押運 n03
+	update @tmpb set m03= round(n03 * c.custprice,0),p03= round(p03 * c.tggprice,0),q03= round(q03 * c.driverprice,0)
+	from @tmpb a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and casetype='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+	--40'押運 n04
+	update @tmpb set m04= round(n04 * c.custprice,0),p04= round(p04 * c.tggprice,0),q04= round(q04 * c.driverprice,0)
+	from @tmpb a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and casetype='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null	
+	
+	update @tmpb set total = ISNULL(m01,0)+ISNULL(m02,0)+ISNULL(m03,0)+ISNULL(m04,0)+ISNULL(m05,0)+ISNULL(m06,0)
+	--==============================================
+	-- tboat OTHER
+	declare @tmpc table(
+		sel int identity(1,1)
+		,datea nvarchar(20)
+		,custno nvarchar(20)
+		,cust nvarchar(50)
+		,nick nvarchar(20)
+		,typea nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,total float
+	)
+	insert into @tmpc(datea,custno,cust,nick,typea,cardealno,cardeal,total)
+	select b.datea,b.custno,b.cust,b.nick,b.typea,a.cardealno,a.cardeal,ISNULL(a.total,0)
+	from tboats a
+	left join tboat b on a.noa=b.noa
+	where LEFT(b.datea,7)=@t_mon
+	------------------------------------------------------------------------------------------------------------------
+	declare @tmp table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,groupa nvarchar(20)
+		,custno nvarchar(20)
+		,cust nvarchar(max)
+		,typea nvarchar(max)
+		,money01 float --自運金額	
+		,money02 float --應付外車
+		,money03 float --代運收入
+		,total float
+	)
+	--車行編號不是A的都算外車
+	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02) 
+	select '1',1,'A','001','萬海','船邊'
+		,SUM(case when left(cardealno,1)='A' then total01 else 0 end)
+		,SUM(case when left(cardealno,1)!='A' then total01 else 0 end)
+	from @tmpa
+	
+	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02) 
+	select '1',1,'B','001','萬海','移櫃'
+		,SUM(case when left(cardealno,1)='A' then total else 0 end)
+		,SUM(case when left(cardealno,1)!='A' then total else 0 end)
+	from @tmpb
+	
+	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02) 
+	select '1',1,case LEFT(typea,2) when '船邊' then 'A' when '移櫃' then 'B' else 'C' end
+		,custno,nick,typea
+		,SUM(case when left(cardealno,1)='A' then total else 0 end)
+		,SUM(case when left(cardealno,1)!='A' then total else 0 end)
+	from @tmpc
+	group by typea,custno,nick
+	-------------------------------------------------------------------------------------------------------
+	update @tmp set total = ISNULL(money01,0)+ISNULL(money02,0)
+	
+	insert into @tmp(gno,pno,groupa,money01,money02,money03,total)
+	select '2',1,groupa,SUM(isnull(money01,0)),SUM(isnull(money02,0)),SUM(isnull(money03,0)),SUM(isnull(total,0))
+	from @tmp
+	where pno=1
+	group by groupa
+	
+	insert into @tmp(gno,pno,money01,money02,money03,total)
+	select '3',3,SUM(isnull(money01,0)),SUM(isnull(money02,0)),SUM(isnull(money03,0)),SUM(isnull(total,0))
+	from @tmp
+	where pno=1
+	
+	select @t_mon+'營收月報表' titlea 
+		,gno
+		,cust a01
+		,typea a02
+		,dbo.getComma(money01,-1) a03
+		,dbo.getComma(money02,-1) a04
+		,dbo.getComma(money03,-1) a05
+		,dbo.getComma(total,-1) a06
+	from @tmp order by pno,groupa,sel;
+
+z_trans_ln12: -- z_trans_ln12
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
