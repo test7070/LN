@@ -241,12 +241,15 @@
 		,p02 float --油桶櫃數量
 		,p03 float --20'押運
 		,p04 float --40'押運
+		
 		,q01 float --數量
 		,q02 float --油桶櫃數量
 		,q03 float --20'押運
 		,q04 float --40'押運
 		
-		,total float
+		,total01 float
+		,total02 float
+		,total03 float
 	)
 	insert into @tmpb(datea,cardealno,cardeal,straddrno,endaddrno,casetype
 		,n01,n02,n03,n04,m05,m06)
@@ -286,7 +289,9 @@
 		where noa=b.noa and casetype='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null	
 	
-	update @tmpb set total = ISNULL(m01,0)+ISNULL(m02,0)+ISNULL(m03,0)+ISNULL(m04,0)+ISNULL(m05,0)+ISNULL(m06,0)
+	update @tmpb set total01 = ISNULL(m01,0)+ ISNULL(m02,0)+ ISNULL(m03,0)+ ISNULL(m04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
+		,total02 = ISNULL(p01,0)+ ISNULL(p02,0)+ ISNULL(p03,0)+ ISNULL(p04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
+		,total03 = ISNULL(q01,0)+ ISNULL(q02,0)+ ISNULL(q03,0)+ ISNULL(q04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
 	--==============================================
 	-- tboat OTHER
 	declare @tmpc table(
@@ -320,27 +325,30 @@
 		,total float
 	)
 	--車行編號不是A的都算外車
-	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02) 
+	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
 	select '1',1,'A','001','萬海','船邊'
-		,SUM(case when left(cardealno,1)='A' then total01 else 0 end)
-		,SUM(case when left(cardealno,1)!='A' then total01 else 0 end)
+		,SUM(case when left(cardealno,1)!='A' then 0 else total01 end)
+		,SUM(case when left(cardealno,1)='A' then 0 else total03 end)
+		,SUM(case when left(cardealno,1)='A' then 0 else total01-total03 end)
 	from @tmpa
 	
-	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02) 
+	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
 	select '1',1,'B','001','萬海','移櫃'
-		,SUM(case when left(cardealno,1)='A' then total else 0 end)
-		,SUM(case when left(cardealno,1)!='A' then total else 0 end)
+		,SUM(case when left(cardealno,1)!='A' then 0 else total01 end)
+		,SUM(case when left(cardealno,1)='A' then 0 else total03 end)
+		,SUM(case when left(cardealno,1)='A' then 0 else total01-total03 end)
 	from @tmpb
 	
-	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02) 
+	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
 	select '1',1,case LEFT(typea,2) when '船邊' then 'A' when '移櫃' then 'B' else 'C' end
 		,custno,nick,typea
-		,SUM(case when left(cardealno,1)='A' then total else 0 end)
-		,SUM(case when left(cardealno,1)!='A' then total else 0 end)
+		,SUM(case when left(cardealno,1)!='A' then 0 else total end)
+		,SUM(case when left(cardealno,1)='A' then 0 else total end)
+		,0
 	from @tmpc
 	group by typea,custno,nick
 	-------------------------------------------------------------------------------------------------------
-	update @tmp set total = ISNULL(money01,0)+ISNULL(money02,0)
+	update @tmp set total = ISNULL(money01,0)+ISNULL(money02,0)++ISNULL(money03,0)
 	
 	insert into @tmp(gno,pno,groupa,money01,money02,money03,total)
 	select '2',1,groupa,SUM(isnull(money01,0)),SUM(isnull(money02,0)),SUM(isnull(money03,0)),SUM(isnull(total,0))
@@ -374,6 +382,7 @@ z_trans_ln12: -- z_trans_ln12
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	-------------------------------------------------------------------------------------------------------------
 	-------------------------------------------------------------------------------------------------------------
 	declare @tmp table(
 		sel int identity(1,1)
@@ -461,6 +470,30 @@ z_trans_ln12: -- z_trans_ln12
 	from @tmp
 	group by noa,invoice,invoiceDate,new_item,isnull(v03,'')+isnull(v02,''),datea
 	----------------------------------------------------------------------------------------------	
+	declare @invoice nvarchar(max) = ''
+	declare @invoiceDate nvarchar(max) = ''
+	declare @t_invoice nvarchar(max) = ''
+	declare @t_invoiceDate nvarchar(max) = ''
+	declare @t_amount float = 0
+	select @t_amount = SUM(isnull(amount,0)) from @tmpa
+	
+	declare cursor_table cursor for
+	select invoice,invoiceDate from @tmpa group by invoice,invoiceDate
+	open cursor_table
+	fetch next from cursor_table
+	into @invoice,@invoiceDate
+	while(@@FETCH_STATUS <> -1)
+	begin
+		set @t_invoice = @t_invoice + case when len(@invoice)>0 then ',' else '' end + @invoice
+		set @t_invoiceDate = @t_invoiceDate + case when len(@invoiceDate)>0 then ',' else '' end + @invoiceDate
+		
+		fetch next from cursor_table
+		into @invoice,@invoiceDate
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+
 	declare @tmpb table(
 		sel int identity(1,1)
 		,gno nvarchar(20)
@@ -485,10 +518,11 @@ z_trans_ln12: -- z_trans_ln12
 	insert into @tmpb(gno,pno,id,[no],[certificate],[date],amount,tax_amount,tol_amount
 		,invoice_seq,place_code,new_item,tfc_code,date_s,dc,amount_s,vendor_code)
 	select '1',1
-		,LEFT(invoice,2) id,right(LEFT(invoice,10),8) [no],invoice [certificate],datea [date]
-		,amount
-		,ROUND(amount*0.05,0) tax_amount
-		,amount+ROUND(amount*0.05,0) tol_amount
+		,LEFT(@t_invoice,2) id,right(LEFT(@t_invoice,10),8) [no]
+		,@t_invoice [certificate],@t_invoiceDate [date]
+		,@t_amount
+		,ROUND(@t_amount*0.05,0) tax_amount
+		,@t_amount+ROUND(@t_amount*0.05,0) tol_amount
 		,row_number()over(order by sel) invoice_seq
 		,'TWKHH' place_code,new_item,tfc_code,[datea] date_s
 		,'D' dc,amount amount_s,'12493583'
