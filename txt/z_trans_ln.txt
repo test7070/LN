@@ -1,4 +1,4 @@
-﻿z_trans_ln14: -- z_trans_ln14
+﻿z_trans_ln14:--z_trans_ln.txt/z_trans_ln14	
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
@@ -7,7 +7,13 @@
 	declare @t_user nvarchar(max) = '[4]'
 	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
-	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_straddrno nvarchar(20) = case when '#non' = [13] then '' else [13] end
+	declare @t_endaddrno nvarchar(20) = case when '#non' = [14] then '' else [14] end
+	declare @t_bcardealno nvarchar(20) = case when '#non' = [15] then '' else [15] end
+	declare @t_ecardealno nvarchar(20) = case when '#non' = [16] then char(255) else [16] end
+	declare @t_option nvarchar(20) = case when '#non' = [17] then '' else [17] end
 	--------------------------------------------------------------------------------------------------------
 	--==============================================
 	-- tran_ln  船邊(萬海) 
@@ -96,7 +102,10 @@
 	left join borr b on a.noa=b.noa
 	where b.vccno='tran_ln'
 	and a.[sign]='borr'
-	and LEFT(b.datea,7) = @t_mon
+	and b.datea between @t_bdate and @t_edate
+	and (len(@t_straddrno)=0 or @t_straddrno=a.addrno) 
+	and (len(@t_endaddrno)=0 or @t_endaddrno=a.addrno2)
+	and ISNULL(a.cardealno,'') between @t_bcardealno and @t_ecardealno 
 	---------------------------------------------------------------------
 	-- 20'F n01
 	update @tmpa set m01=round(n01*c.custprice,0),p01=round(n01*c.tggprice,0),q01=round(q01*c.driverprice,0)
@@ -216,6 +225,7 @@
 		+ISNULL(p07,0)+ISNULL(p08,0)+ISNULL(p09,0)+ISNULL(p10,0)+ISNULL(p11,0)+ISNULL(p12,0)+ISNULL(p13,0)+ISNULL(p14,0)+ISNULL(p15,0)+ISNULL(p16,0)
 		,total03=ISNULL(q01,0)+ISNULL(q02,0)+ISNULL(q03,0)+ISNULL(q04,0)+ISNULL(q05,0)+ISNULL(q06,0)
 		+ISNULL(q07,0)+ISNULL(q08,0)+ISNULL(q09,0)+ISNULL(q10,0)+ISNULL(q11,0)+ISNULL(q12,0)+ISNULL(q13,0)+ISNULL(q14,0)+ISNULL(q15,0)+ISNULL(q16,0)
+
 	--==============================================
 	-- tran_ln3 移櫃(萬海) 
 	declare @tmpb table(
@@ -258,8 +268,11 @@
 		,a.n01,a.n02,a.n03,a.n04,a.m01,a.m02
 	from borrs a
 	left join borr b on a.noa=b.noa
-	where LEFT(b.datea,7)=@t_mon
-	and b.vccno='tran_ln3'
+	where b.vccno='tran_ln3'
+	and b.datea between @t_bdate and @t_edate
+	and (len(@t_straddrno)=0 or @t_straddrno=a.addrno) 
+	and (len(@t_endaddrno)=0 or @t_endaddrno=a.addrno2)
+	and ISNULL(a.cardealno,'') between @t_bcardealno and @t_ecardealno 
 	
 	--數量 n01
 	update @tmpb set m01= round(n01 * c.custprice,0),p01= round(p01 * c.tggprice,0),q01= round(q01 * c.driverprice,0)
@@ -293,7 +306,7 @@
 	update @tmpb set total01 = ISNULL(m01,0)+ ISNULL(m02,0)+ ISNULL(m03,0)+ ISNULL(m04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
 		,total02 = ISNULL(p01,0)+ ISNULL(p02,0)+ ISNULL(p03,0)+ ISNULL(p04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
 		,total03 = ISNULL(q01,0)+ ISNULL(q02,0)+ ISNULL(q03,0)+ ISNULL(q04,0)+ ISNULL(m05,0)+ ISNULL(m06,0)
-
+	
 	--==============================================
 	-- tboat OTHER
 	declare @tmpc table(
@@ -311,7 +324,10 @@
 	select a.trandate,b.custno,b.cust,b.nick,b.typea,a.cardealno,a.cardeal,ISNULL(a.total,0)
 	from tboats a
 	left join tboat b on a.noa=b.noa
-	where LEFT(a.trandate,7)=@t_mon
+	where a.trandate between @t_bdate and @t_edate
+	and (len(@t_straddrno)=0 or @t_straddrno=a.straddrno) 
+	and (len(@t_endaddrno)=0 or @t_endaddrno=a.endaddrno)
+	and ISNULL(a.cardealno,'') between @t_bcardealno and @t_ecardealno 
 	------------------------------------------------------------------------------------------------------------------
 	declare @tmp table(
 		sel int identity(1,1)
@@ -327,19 +343,43 @@
 		,total float
 	)
 	--車行編號不是A的都算外車
-	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
-	select '1',1,'A','001','萬海','船邊'
-		,SUM(case when left(cardealno,1)!='A' then 0 else total01 end)
-		,SUM(case when left(cardealno,1)='A' then 0 else total03 end)
-		,SUM(case when left(cardealno,1)='A' then 0 else total01-total03 end)
-	from @tmpa
+	if @t_option='1'
+	begin
+		insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
+		select '1',1,'A','001','萬海','船邊'
+			,SUM(case when left(cardealno,1)!='A' then 0 else total02 end)
+			,SUM(case when left(cardealno,1)='A' then 0 else total03 end)
+			,SUM(case when left(cardealno,1)='A' then 0 else total02-total03 end)
+		from @tmpa
+	end
+	else
+	begin
+		insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
+		select '1',1,'A','001','萬海','船邊'
+			,SUM(case when left(cardealno,1)!='A' then 0 else total01 end)
+			,SUM(case when left(cardealno,1)='A' then 0 else total03 end)
+			,SUM(case when left(cardealno,1)='A' then 0 else total01-total03 end)
+		from @tmpa
+	end
 	
-	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
-	select '1',1,'B','001','萬海','移櫃'
-		,SUM(case when left(cardealno,1)!='A' then 0 else total01 end)
-		,SUM(case when left(cardealno,1)='A' then 0 else total03 end)
-		,SUM(case when left(cardealno,1)='A' then 0 else total01-total03 end)
-	from @tmpb
+	if @t_option='1'
+	begin
+		insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
+		select '1',1,'B','001','萬海','移櫃'
+			,SUM(case when left(cardealno,1)!='A' then 0 else total02 end)
+			,SUM(case when left(cardealno,1)='A' then 0 else total03 end)
+			,SUM(case when left(cardealno,1)='A' then 0 else total02-total03 end)
+		from @tmpb
+	end
+	else
+	begin
+		insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
+		select '1',1,'B','001','萬海','移櫃'
+			,SUM(case when left(cardealno,1)!='A' then 0 else total01 end)
+			,SUM(case when left(cardealno,1)='A' then 0 else total03 end)
+			,SUM(case when left(cardealno,1)='A' then 0 else total01-total03 end)
+		from @tmpb
+	end
 	
 	insert into @tmp(gno,pno,groupa,custno,cust,typea,money01,money02,money03) 
 	select '1',1,case LEFT(typea,2) when '船邊' then 'A' when '移櫃' then 'B' else 'C' end
@@ -363,7 +403,7 @@
 	from @tmp
 	where pno=1
 	
-	select @t_mon+'營收月報表' titlea 
+	select '營收月報表' titlea 
 		,gno
 		,cust a01
 		,typea a02
