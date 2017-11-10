@@ -15,6 +15,10 @@
 		<script src="css/jquery/ui/jquery.ui.widget.js"></script>
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
+            aPop = new Array(
+				['txtXstraddr', 'lblXstraddr', 'addr2', 'noa,addr', 'txtXstraddr', 'addr2_b.aspx'],
+				['txtXendaddr', 'lblXendaddr', 'addr2', 'noa,addr', 'txtXendaddr', 'addr2_b.aspx']
+			);
             $(document).ready(function() {
             	$.datepicker.r_len=4;
 				$.datepicker.setDefaults($.datepicker.regional["ENG"]);
@@ -59,6 +63,19 @@
                     },{//[11][12]               6
                         type : '1',
                         name : 'xsel'
+                    }, {
+						//[13]                 7
+						type : '6', name : 'xstraddr'
+					}, {
+						//[14]                 8
+						type : '6', name : 'xendaddr'
+					}, {
+						//[15][16]              9
+						type : '2', name : 'xcardeal', dbf : 'cardeal', index : 'noa,nick', src : 'cardeal_b.aspx'
+					},{//[17]                 10
+                        type : '8',
+                        name : 'xoption',
+                        value : "1@新實單價".split(",")
                     }]
                 });
                 q_popAssign();

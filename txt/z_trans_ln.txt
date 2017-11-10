@@ -882,7 +882,13 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	declare @t_user nvarchar(max) = '[4]'
 	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
-	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_straddrno nvarchar(20) = case when '#non' = [13] then '' else [13] end
+	declare @t_endaddrno nvarchar(20) = case when '#non' = [14] then '' else [14] end
+	declare @t_bcardealno nvarchar(20) = case when '#non' = [15] then '' else [15] end
+	declare @t_ecardealno nvarchar(20) = case when '#non' = [16] then char(255) else [16] end
+	declare @t_option nvarchar(20) = case when '#non' = [17] then '' else [17] end
 	-------------------------------------------------------------------------------------------
 	declare @tmpa table(
 		sel int identity(1,1)
@@ -918,6 +924,16 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,m_h02 float --20'押運
 		,m_h03 float --40'押運
 		,total float
+		
+		,p_e20 float
+		,p_e40 float
+		,p_f20 float
+		,p_f40 float
+		,p_h01 float --油桶櫃
+		,p_h02 float --20'押運
+		,p_h03 float --40'押運
+		,total02 float
+		
 	)
 	insert into @tmpa(noa,planid,datea,v02,v03,memo2
 		,cardealno,cardeal,straddrno,straddr,endaddrno,endaddr,memo
@@ -943,32 +959,39 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	from borrs a
 	left join borr b on a.noa=b.noa
 	where b.vccno='tran_ln3' 
-	and LEFT(b.datea,7) = @t_mon
+	and b.datea between @t_bdate and @t_edate
+	and (len(@t_straddrno)=0 or @t_straddrno=a.addrno) 
+	and (len(@t_endaddrno)=0 or @t_endaddrno=a.addrno2)
+	and ISNULL(a.cardealno,'') between @t_bcardealno and @t_ecardealno 
 	order by b.datea,b.v01,a.noa,a.noq
 
 	--限定客戶: 萬海
-	update @tmpa set m_e20 = e20 * ISNULL(c.custprice,0)
+	update @tmpa set m_e20 = e20 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_e20 = e20 * ISNULL(c.driverprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
 			and x.custno='001' and x.custunit="20~#$E" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
-	update @tmpa set m_f20 = f20 * ISNULL(c.custprice,0)
+	update @tmpa set m_f20 = f20 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_f20 = f20 * ISNULL(c.driverprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
 			and x.custno='001' and x.custunit="20~#$F" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
-	update @tmpa set m_e40 = e40 * ISNULL(c.custprice,0)
+	update @tmpa set m_e40 = e40 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_e40 = e40 * ISNULL(c.driverprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
 			and x.custno='001' and x.custunit="40~#$E" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
-	update @tmpa set m_f40 = f40 * ISNULL(c.custprice,0)
+	update @tmpa set m_f40 = f40 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_f40 = f40 * ISNULL(c.driverprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
@@ -976,7 +999,8 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
 			and x.custno='001' and x.custunit="40~#$F" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 
-	update @tmpa set m_h01 = h01 * ISNULL(c.custprice,0)
+	update @tmpa set m_h01 = h01 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_h01 = h01 * ISNULL(c.driverprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
@@ -984,7 +1008,8 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
 			and x.custno='001' and x.custunit="油桶櫃" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	
-	update @tmpa set m_h02 = h02 * ISNULL(c.custprice,0)
+	update @tmpa set m_h02 = h02 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_h02 = h02 * ISNULL(c.driverprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
@@ -992,7 +1017,8 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
 			and x.custno='001' and x.custunit="20~#$押運" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 		
-	update @tmpa set m_h03 = h03 * ISNULL(c.custprice,0)
+	update @tmpa set m_h03 = h03 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_h03 = h03 * ISNULL(c.driverprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
@@ -1002,7 +1028,8 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 			
 	update @tmpa set total = ISNULL(m_e20,0)+ISNULL(m_e40,0)+ISNULL(m_f20,0)+ISNULL(m_f40,0)+ISNULL(m_h01,0)
 		+ISNULL(m_h02,0)+ISNULL(m_h03,0)+ISNULL(h20,0)+ISNULL(h40,0)
-
+		,total02 = ISNULL(p_e20,0)+ISNULL(p_e40,0)+ISNULL(p_f20,0)+ISNULL(p_f40,0)+ISNULL(p_h01,0)
+		+ISNULL(p_h02,0)+ISNULL(p_h03,0)
 	-----------------------------------------------------------------------------------------------
 	declare @tmpb table(
 		sel int identity(1,1)
@@ -1020,6 +1047,8 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,endaddrno nvarchar(20)
 		,endaddr nvarchar(50)
 		,memo nvarchar(max)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
 		
 		,e20 float
 		,e40 float
@@ -1039,18 +1068,32 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,m_h02 float
 		,m_h03 float
 		,total float
+		
+		,p_e20 float
+		,p_e40 float
+		,p_f20 float
+		,p_f40 float
+		,p_h01 float --油桶櫃
+		,p_h02 float
+		,p_h03 float
+		,total02 float
 	)
 	insert into @tmpb(pno,noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr,memo
+		,cardealno,cardeal
 		,e20,e40,f20,f40,h01,h02,h03,h20,h40
-		,m_e20,m_e40,m_f20,m_f40,m_h01,m_h02,m_h03,total)
+		,m_e20,m_e40,m_f20,m_f40,m_h01,m_h02,m_h03,total
+		,p_e20,p_e40,p_f20,p_f40,p_h01,p_h02,p_h03,total02)
 	select 1,noa,planid
 		,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr,memo
+		,cardealno,cardeal
 		,sum(isnull(e20,0)),sum(isnull(e40,0)),sum(isnull(f20,0)),sum(isnull(f40,0))
 		,sum(isnull(h01,0)),sum(isnull(h02,0)),sum(isnull(h03,0)),sum(isnull(h20,0)),sum(isnull(h40,0))
 		,sum(isnull(m_e20,0)),sum(isnull(m_e40,0)),sum(isnull(m_f20,0)),sum(isnull(m_f40,0))
 		,SUM(ISNULL(m_h01,0)),SUM(ISNULL(m_h02,0)),SUM(ISNULL(m_h03,0)),sum(isnull(total,0))
+		,sum(isnull(p_e20,0)),sum(isnull(p_e40,0)),sum(isnull(p_f20,0)),sum(isnull(p_f40,0))
+		,sum(ISNULL(p_h01,0)),sum(ISNULL(p_h02,0)),sum(ISNULL(p_h03,0)),sum(isnull(total02,0))
 	from @tmpa
-	group by noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr	,memo
+	group by noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr	,memo,cardealno,cardeal
 	
 	update @tmpb set recno=b.recno
 	from @tmpb a
@@ -1061,15 +1104,22 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	left join (select sel,ROW_NUMBER()over(partition by noa order by sel) recno from @tmpb ) b on a.sel=b.sel
 	
 	insert into @tmpb(gno,pno,f20,f40,e20,e40,h01,h02,h03,h20,h40
-		,m_e20,m_e40,m_f20,m_f40,m_h01,m_h02,m_h03,total)
+		,m_e20,m_e40,m_f20,m_f40,m_h01,m_h02,m_h03,total
+		,p_e20,p_e40,p_f20,p_f40,p_h01,p_h02,p_h03,total02)
 	select '3',2,SUM(ISNULL(f20,0)),SUM(ISNULL(f40,0)),SUM(ISNULL(e20,0)),SUM(ISNULL(e40,0))
 		,SUM(ISNULL(h01,0)),SUM(ISNULL(h02,0)),SUM(ISNULL(h03,0))
 		,SUM(ISNULL(h20,0)),SUM(ISNULL(h40,0))
 		,SUM(ISNULL(m_e20,0)),SUM(ISNULL(m_e40,0)),SUM(ISNULL(m_f20,0)),SUM(ISNULL(m_f40,0))
 		,SUM(ISNULL(m_h01,0)),SUM(ISNULL(m_h02,0)),SUM(ISNULL(m_h03,0)),SUM(ISNULL(total,0))
+		,sum(isnull(p_e20,0)),sum(isnull(p_e40,0)),sum(isnull(p_f20,0)),sum(isnull(p_f40,0))
+		,sum(ISNULL(p_h01,0)),sum(ISNULL(p_h02,0)),sum(ISNULL(p_h03,0)),sum(isnull(total02,0))
 	from @tmpb 
 
+	declare @title1 nvarchar(max) = case when @t_option='1' then '新實' else '萬海' end
+	declare @title2 nvarchar(max) = case when @t_option='1' then '協理:　　　　　　　經理:　　　　　　　製表:' else '萬海高雄代表簽署 :　　　　　　　協理:　　　　　　　經理:　　　　　　　製表:' end
 	select gno
+		,@title1  title1 
+		,@title2  title2
 		,recno rr
 		,planid a01
 		,datea a02
@@ -1089,6 +1139,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,memo2 b10
 		,memo b11
 		
+		
 		,dbo.getComma(m_f20,-1) c01
 		,dbo.getComma(m_f40,-1) c02
 		,dbo.getComma(m_e20,-1) c03
@@ -1097,6 +1148,16 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,dbo.getComma(m_h02,-1) c06
 		,dbo.getComma(m_h03,-1) c07
 		,dbo.getComma(total,-1) c08
+		
+		,cardeal d01
+		,dbo.getComma(p_f20,-1) d02
+		,dbo.getComma(p_f40,-1) d03
+		,dbo.getComma(p_e20,-1) d04
+		,dbo.getComma(p_e40,-1) d05
+		,dbo.getComma(p_h01,-1) d06
+		,dbo.getComma(p_h02,-1) d07
+		,dbo.getComma(p_h03,-1) d08
+		,dbo.getComma(total02,-1) d09
 	from @tmpb order by pno,recno,sel;
 	
 ---------------------------------------------------------------------------------
