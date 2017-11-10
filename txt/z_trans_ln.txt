@@ -395,13 +395,13 @@
 	insert into @tmp(gno,pno,groupa,money01,money02,money03,total)
 	select '2',1,groupa,SUM(isnull(money01,0)),SUM(isnull(money02,0)),SUM(isnull(money03,0)),SUM(isnull(total,0))
 	from @tmp
-	where pno=1
+	where gno=1
 	group by groupa
 	
 	insert into @tmp(gno,pno,money01,money02,money03,total)
 	select '3',3,SUM(isnull(money01,0)),SUM(isnull(money02,0)),SUM(isnull(money03,0)),SUM(isnull(total,0))
 	from @tmp
-	where pno=1
+	where gno=1
 	
 	select '營收月報表' titlea 
 		,gno
@@ -1012,7 +1012,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
-		where a.straddr=y.straddr and a.endaddr=y.endaddr
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno='001' and x.custunit="20~#$E" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	update @tmpa set m_f20 = f20 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
 		,p_f20 = f20 * ISNULL(c.driverprice,0)
@@ -1020,7 +1020,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
-		where a.straddr=y.straddr and a.endaddr=y.endaddr
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno='001' and x.custunit="20~#$F" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	update @tmpa set m_e40 = e40 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
 		,p_e40 = e40 * ISNULL(c.driverprice,0)
@@ -1028,7 +1028,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
-		where a.straddr=y.straddr and a.endaddr=y.endaddr
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno='001' and x.custunit="40~#$E" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	update @tmpa set m_f40 = f40 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
 		,p_f40 = f40 * ISNULL(c.driverprice,0)
@@ -1036,7 +1036,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
-		where a.straddr=y.straddr and a.endaddr=y.endaddr
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno='001' and x.custunit="40~#$F" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 
 	update @tmpa set m_h01 = h01 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
@@ -1045,7 +1045,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
-		where a.straddr=y.straddr and a.endaddr=y.endaddr
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno='001' and x.custunit="油桶櫃" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	
 	update @tmpa set m_h02 = h02 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
@@ -1054,7 +1054,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
-		where a.straddr=y.straddr and a.endaddr=y.endaddr
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno='001' and x.custunit="20~#$押運" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 		
 	update @tmpa set m_h03 = h03 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
@@ -1063,7 +1063,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
-		where a.straddr=y.straddr and a.endaddr=y.endaddr
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno='001' and x.custunit="40~#$押運" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 			
 	update @tmpa set total = ISNULL(m_e20,0)+ISNULL(m_e40,0)+ISNULL(m_f20,0)+ISNULL(m_f40,0)+ISNULL(m_h01,0)
