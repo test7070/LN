@@ -884,7 +884,6 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	-------------------------------------------------------------------------------------------
-	-------------------------------------------------------------------------------------------
 	declare @tmpa table(
 		sel int identity(1,1)
 		,noa nvarchar(20)
@@ -893,6 +892,8 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,v02 nvarchar(max)--船名
 		,v03 nvarchar(max)--航次
 		,memo2 nvarchar(max)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
 		,straddrno nvarchar(20)
 		,straddr nvarchar(max)
 		,endaddrno nvarchar(20)
@@ -918,13 +919,15 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,m_h03 float --40'押運
 		,total float
 	)
-	insert into @tmpa(noa,planid,datea,v02,v03,memo2,straddrno,straddr,endaddrno,endaddr,memo
+	insert into @tmpa(noa,planid,datea,v02,v03,memo2
+		,cardealno,cardeal,straddrno,straddr,endaddrno,endaddr,memo
 		,e20,e40,f20,f40,h01,h02,h03,h20,h40)
 	select a.noa,isnull(b.v01,'') planid
 		,case when len(isnull(b.begindate,''))=0 then b.datea 
 			when isnull(b.begindate,'')=isnull(b.enddate,'') then b.begindate 
 			else isnull(b.begindate,'')+'~'+isnull(b.enddate,'') end datea
 		,isnull(b.v02,''),isnull(b.v03,''),isnull(b.memo2,'')
+		,a.cardealno,a.cardeal
 		,isnull(a.addrno,'') straddrno,isnull(a.addr,'') straddr
 		,isnull(a.addrno2,'') endaddrno,isnull(a.addr2,'') endaddr
 		,isnull(a.memo,'')
@@ -950,28 +953,28 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
-			and x.custno='001' and x.custunit="20~#$E" and x.datea<=a.datea order by x.datea desc) c
+			and x.custno='001' and x.custunit="20~#$E" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	update @tmpa set m_f20 = f20 * ISNULL(c.custprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
-			and x.custno='001' and x.custunit="20~#$F" and x.datea<=a.datea order by x.datea desc) c
+			and x.custno='001' and x.custunit="20~#$F" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	update @tmpa set m_e40 = e40 * ISNULL(c.custprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
-			and x.custno='001' and x.custunit="40~#$E" and x.datea<=a.datea order by x.datea desc) c
+			and x.custno='001' and x.custunit="40~#$E" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	update @tmpa set m_f40 = f40 * ISNULL(c.custprice,0)
 	from @tmpa a
 	outer apply(select top 1 x.* 
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
-			and x.custno='001' and x.custunit="40~#$F" and x.datea<=a.datea order by x.datea desc) c
+			and x.custno='001' and x.custunit="40~#$F" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 
 	update @tmpa set m_h01 = h01 * ISNULL(c.custprice,0)
 	from @tmpa a
@@ -979,7 +982,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
-			and x.custno='001' and x.custunit="油桶櫃" and x.datea<=a.datea order by x.datea desc) c
+			and x.custno='001' and x.custunit="油桶櫃" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 	
 	update @tmpa set m_h02 = h02 * ISNULL(c.custprice,0)
 	from @tmpa a
@@ -987,7 +990,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
-			and x.custno='001' and x.custunit="20~#$押運" and x.datea<=a.datea order by x.datea desc) c
+			and x.custno='001' and x.custunit="20~#$押運" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 		
 	update @tmpa set m_h03 = h03 * ISNULL(c.custprice,0)
 	from @tmpa a
@@ -995,7 +998,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		from addrs x
 		left join addr y on x.noa=y.noa
 		where a.straddr=y.straddr and a.endaddr=y.endaddr
-			and x.custno='001' and x.custunit="40~#$押運" and x.datea<=a.datea order by x.datea desc) c
+			and x.custno='001' and x.custunit="40~#$押運" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 			
 	update @tmpa set total = ISNULL(m_e20,0)+ISNULL(m_e40,0)+ISNULL(m_f20,0)+ISNULL(m_f40,0)+ISNULL(m_h01,0)
 		+ISNULL(m_h02,0)+ISNULL(m_h03,0)+ISNULL(h20,0)+ISNULL(h40,0)
@@ -1238,7 +1241,7 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	-------------------------------------------------------------------
-	declare @t_page int = 40 --  每頁資料筆數
+	declare @t_page int = 50 --  每頁資料筆數
 	
 	declare @tmp table(
 		sel int identity(1,1)
@@ -1246,23 +1249,23 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 		,gno nvarchar(20)
 		,pno int
 		,noa nvarchar(20)
-		,datea nvarchar(20)
-		,mv nvarchar(50)
-		,voyage nvarchar(30)
-		,ship nvarchar(20)--船名代碼
-		,mount01 float
+		,datea nvarchar(20)--作業日期
+		,v02 nvarchar(max) --船名
+		,v03 nvarchar(max) --航次
+		,boatno nvarchar(max)--船名代碼
+		,v01 nvarchar(max) --船隻編號
+		,mount01 float    --數量
 		,mount02 float    --超高吊架
 		,mount03 float    --鐳仔桶
-		,shipno nvarchar(20)
 		,memo nvarchar(max)
 	)
-	insert into @tmp(gno,pno,noa,datea,mv,voyage,ship,mount01,mount02,mount03,shipno,memo)
-	select '1',1,a.noa,a.datea,a.v02 mv,a.v03 voyage
-		,'' ship
+	insert into @tmp(gno,pno,noa,datea,v02,v03,boatno,v01
+		,mount01,mount02,mount03,memo)
+	select '1',1,a.noa,a.datea
+		,a.v02,a.v03,'' boatno,a.v01
 		,b.n15 mount01
 		,b.inteis mount02
 		,b.arrerage mount03
-		,a.v11 shipno
 		,''
 	from borr a
 	left join (select noa,SUM(ISNULL(n15,0)) n15
@@ -1271,6 +1274,10 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 		from borrs group by noa) b on a.noa=b.noa 
 	where LEFT(a.datea,7) = @t_mon
 	order by a.noa
+	
+	update @tmp set boatno=ISNULL(b.noa,'')
+	from @tmp a
+	left join boat b on a.v02=b.boat
 	
 	update @tmp set page = FLOOR( (sel-1)/@t_page) + 1
 	
@@ -1285,12 +1292,12 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	select gno 
 		,sel rr
 		,@t_mon a01
-		,datea b01
-		,mv b02
-		,voyage b03
-		,ship b04
+		,right(datea,4) b01
+		,v02 b02
+		,v03 b03
+		,boatno b04
 		,dbo.getComma(mount01,-1) b05
-		,shipno b06
+		,v01 b06
 		,memo b07 
 	from @tmp order by page,pno,sel;
 
