@@ -108,112 +108,112 @@
 	and ISNULL(a.cardealno,'') between @t_bcardealno and @t_ecardealno 
 	---------------------------------------------------------------------
 	-- 20'F n01
-	update @tmpa set m01=round(n01*c.custprice,0),p01=round(n01*c.tggprice,0),q01=round(q01*c.driverprice,0)
+	update @tmpa set m01=round(n01*c.custprice,0),p01=round(n01*c.tggprice,0),q01=round(n01*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="20~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
 		
 	-- 40'F n02
-	update @tmpa set m02=round(n02*c.custprice,0),p02=round(n02*c.tggprice,0),q02=round(q02*c.driverprice,0)
+	update @tmpa set m02=round(n02*c.custprice,0),p02=round(n02*c.tggprice,0),q02=round(n02*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="40~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 20'F n03
-	update @tmpa set m03=round(n03*c.custprice,0),p03=round(n03*c.tggprice,0),q03=round(q03*c.driverprice,0)
+	update @tmpa set m03=round(n03*c.custprice,0),p03=round(n03*c.tggprice,0),q03=round(n03*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="20~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 40'F n04
-	update @tmpa set m04=round(n04*c.custprice,0),p04=round(n04*c.tggprice,0),q04=round(q04*c.driverprice,0)
+	update @tmpa set m04=round(n04*c.custprice,0),p04=round(n04*c.tggprice,0),q04=round(n04*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="40~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 20'E n05
-	update @tmpa set m05=round(n05*c.custprice,0),p05=round(n05*c.tggprice,0),q05=round(q05*c.driverprice,0)
+	update @tmpa set m05=round(n05*c.custprice,0),p05=round(n05*c.tggprice,0),q05=round(n05*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="20~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 40'E n06
-	update @tmpa set m06=round(n06*c.custprice,0),p06=round(n06*c.tggprice,0),q06=round(q06*c.driverprice,0)
+	update @tmpa set m06=round(n06*c.custprice,0),p06=round(n06*c.tggprice,0),q06=round(n06*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="40~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 20'E n07
-	update @tmpa set m07=round(n07*c.custprice,0),p07=round(n07*c.tggprice,0),q07=round(q07*c.driverprice,0)
+	update @tmpa set m07=round(n07*c.custprice,0),p07=round(n07*c.tggprice,0),q07=round(n07*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="20~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 40'E n08
-	update @tmpa set m08=round(n08*c.custprice,0),p08=round(n08*c.tggprice,0),q08=round(q08*c.driverprice,0)
+	update @tmpa set m08=round(n08*c.custprice,0),p08=round(n08*c.tggprice,0),q08=round(n08*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="40~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 20'E n09
-	update @tmpa set m09=round(n09*c.custprice,0),p09=round(n09*c.tggprice,0),q09=round(q09*c.driverprice,0)
+	update @tmpa set m09=round(n09*c.custprice,0),p09=round(n09*c.tggprice,0),q09=round(n09*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="20~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 40'E
-	update @tmpa set m10=round(n10*c.custprice,0),p10=round(n10*c.tggprice,0),q10=round(q10*c.driverprice,0)
+	update @tmpa set m10=round(n10*c.custprice,0),p10=round(n10*c.tggprice,0),q10=round(n10*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="40~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 20'E n11
-	update @tmpa set m11=round(n11*c.custprice,0),p11=round(n11*c.tggprice,0),q11=round(q11*c.driverprice,0)
+	update @tmpa set m11=round(n11*c.custprice,0),p11=round(n11*c.tggprice,0),q11=round(n11*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="20~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 40'E n12
-	update @tmpa set m12=round(n12*c.custprice,0),p12=round(n12*c.tggprice,0),q12=round(q12*c.driverprice,0)
+	update @tmpa set m12=round(n12*c.custprice,0),p12=round(n12*c.tggprice,0),q12=round(n12*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="40~#$E" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 20'F n13
-	update @tmpa set m13=round(n13*c.custprice,0),p13=round(n13*c.tggprice,0),q13=round(q13*c.driverprice,0)
+	update @tmpa set m13=round(n13*c.custprice,0),p13=round(n13*c.tggprice,0),q13=round(n13*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="20~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
 
 	-- 40'F n14
-	update @tmpa set m14=round(n14*c.custprice,0),p14=round(n14*c.tggprice,0),q14=round(q14*c.driverprice,0)
+	update @tmpa set m14=round(n14*c.custprice,0),p14=round(n14*c.tggprice,0),q14=round(n14*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit="40~#$F" and salesno=a.cardealno order by datea desc,noq desc) c	
 	
 	--超高吊架 n15
-	update @tmpa set m15=round(n15*c.custprice,0),p15=round(n15*c.tggprice,0),q15=round(q15*c.driverprice,0)
+	update @tmpa set m15=round(n15*c.custprice,0),p15=round(n15*c.tggprice,0),q15=round(n15*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and datea<=a.datea and custunit=N'超高吊架' and salesno=a.cardealno order by datea desc,noq desc) c
 		
 	--鐳仔桶 n16	
-	update @tmpa set m16=round(n16*c.custprice,0),p16=round(n16*c.tggprice,0),q16=round(q16*c.driverprice,0)
+	update @tmpa set m16=round(n16*c.custprice,0),p16=round(n16*c.tggprice,0),q16=round(n16*c.driverprice,0)
 	from @tmpa a
 	left join addr b on b.noa='001' --固定是這個
 	outer apply(select top 1 * from addrs 
@@ -273,30 +273,31 @@
 	and (len(@t_straddrno)=0 or @t_straddrno=a.addrno) 
 	and (len(@t_endaddrno)=0 or @t_endaddrno=a.addrno2)
 	and ISNULL(a.cardealno,'') between @t_bcardealno and @t_ecardealno 
-	
+
 	--數量 n01
-	update @tmpb set m01= round(n01 * c.custprice,0),p01= round(p01 * c.tggprice,0),q01= round(q01 * c.driverprice,0)
+	update @tmpb set m01= round(n01 * c.custprice,0),p01= round(n01 * c.tggprice,0),q01= round(n01 * c.driverprice,0)
 	from @tmpb a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+
 	--油桶櫃數量 n02
-	update @tmpb set m02= round(n02 * c.custprice,0),p02= round(p02 * c.tggprice,0),q02= round(q02 * c.driverprice,0)
+	update @tmpb set m02= round(n02 * c.custprice,0),p02= round(n02 * c.tggprice,0),q02= round(n02 * c.driverprice,0)
 	from @tmpb a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	--20'押運 n03
-	update @tmpb set m03= round(n03 * c.custprice,0),p03= round(p03 * c.tggprice,0),q03= round(q03 * c.driverprice,0)
+	update @tmpb set m03= round(n03 * c.custprice,0),p03= round(n03 * c.tggprice,0),q03= round(n03 * c.driverprice,0)
 	from @tmpb a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	--40'押運 n04
-	update @tmpb set m04= round(n04 * c.custprice,0),p04= round(p04 * c.tggprice,0),q04= round(q04 * c.driverprice,0)
+	update @tmpb set m04= round(n04 * c.custprice,0),p04= round(n04 * c.tggprice,0),q04= round(n04 * c.driverprice,0)
 	from @tmpb a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
@@ -1372,8 +1373,9 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	left join (select noa,SUM(ISNULL(n15,0)) n15
 			,SUM(ISNULL(inteis,0)) inteis
 			,SUM(ISNULL(arrerage,0)) arrerage
-		from borrs group by noa) b on a.noa=b.noa 
+		from borrs where [sign]='borr'  group by noa) b on a.noa=b.noa 
 	where LEFT(a.datea,7) = @t_mon
+	and a.vccno='tran_ln'
 	order by a.noa
 	
 	update @tmp set boatno=ISNULL(b.noa,'')
