@@ -541,20 +541,20 @@ z_trans_ln12: -- z_trans_ln12
 		sel int identity(1,1)
 		,gno nvarchar(20)
 		,pno nvarchar(20)
-		,id nvarchar(20)
-		,[no] nvarchar(20)
-		,[certificate] nvarchar(20)
-		,[date] nvarchar(20)
+		,id nvarchar(max)
+		,[no] nvarchar(max)
+		,[certificate] nvarchar(max)
+		,[date] nvarchar(max)
 		,amount float
 		,tax_amount float
 		,tol_amount float
 		
 		,invoice_seq int
-		,place_code nvarchar(20)
-		,new_item nvarchar(20)
-		,tfc_code nvarchar(20)
-		,date_s nvarchar(20)
-		,dc nvarchar(20)
+		,place_code nvarchar(max)
+		,new_item nvarchar(max)
+		,tfc_code nvarchar(max)
+		,date_s nvarchar(max)
+		,dc nvarchar(max)
 		,amount_s float
 		,vendor_code nvarchar(max)
 	)
