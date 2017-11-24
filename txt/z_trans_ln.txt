@@ -467,10 +467,11 @@ z_trans_ln12: -- z_trans_ln12
 	where b.vccno='tran_ln3' 
 	and b.datea between @t_bdate and @t_edate
 	
+	
 	update @tmp set m01 = ROUND( isnull( a.mount01,0) * ISNULL(c.custprice,0),0)
 		,new_item = b.addr
 	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno 
 	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=a.casetype order by datea desc,noq desc) c
 	where c.noa is not null
 	
@@ -478,25 +479,27 @@ z_trans_ln12: -- z_trans_ln12
 		,new_item = b.addr
 	from @tmp a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' order by datea desc,noq desc) c
+	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' and custunit=a.casetype order by datea desc,noq desc) c
 	where c.noa is not null
-	
+
+		
 	update @tmp set m03 = ROUND( isnull( a.mount03,0) * ISNULL(c.custprice,0),0)
 		,new_item = b.addr
 	from @tmp a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=N'20~#$押運' order by datea desc,noq desc) c
+	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=N'20~#$押運' and custunit=a.casetype order by datea desc,noq desc) c
 	where c.noa is not null
-	
+
+
 	update @tmp set m04 = ROUND( isnull( a.mount04,0) * ISNULL(c.custprice,0),0)
 		,new_item = b.addr
 	from @tmp a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=N'40~#$押運' order by datea desc,noq desc) c
+	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=N'40~#$押運' and custunit=a.casetype order by datea desc,noq desc) c
 	where c.noa is not null
 	
 	update @tmp set total = ISNULL(m01,0)+ISNULL(m02,0)+ISNULL(m03,0)+ISNULL(m04,0)+ISNULL(m05,0)+ISNULL(m06,0)
-	
+
 	--------------------------------------------------------------------------------------------------------------------
 	declare @tmpa table(
 		sel int identity(1,1)
@@ -512,6 +515,7 @@ z_trans_ln12: -- z_trans_ln12
 	select noa,invoice,invoiceDate,new_item,isnull(v03,'')+isnull(v02,''),datea,SUM(ISNULL(total,0))
 	from @tmp
 	group by noa,invoice,invoiceDate,new_item,isnull(v03,'')+isnull(v02,''),datea
+	
 	----------------------------------------------------------------------------------------------	
 	declare @invoice nvarchar(max) = ''
 	declare @invoiceDate nvarchar(max) = ''
@@ -570,6 +574,9 @@ z_trans_ln12: -- z_trans_ln12
 		,'TWKHH' place_code,new_item,tfc_code,[datea] date_s
 		,'D' dc,amount amount_s,'12493583'
 	from @tmpa  
+	
+	--	select * from @tmpb where tfc_code='E1035A'
+	--return
 	
 	select gno
 		,id a01
