@@ -197,7 +197,7 @@
 					alert("error: btnok!");
 				}
 				var t_noa = trim($('#txtNoa').val());
-				var t_date = trim($('#txtDatea').val()).replace(/(\d+)\/(\d+)\/\d+/,'$1$2');
+				var t_date = trim($('#txtDatea').val()).replace(/\//g,'');
 				//t_date = t_date.length == 0 ? q_date() : t_date;
 				//t_date = t_date.replace(/(\d+)\/(\d+)\/\d+/,'$1$2');
 				

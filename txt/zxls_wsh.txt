@@ -5,6 +5,7 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 	declare @worker nvarchar(max) = [2]
 	declare @filename nvarchar(max) = [3]
 	declare @curdate nvarchar(max) = convert(nvarchar,getDate(),120)
+	declare @key nvarchar(20) = 'S'
 	---------------------------------------------------------------------------------------------------------
 	declare @a nvarchar(max)
 	declare @b nvarchar(max)
@@ -31,7 +32,8 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 	if exists(select * from ztmpxls where b='WORKING SHEET')
 	begin
 		declare @tmp table(
-			mv nvarchar(20)
+			noa nvarchar(20)
+			,mv nvarchar(20)
 			,voyage nvarchar(20)
 			,[service] nvarchar(20)
 			,[no] nvarchar(20)
@@ -76,6 +78,10 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 	
 		insert into @tmp([no])values('')
 		declare @curbayno nvarchar(20) = ''
+		declare @noa nvarchar(20) = ''
+		declare @v01 nvarchar(max) = ''
+		declare @datea nvarchar(20) = ''
+		declare @string nvarchar(max) = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 		
 		declare cursor_table cursor for
 		select a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s from ztmpxls order by CAST(noa as int)
@@ -104,7 +110,6 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 				
 				if @b = 'ARRIVAL:'
 				begin
-					select @d
 					update @tmp set [arrival]= cast(case when charindex('上午',@d)>0 then replace(@d,'上午','')+' AM'
 						when charindex('下午',@d)>0 then replace(@d,'下午','')+' PM'
 						else @d end as datetime)
@@ -200,6 +205,7 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		close cursor_table
 		deallocate cursor_table
 
+
 		-- 寫入BORR
 		declare @memo nvarchar(max)
 		declare @pob datetime
@@ -208,8 +214,9 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		declare @plan datetime
 		declare @act datetime
 		
-		declare @no nvarchar(20) = ''
-		select @no=[no] from @tmp where len([no])>0
+		
+		select @v01 = '',@datea =''
+		select @v01=[no],@datea=convert(nvarchar,arrival,111) from @tmp where len([no])>0
 		select @pob=pob
 			,@unlashing=unlashing
 			,@lashing=lashing
@@ -217,41 +224,67 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 			,@act=act
 		from @tmp
 
-		set @memo = 'P.O.B.：'+convert(nvarchar,@pob,120)+CHAR(10)
+		/*set @memo = 'P.O.B.：'+convert(nvarchar,@pob,120)+CHAR(10)
 			+'UNLASHING：'+convert(nvarchar,@unlashing,120)+CHAR(10)
 			+'LASHING：'+convert(nvarchar,@lashing,120)+CHAR(10)
 			+'DEPARTURE(PLAN)：'+convert(nvarchar,@plan,120)+CHAR(10)
-			+'DEPARTURE(ACT):：'+convert(nvarchar,@act,120)
-				
-		if LEN(isnull(@no,''))>0 and not exists(select * from borr where noa=@no)
+			+'DEPARTURE(ACT):：'+convert(nvarchar,@act,120)*/
+		
+		declare @maxnoa nvarchar(max) = ''
+		
+		declare @nx int
+		
+		if LEN(isnull(@v01,''))>0 and not exists(select * from borr where v01=@v01)
 		begin
+			--產生新單據編號
+			select top 1 @maxnoa = noa from borr 
+			where [vccno]='tran_ln' 
+			and noa like @key+replace(left(@datea,7),'/','')+'[0-9,A-Z][0-9][0-9]'
+			order by noa desc
+			
+			if len(@maxnoa)=0
+			begin
+				set @noa = @key+replace(left(@datea,7),'/','')+'001'
+			end
+			else
+			begin
+				set @nx = (charindex(left(RIGHT(@maxnoa,3),1),@string)-1)*100 + cast(RIGHT(@maxnoa,2) as int)+1
+				set @noa = @key+replace(left(@datea,7),'/','')
+					+ substring(@string,floor(@nx/100)+1,1)
+					+ right(CAST(@nx as nvarchar),2)
+			end
+	
 			insert into borr(vccno,noa,datea,v02,v03,v04,v01,begindate,v05,v06,memo,worker)
-			select 'tran_ln',[no],convert(nvarchar,arrival,111),mv,voyage,[service],[no]
+			select 'tran_ln',@noa,convert(nvarchar,arrival,111),mv,voyage,[service],[no]
 				,convert(nvarchar,arrival,111)
 				,convert(nvarchar,berth,111)
 				,wharf,@memo,worker
 			from @tmp
 		end
-		else if LEN(isnull(@no,''))>0 and exists(select * from borr where noa=@no)
+		else
 		begin
+			--用船號找出之前上傳的
+			select top 1 @noa = noa from borr where v01=@v01 order by datea desc
+			
 			update borr set datea=convert(nvarchar,b.arrival,111)
 				,v02=b.mv,v03=b.voyage,v04=b.[service],v01=b.[no]
 				,begindate=convert(nvarchar,b.arrival,111)
 				,v05=convert(nvarchar,b.berth,111)
 				,v06=b.wharf,memo=@memo,worker=b.worker
 			from borr a
-			left join @tmp b on a.[noa]=b.[no]
-			where b.[no] is not null
-		end
+			left join @tmp b on a.[noa]=b.[noa]
+			where b.[noa] is not null
+		end	
+		
 		
 		--寫入BORRS
-		delete borrs where noa=@no and [sign]='borr'
-		select @nn = MAX(cast(noq as int)) from borrs where noa=@no
+		delete borrs where noa=@noa and [sign]='borr'
+		select @nn = MAX(cast(noq as int)) from borrs where noa=@noa
 		set @nn = ISNULL(@nn,0)
 		insert into borrs([sign],noa,noq,typea,indate,edate
 			,n01,n02,n03,n04,n05,n06,n07
 			,n08,n09,n10,n11,n12,n13,n14)
-		select 'borr',@no
+		select 'borr',@noa
 			,right('000'+cast(ROW_NUMBER()over(order by sel)+@nn as nvarchar),3)
 			,bayno,convert(nvarchar,commence,120),convert(nvarchar,complete,120)
 			,laden_dis_20,laden_dis_40,laden_load_20,laden_load_40
@@ -264,31 +297,32 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		begin try
 			update borr set datea=convert(nvarchar,cast(left(b.indate,10) as datetime),111)
 			from borr a
-			outer apply (select top 1 indate from borrs b where noa=@no order by noq ) b
-			where a.noa=@no and len(isnull(b.indate,''))>0
+			outer apply (select top 1 indate from borrs b where noa=@noa order by noq ) b
+			where a.noa=@noa and len(isnull(b.indate,''))>0
 		end try
 		begin catch
-			select @no+' 日期轉換異常'
+			select @noa+' 日期轉換異常'
 		end catch
 	
 	end
 	else
 	begin
 		-- 表身
-		declare @noa nvarchar(20) = ''
+		select @v01 = '',@noa=''
 		if charindex('_',@filename)>0
-			select @noa=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('_',@filename)-4)
+			select @v01=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('_',@filename)-4)
 		else
 		begin
-			select @noa=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('.',@filename)-5)
+			select @v01=SUBSTRING(@filename,CHARINDEX('WSH',@filename)+3,charindex('.',@filename)-5)
 		end
-		
-		if not exists(select * from borr where noa=@noa)
+
+		if not exists(select * from borr where v01=@v01)
 		begin
 			-- 找不到表頭
-			print '找不到表頭'+@noa
+			print '找不到表頭'+@v01
 			return
 		end
+		select top 1 @noa = noa from borr where vccno='tran_ln' and v01=@v01 order by noa desc
 		
 		declare @tmpss table(
 			sel int identity(1,1)
@@ -316,8 +350,6 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		deallocate cursor_table
 		
 		--寫入BORRS
-		declare @string nvarchar(max) = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
 		delete borrs where noa=@noa and [sign]='borrs'
 		select @nn = MAX(cast(noq as int)) from borrs where noa=@noa
 		set @nn = ISNULL(@nn,0)
