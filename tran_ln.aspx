@@ -81,7 +81,7 @@
 			function mainPost() {
 				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtV09',r_picd],['txtV10',r_picd],['txtCheckno',r_picd]);
 				q_mask(bbmMask);
-				document.title = 'WORKING SHEET';
+				document.title = '船邊移櫃作業';
 			}
             
 			function bbsAssign() {

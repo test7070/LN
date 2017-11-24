@@ -67,7 +67,7 @@
 			function mainPost() {
 				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtCheckno',r_picd]);
 				q_mask(bbmMask);
-				document.title = '移櫃';
+				document.title = '場外移櫃作業';
 				
 				q_cmbParse("cmbCasetype", " ,20'E,40'E,20'F,40'F","s");
 				
@@ -197,9 +197,9 @@
 					alert("error: btnok!");
 				}
 				var t_noa = trim($('#txtNoa').val());
-				var t_date = trim($('#txtDatea').val());
-				t_date = t_date.length == 0 ? q_date() : t_date;
-				t_date = t_date.replace(/(\d+)\/(\d+)\/\d+/,'$1$2');
+				var t_date = trim($('#txtDatea').val()).replace(/(\d+)\/(\d+)\/\d+/,'$1$2');
+				//t_date = t_date.length == 0 ? q_date() : t_date;
+				//t_date = t_date.replace(/(\d+)\/(\d+)\/\d+/,'$1$2');
 				
 				if (t_noa.length == 0 || t_noa == "AUTO")
 					q_gtnoa(q_name, 'Y' + t_date);
