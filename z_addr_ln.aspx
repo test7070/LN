@@ -15,7 +15,12 @@
 		<script src="css/jquery/ui/jquery.ui.widget.js"></script>
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
+			aPop = new Array(['txtXstraddr', '', 'addr2', 'noa,addr', 'txtXstraddr', 'addr2_b.aspx']
+				,['txtXendaddr', '', 'addr2', 'noa,addr', 'txtXendaddr', 'addr2_b.aspx']);
             $(document).ready(function() {
+            	$.datepicker.r_len=4;
+				$.datepicker.setDefaults($.datepicker.regional["ENG"]);
+
                 q_getId();
                 q_gf('', 'z_addr_ln');
             });
@@ -31,16 +36,44 @@
 						name : 'db',
 						value : q_db
 					},{
-						type : '0', //[2]
+						type : '0', //[3]
 						name : 'project',
 						value : q_getPara('sys.project').toUpperCase()
-					}, {//[3]
+					}, {
+                        type : '1', //[4][5]    1
+                        name : 'xdate'
+                    }, { 
+                        type : '2', //[6][7]    2
+                        name : 'xcust',
+                        dbf : 'cust',
+                        index : 'noa,comp,nick',
+                        src : 'cust_b.aspx'
+                    }, { 
+                        type : '2', //[8][9]    3
+                        name : 'xsales',
+                        dbf : 'sales',
+                        index : 'noa,nick',
+                        src : 'cardeal_b.aspx'
+                    }, {//[10][11]     4
                         type : '1',
                         name : 'xnoa'
+                    }, {//[12]     5
+                        type : '6',
+                        name : 'xstraddr'
+                    }, {//[13]     6
+                        type : '6',
+                        name : 'xendaddr'
+                    }, {//[14]     7
+                        type : '6',
+                        name : 'xaddr'
                     }]
                 });
                 q_popAssign();
-
+				$('#txtXdate1').mask(r_picd);
+                $('#txtXdate1').datepicker();
+                $('#txtXdate2').mask(r_picd);
+                $('#txtXdate2').datepicker();
+                
 				var t_para = new Array();
 	            try{
 	            	t_para = JSON.parse(q_getId()[3]);

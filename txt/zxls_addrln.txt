@@ -1,0 +1,135 @@
+zxls_addrln:--zxls_addrln  要和z_addr_ln01的格式一致
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @workerno nvarchar(max) = [1]
+	declare @worker nvarchar(max) = [2]
+	declare @filename nvarchar(max) = [3]
+	--------------------------------------------------------------------------------------
+	declare @bbm table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,addr nvarchar(50)
+		,straddrno nvarchar(20)
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+	)
+	declare @bbs table(
+		noa nvarchar(20)
+		,noq nvarchar(10)	
+		,datea nvarchar(20)
+		,custunit nvarchar(20)
+		,custno nvarchar(20)
+		,cust nvarchar(50)
+		,custprice float
+		,tggprice float
+		,salesno nvarchar(20)
+		,sales nvarchar(50)
+		,driverprice float
+		,memo nvarchar(max)
+	)
+	
+	declare @a nvarchar(max)
+	declare @b nvarchar(max)
+	declare @c nvarchar(max)
+	declare @d nvarchar(max)
+	declare @e nvarchar(max)
+	declare @f nvarchar(max)
+	declare @g nvarchar(max)
+	declare @h nvarchar(max)
+	declare @i nvarchar(max)
+	declare @j nvarchar(max)
+	declare @k nvarchar(max)
+	--------------------------------------------
+	declare @noa nvarchar(20) = ''
+	declare @date nvarchar(20) = ''
+
+	declare cursor_table cursor for
+	select ltrim(rtrim(a)),ltrim(rtrim(b)),ltrim(rtrim(c)),ltrim(rtrim(d)),ltrim(rtrim(e))
+		,ltrim(rtrim(f)),ltrim(rtrim(g)),ltrim(rtrim(h)),ltrim(rtrim(i)),ltrim(rtrim(j)),ltrim(rtrim(k))
+		from ztmpxls order by CAST(noa as int)
+	open cursor_table
+	fetch next from cursor_table
+	into @a,@b,@c,@d,@e,@f,@g,@h,@i,@j,@k
+	while(@@FETCH_STATUS <> -1)
+	begin
+		begin try	
+			if(@a='編號：')
+			begin
+				insert into @bbm(noa,addr,straddrno,straddr,endaddrno,endaddr)
+				select @b,@d,@f,@g,@i,@j
+				select @noa=@b
+			end
+			else
+			begin
+				if(len(@a)>0)
+				begin
+					set @date = ''
+					while(len(@b)>0)
+					begin
+						if LEFT(@b,1) like '[0-9,/]' 
+							set @date = @date + LEFT(@b,1)
+						set @b = SUBSTRING(@b,2,len(@b))
+					end
+				
+					insert into @bbs(noa,noq,datea,custunit,custno,cust,custprice,tggprice
+						,salesno,sales,driverprice,memo)
+					select @noa,@a noq,@date datea
+						,replace(@c,N'＇',"'") custunit
+						,@d custno
+						,replace(@e,N'＇',"'") cust
+						,cast(@f as float) custprice,cast(@g as float) tggprice
+						,@h salesno
+						,replace(@i,N'＇',"'") sales,cast(@j as float) driverprice
+						,replace(@k,N'＇',"'") memo 
+				end
+			end
+		end try
+		begin catch 
+			--nothing
+		end catch
+
+		fetch next from cursor_table
+		into @a,@b,@c,@d,@e,@f,@g,@h,@i,@j,@k
+	end
+	close cursor_table
+	deallocate cursor_table
+	--------------------------------------------------------------------------------
+	-- update data
+	-- 有錯誤就放棄
+	Begin Transaction [Trans_Name]
+	begin try
+		--addr
+		update addr set addr=b.addr,straddrno=b.straddrno,straddr=b.straddr
+			,endaddrno=b.endaddrno,endaddr=b.endaddr
+		from addr a
+		left join @bbm b on a.noa=b.noa
+		where b.noa is not null
+		
+		insert into addr(noa,addr,straddrno,straddr,endaddrno,endaddr)
+		select a.noa,a.addr,a.straddrno,a.straddr,a.endaddrno,a.endaddr
+		from @bbm a
+		left join addr b on a.noa=b.noa
+		where b.noa is null
+		-- addrs
+		update addrs set datea=b.datea,custunit=b.custunit,custno=b.custno,cust=b.cust
+			,custprice=b.custprice,tggprice=b.tggprice,salesno=b.salesno,sales=b.sales
+			,driverprice=b.driverprice,memo=b.memo
+		from addrs a
+		left join @bbs b on a.noa=b.noa and a.noq=b.noq
+		where b.noa is not null
+		
+		insert into addrs(noa,noq,datea,custunit,custno,cust,custprice,tggprice
+			,salesno,sales,driverprice,memo)
+		select a.noa,a.noq,a.datea,a.custunit,a.custno,a.cust,a.custprice,a.tggprice
+			,a.salesno,a.sales,a.driverprice,a.memo 
+		from @bbs a
+		left join addrs b on a.noa=b.noa and a.noq=b.noq
+		where b.noa is null
+	
+		Commit Transaction [Trans_Name] -- 提交所有操作所造成的變更
+	end try
+	begin catch
+		Rollback Transaction [Trans_Name] -- 復原所有操作所造成的變更
+		select ERROR_MESSAGE()
+	end catch;
