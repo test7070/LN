@@ -39,33 +39,18 @@
 						type : '0', //[3]
 						name : 'project',
 						value : q_getPara('sys.project').toUpperCase()
-					}, {
-                        type : '1', //[4][5]    1
-                        name : 'xdate'
-                    }, { 
-                        type : '2', //[6][7]    2
-                        name : 'xcust',
-                        dbf : 'cust',
-                        index : 'noa,comp,nick',
-                        src : 'cust_b.aspx'
-                    }, { 
-                        type : '2', //[8][9]    3
-                        name : 'xsales',
-                        dbf : 'sales',
-                        index : 'noa,nick',
-                        src : 'cardeal_b.aspx'
-                    }, {//[10][11]     4
+					}, {//[4][5]     1
                         type : '1',
                         name : 'xnoa'
-                    }, {//[12]     5
+                    }, {//[6]     2
                         type : '6',
                         name : 'xstraddr'
-                    }, {//[13]     6
+                    }, {//[7]     3
                         type : '6',
                         name : 'xendaddr'
-                    }, {//[14]     7
+                    }, {//[8]     4
                         type : '6',
-                        name : 'xaddr'
+                        name : 'xproductno'
                     }]
                 });
                 q_popAssign();

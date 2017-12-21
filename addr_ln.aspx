@@ -37,6 +37,8 @@
 				,['txtStraddrno', 'lblStraddr', 'addr2', 'noa,addr', 'txtStraddrno,txtStraddr', 'addr2_b.aspx']
 				,['txtEndaddrno', 'lblEndaddr', 'addr2', 'noa,addr', 'txtEndaddrno,txtEndaddr', 'addr2_b.aspx']
 				,['txtSalesno_', 'btnSales_', 'cardeal', 'noa,nick', 'txtSalesno_,txtSales_', 'cardeal_b.aspx']);
+            
+            var t_typea = "";
             $(document).ready(function() {
             	$.datepicker.r_len=4;
 				$.datepicker.setDefaults($.datepicker.regional["ENG"]);
@@ -45,6 +47,8 @@
                 bbsKey = ['noa', 'noq'];
                 q_brwCount();
                 q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
+               /* t_where = "where=^^len(noa)=2^^ order=^^noa^^";
+                q_gt('addr', t_where, 0, 0, 0, "getTypea", r_accy);*/
             });
             function main() {
                 if (dataErr) {
@@ -56,8 +60,9 @@
 
             function mainPost() {
                 q_getFormat();
-                q_mask(bbmMask);
                 bbsMask = [['txtDatea', r_picd]];
+                q_mask(bbmMask);
+                
                 $('#txtNoa').change(function(e) {
                     $(this).val($.trim($(this).val()).toUpperCase());
                     if ($(this).val().length > 0) {
@@ -66,6 +71,11 @@
                     }
                 });
                 q_cmbParse("cmbCustunit", " ,20'E,40'E,20'F,40'F,油桶櫃,20'押運,40'押運,20'儀檢,40'儀檢,20'OOG,40'OOG,超高吊架,鐳仔桶","s");
+           	
+           		$('#btnProductno').click(function(e){
+           			t_where = "where=^^noa='"+$('#txtProductno').val()+"'^^ order=^^noq^^";
+                	q_gt('addrs', t_where, 0, 0, 0, "getBbs", r_accy);
+           		});
             }
 
             function q_funcPost(t_func, result) {
@@ -87,6 +97,38 @@
 
             function q_gtPost(t_name) {
                 switch (t_name) {
+                	case 'getBbs':
+                		var as = _q_appendData("addrs", "", true);
+                		for(var i=0;i<q_bbsCount;i++){
+                			$('#btnMinus_'+i).click();
+                		}
+                		while(q_bbsCount<as.length){
+                			$('#btnPlus').click();
+                		}
+                		for(var i=0;i<as.length;i++){
+                			$('#txtDatea_'+i).val(as[i].datea);
+                			$('#txtTypea_'+i).val(as[i].typea);
+                			$('#cmbCustunit_'+i).val(as[i].custunit);
+                			$('#txtCustno_'+i).val(as[i].custno);
+                			$('#txtCust_'+i).val(as[i].cust);
+                			$('#txtCustprice_'+i).val(as[i].custprice);
+                			$('#txtTggprice_'+i).val(as[i].tggprice);
+                			$('#txtSalesno_'+i).val(as[i].salesno);
+                			$('#txtSales_'+i).val(as[i].sales);
+                			$('#txtDriverprice_'+i).val(as[i].driverprice);
+                			$('#txtMemo_'+i).val(as[i].memo);
+                		}
+                		break;
+                	case 'getTypea':
+                		var as = _q_appendData("addr", "", true);
+                		t_typea= '@';
+	                    if (as[0] != undefined) {
+	                    	for(var i=0;i<as.length;i++)
+	                    		t_typea += ","+as[i].noa+'@'+as[i].memo; 
+	                        return;
+	                    }
+                		q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
+                		break;
                 case 'z_addr':
                     var as = _q_appendData("authority", "", true);
                     if (as[0] != undefined && (as[0].pr_run == "1" || as[0].pr_run == "true")) {
@@ -396,7 +438,7 @@
                 font-size: medium;
             }
             .dbbs {
-                width: 1100px;
+                width: 1200px;
             }
             .tbbs a {
                 font-size: medium;
@@ -422,7 +464,7 @@
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
 						<td align="center" style="width:150px; color:black;"><a id='vewNoa'> </a></td>
-						<td align="center" style="width:150px; color:black;"><a>科目</a></td>
+						<td align="center" style="width:100px; color:black;"><a>名稱</a></td>
 						<td align="center" style="width:150px; color:black;"><a id='vewStraddr'> </a></td>
 						<td align="center" style="width:150px; color:black;"><a id='vewEndaddr'> </a></td>
 					</tr>
@@ -446,15 +488,13 @@
 					</tr>
 					<tr>
 						<td><span> </span><a id='lblNoa' class="lbl"> </a></td>
-						<td colspan="3">
-						<input id="txtNoa" type="text" class="txt c1" />
-						</td>
+						<td><input type="text" id="txtNoa" class="txt c1" /></td>
+						<td><input type="text" id="txtAddr" class="txt c1" /></td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">科目</a></td>
-						<td colspan="3">
-						<input id="txtAddr" type="text" class="txt c1" />
-						</td>
+						<td><span> </span><a class="lbl">費率</a></td>
+						<td><input type="text" id="txtProductno" class="txt c1" /></td>
+						<td><input type="button" id="btnProductno" class="txt c1" value="匯入"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id='lblStraddr' class="lbl btn"> </a></td>
@@ -488,6 +528,7 @@
 					</td>
 					<td style="width:20px;"> </td>
 					<td align="center" style="width:80px;"><a>生效日期</a></td>
+					<td align="center" style="width:80px;"><a>科目</a></td>
 					<td align="center" style="width:80px;"><a>規格</a></td>
 					<td align="center" style="width:150px;"><a>客戶</a></td>
 					<td align="center" style="width:80px;"><a>應收單價</a></td>
@@ -503,6 +544,7 @@
 					</td>
 					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
 					<td><input type="text" id="txtDatea.*" style="width:95%;" /></td>
+					<td><input type="text" id="txtTypea.*" style="width:95%;"/></td>
 					<td><select id="cmbCustunit.*" style="width:95%;"> </select></td>
 					<td>
 						<input type="text" id="txtCustno.*" style="width:45%;float:left;" />
