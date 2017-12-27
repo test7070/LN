@@ -90,6 +90,9 @@
                             
                             fr.onload=function(e){
                             	var row = fr.result.split(/\r\n/);
+                            	for(var i=0;i<q_bbtCount;i++){
+                            		$('#btnMinut__'+i).click();
+                            	}
 								while(row.length-1>q_bbtCount){
 									$('#btnPlut').click();
 								}
@@ -127,19 +130,7 @@
                         }
                    }
 				});
-				
-				/*window.onload = function () {
-				    document.getElementById('myfile').onchange = readFile;
-				};*/
 			}
-			/*function readFile() {
-			    file = this.files[0];
-			    var fReader = new FileReader();           
-			    fReader.onload = function (event) {
-			        document.getElementById('fileContent').value = event.target.result;
-			    };
-			    fReader.readAsText(file);
-			}*/
 
 			function bbsAssign() {
 				for (var i = 0; i < q_bbsCount; i++) {
