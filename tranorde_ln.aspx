@@ -86,44 +86,85 @@
                         file = files[i];
                         if(file){
                         	fr = new FileReader();
-                            fr.readAsText(file,'big5');
-                            
+                            fr.readAsText(file,'BIG5');
+                            //fr.readAsText(file,'ANSI');
+                            fr.fileName = file.name;
                             fr.onload=function(e){
                             	var row = fr.result.split(/\r\n/);
                             	for(var i=0;i<q_bbtCount;i++){
                             		$('#btnMinut__'+i).click();
                             	}
-								while(row.length-1>q_bbtCount){
-									$('#btnPlut').click();
-								}
-								
-                            	for(var i=0;i<row.length-1;i++){
-                            		if(row[i+1].length == 0)
-                            			continue;
-                            		var column = row[i+1].split(',');
-                            		var date = new Date(Date.parse(column[4]));
-                            		var yy = date.getFullYear()+"";
-                            		var mm = date.getMonth()+"";
-                            		var dd = date.getDate()+"";
-                            		mm = (mm.length==1?"0":"") + mm;
-                            		dd = (dd.length==1?"0":"") + dd;
-                            		var HH = date.getHours()+"";
-                            		var MM = date.getMinutes()+"";
-                            		var SS = date.getSeconds()+"";
-                            		HH = (HH.length==1?"0":"") + HH;
-                            		MM = (MM.length==1?"0":"") + MM;
-                            		SS = (SS.length==1?"0":"") + SS;
-                            		
-                            		$('#txtDatea__'+i).val(yy+'/'+mm+'/'+dd);
-                            		$('#txtTimea__'+i).val(HH+':'+MM+':'+SS);
-                            		$('#txtCasetype__'+i).val($.trim(column[5]));
-                            		$('#txtContainerno1__'+i).val($.trim(column[3]));
-                            		$('#txtMount__'+i).val($.trim(column[9]));
-                            		$('#txtStraddr__'+i).val($.trim(column[10]));
-                            		$('#txtEndaddr__'+i).val($.trim(column[11]));
-                            		$('#txtCardeal__'+i).val($.trim(column[13]));
-                            		$('#txtCarno__'+i).val($.trim(column[14]));
+                            	if(row.length>q_bbtCount){
+                            		q_gridAddRow(bbtHtm, 'tbbt', 'txtNoq', row.length-q_bbtCount);
                             	}
+                            	
+								console.log(e.target.fileName);
+								var n = 0;
+								if(/本場/g.test(e.target.fileName)){
+									for(var i=0;i<row.length;i++){
+	                            		if(row[i].length == 0)
+	                            			continue;
+	                            		var column = row[i].split(',');
+	                            		var date = new Date(Date.parse(column[4]));
+	                            		//日期沒有問題才存入
+	                            		if(!(date instanceof Date) || isNaN(date.getMonth()))
+	                            			continue;
+	                            		var yy = date.getFullYear()+"";
+	                            		var mm = date.getMonth()+"";
+	                            		var dd = date.getDate()+"";
+	                            		mm = (mm.length==1?"0":"") + mm;
+	                            		dd = (dd.length==1?"0":"") + dd;
+	                            		var HH = date.getHours()+"";
+	                            		var MM = date.getMinutes()+"";
+	                            		var SS = date.getSeconds()+"";
+	                            		HH = (HH.length==1?"0":"") + HH;
+	                            		MM = (MM.length==1?"0":"") + MM;
+	                            		SS = (SS.length==1?"0":"") + SS;
+	                            		
+	                            		$('#txtDatea__'+n).val(yy+'/'+mm+'/'+dd);
+	                            		$('#txtTimea__'+n).val(HH+':'+MM+':'+SS);
+	                            		$('#txtCasetype__'+n).val($.trim(column[5]));
+	                            		$('#txtContainerno1__'+n).val($.trim(column[3]));
+	                            		$('#txtMount__'+n).val($.trim(column[9]));
+	                            		$('#txtStraddr__'+n).val($.trim(column[10]));
+	                            		$('#txtEndaddr__'+n).val($.trim(column[11]));
+	                            		$('#txtCardeal__'+n).val($.trim(column[13]));
+	                            		$('#txtCarno__'+n).val($.trim(column[14]));
+	                            		$('#txtMemo__'+n).val($.trim(column[2]));
+	                            		n++;
+	                            	}
+								}else if(/外場/g.test(e.target.fileName)){
+									for(var i=0;i<row.length;i++){
+	                            		if(row[i].length == 0)
+	                            			continue;
+	                            		var column = row[i].split(',');
+	                            		var date = new Date(Date.parse(column[2]));
+	                            		//日期沒有問題才存入
+	                            		if(!(date instanceof Date) || isNaN(date.getMonth()))
+	                            			continue;
+	                            		var yy = date.getFullYear()+"";
+	                            		var mm = date.getMonth()+"";
+	                            		var dd = date.getDate()+"";
+	                            		mm = (mm.length==1?"0":"") + mm;
+	                            		dd = (dd.length==1?"0":"") + dd;
+	                            		var HH = date.getHours()+"";
+	                            		var MM = date.getMinutes()+"";
+	                            		var SS = date.getSeconds()+"";
+	                            		HH = (HH.length==1?"0":"") + HH;
+	                            		MM = (MM.length==1?"0":"") + MM;
+	                            		SS = (SS.length==1?"0":"") + SS;
+	                            		
+	                            		$('#txtDatea__'+n).val(yy+'/'+mm+'/'+dd);
+	                            		$('#txtTimea__'+n).val(HH+':'+MM+':'+SS);
+	                            		$('#txtCasetype__'+n).val($.trim(column[1]));
+	                            		$('#txtContainerno1__'+n).val($.trim(column[0]));
+	                            		$('#txtStraddr__'+n).val($.trim(column[4]));
+	                            		$('#txtEndaddr__'+n).val($.trim(column[5]));
+	                            		$('#txtMemo__'+n).val($.trim(column[6]));
+	                            		n++;
+	                            	}
+								}
+                            	
                             	
                             	$('#btnFile').val('');
                             };
@@ -135,23 +176,23 @@
 			function bbsAssign() {
 				for (var i = 0; i < q_bbsCount; i++) {
 					$('#lblNo_' + i).text(i + 1);
-                    if (!$('#btnMinus_' + i).hasClass('isAssign')) {
-                    	
-                    }
+                    if ($('#btnMinus_' + i).hasClass('isAssign')) 
+                    	continue;
 				}
 				_bbsAssign();
 			}
 			function bbtAssign() {
                 for (var i = 0; i < q_bbtCount; i++) {
                     $('#lblNo__' + i).text(i + 1);
-                    if (!$('#btnMinut__' + i).hasClass('isAssign')) {
-                    	$('#txtWeight__'+i).change(function(e){
+                    if ($('#btnMinut__' + i).hasClass('isAssign'))
+                    	continue;
+                    	/*$('#txtWeight__'+i).change(function(e){
                     		sum();
                     	});
                     	$('#txtTrannumber__'+i).change(function(e){
                     		sum();
-                    	});
-                    }
+                    	});*/
+                    
                 }
                 _bbtAssign();
             }
@@ -330,6 +371,11 @@
 
 			function readonly(t_para, empty) {
 				_readonly(t_para, empty);
+				if(q_cur==1 || q_cur==2){
+					$('#btnFile').removeAttr('disabled');
+				}else{
+					$('#btnFile').attr('disabled','disabled');
+				}
 			}
 
 			function btnMinus(id) {
@@ -648,33 +694,106 @@
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' >
+		<div style="width: 1600px;">
+			<table>
+				<tr style='color:white; background:#003366;' > 				
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>數量</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>油桶櫃</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>押運</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>儀檢</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>DG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>OOG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
+				</tr>
+			</table>
+		</div>
+		<div style="width: 1600px;">
+			<table>
+				<tr style='color:white; background:#003366;' > 	
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>TOTAL</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA01" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA03" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA04" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA05" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA06" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+				</tr>
+			</table>
+		</div>
+		<div class='dbbs' style="width: 1600px;">
 			<table id="tbbs" class='tbbs' >
-				<tr style='color:white; background:#003366;' >
-					<td align="center" style="width:25px">
-					<input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  />
-					</td>
-					<td align="center" style="width:20px;"></td>
-					<td align="center" style="width:150px"><a>櫃號一</a></td>
-					<td align="center" style="width:150px"><a>櫃號二</a></td>
-					<td align="center" style="width:150px"><a id='lblMemo_s'></a></td>
+				<tr style='display:none;' >
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 				<tr  style='background:#cad3ff;'>
-					<td align="center">
+					<td align="center" style="width:50px;">
 					<input class="btn"  id="btnMinus.*" type="button" value='-' style=" font-weight: bold;" />
 					</td>
-					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a>
-					<input type="text" id="txtNoq.*" style="display:none;"/>
+					<td style="width:50px;">
+						<a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a>
+						<input type="text" id="txtNoq.*" style="display:none;"/>
 					</td>
-					<td><input type="text" id="txtContainerno1.*" style="width:95%;"/></td>
-					<td><input type="text" id="txtContainerno2.*" style="width:95%;"/></td>
-					<td><input type="text" id="txtMemo.*" style="width:95%;" /></td>
+					<td align="center" colspan="1" rowspan="1" style="width:150px;"><input type="text" id="txtContainerno1.*" style="width:95%;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><select id="cmbCasetype.*" style="width:95%;"> </select></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:100px;">
+						<input type="text" id="txtCardealno.*" style="float:left;width:45%;"/>
+						<input type="text" id="txtCardeal.*" style="float:left;width:45%;"/>
+						<input type="button" id="btnCardeal.*" style="display:none;"/>
+					</td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;">
+						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
+						<input type="button" id="btnAddr.*" style="display:none;"/>
+					</td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;">
+						<input type="text" id="txtAddrno2.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtAddr2.*" style="float:left;width:55%;"/>
+						<input type="button" id="btnAddr2.*" style="display:none;"/>
+					</td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 
 			</table>
 		</div>
 		<input id="q_sys" type="hidden" />
-		<div id="dbbt" style="width:1000px;">
+		<div id="dbbt" style="width:1100px;">
 			<table id="tbbt">
 				<tbody>
 					<tr class="head" style="color:white; background:#003366;">
@@ -685,12 +804,13 @@
 						<td style="width:100px; text-align: center;">日期</td>
 						<td style="width:100px; text-align: center;">時間</td>
 						<td style="width:100px; text-align: center;">櫃型</td>
-						<td style="width:100px; text-align: center;">櫃號</td>
+						<td style="width:130px; text-align: center;">櫃號</td>
 						<td style="width:100px; text-align: center;">重量</td>
 						<td style="width:100px; text-align: center;">起點</td>
 						<td style="width:100px; text-align: center;">迄點</td>
 						<td style="width:100px; text-align: center;">車行</td>
 						<td style="width:100px; text-align: center;">車牌</td>
+						<td style="width:100px; text-align: center;">備註</td>
 					</tr>
 					<tr class="detail">
 						<td>
@@ -707,6 +827,7 @@
 						<td><input class="txt" id="txtEndaddr..*" type="text" style="width:95%;"/></td>
 						<td><input class="txt" id="txtCardeal..*" type="text" style="width:95%;"/></td>
 						<td><input class="txt" id="txtCarno..*" type="text" style="width:95%;"/></td>
+						<td><input class="txt" id="txtMemo..*" type="text" style="width:95%;"/></td>
 					</tr>
 				</tbody>
 			</table>
