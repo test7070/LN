@@ -229,7 +229,7 @@
             }
 
 			function bbsSave(as) {
-				if (!as['containerno1']) {
+				if (!as['addr']) {
 					as[bbsKey[1]] = '';
 					return;
 				}
