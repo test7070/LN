@@ -99,6 +99,7 @@
 								console.log(e.target.fileName);
 								$('#cmbStype').val('');
 								var n = 0;
+								//bbt
 								if(/本場/g.test(e.target.fileName)){
 									$('#cmbStype').val('本場');
 									for(var i=0;i<row.length;i++){
@@ -165,9 +166,55 @@
 	                            		n++;
 	                            	}
 								}
-                            	
-                            	
                             	$('#btnFile').val('');
+                            	//bbs
+                            	var item = new Array();
+								for(var i=0;i<q_bbtCount;i++){
+									if($.trim($('#txtContainerno1__'+i).val()).length==0)
+										continue;
+									casetype = "";
+									switch($('#txtCasetype__'+i).val().substring(0,1)){
+										case "2":
+											casetype = "20'"+(q_float('txtMount__'+i)>0?"F":"E");
+											break;
+										case "4":
+											casetype = "40'"+(q_float('txtMount__'+i)>0?"F":"E");
+											break;
+										default:
+											break;
+									}
+									straddr = $.trim($("#txtStraddr__"+i).val()); 
+									endaddr = $.trim($("#txtEndaddr__"+i).val());
+									cardeal = $.trim($("#txtCardeal__"+i).val());
+									
+									n = -1;//判斷 起點+迄點+車行+櫃型 是否已存在
+									for(var j=0;j<item.length;j++){
+										if(item[j].straddr==straddr && item[j].endaddr==endaddr && item[j].cardeal==cardeal && item[j].casetype==casetype){
+											n=j;
+											break;
+										}
+									}
+									if(n==-1){
+										item.push({straddr:straddr,endaddr:endaddr,cardeal:cardeal,casetype:casetype,mount:0});
+										n = item.length-1;
+									}
+									item[n].mount++;
+								}
+								for(var i=0;i<q_bbsCount;i++){
+                            		$('#btnMinus_'+i).click();
+                            	}
+                            	if(item.length>q_bbsCount){
+                            		q_gridAddRow(bbsHtm, 'tbbs', 'txtNoq', item.length-q_bbsCount);
+                            	}	
+								for(var i=0;i<item.length;i++){
+									$('#cmbCaseno_'+i).val(item[i].casetype);
+									$('#txtDriver_'+i).val(item[i].cardeal);
+									$('#txtAddrno_'+i).val(item[i].straddr);
+									$('#txtAddrno2_'+i).val(item[i].endaddr);
+									$('#txtMount_'+i).val(item[i].mount);
+								}
+								refreshBbs();
+								sum();
                             };
                         }
                    }
@@ -239,6 +286,8 @@
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
 					return;
+				
+					
 				/*var t_weight2 = 0,t_trannumber = 0;
 				for(var i=0;i<q_bbtCount;i++){
 					if($('#txtDatea__'+i).val().length>0){
