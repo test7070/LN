@@ -86,7 +86,6 @@
                         if(file){
                         	fr = new FileReader();
                             fr.readAsText(file,'BIG5');
-                            //fr.readAsText(file,'ANSI');
                             fr.fileName = file.name;
                             fr.onload=function(e){
                             	var row = fr.result.split(/\r\n/);
