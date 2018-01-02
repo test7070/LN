@@ -14,6 +14,34 @@
 		<script src="css/jquery/ui/jquery.ui.widget.js"></script>
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
+			//地點代碼對照
+			var addr = [{org:'KHH00',name:'63號碼頭',cur:'KHH063'}
+				,{org:'KHH01',name:'亞太櫃場',cur:'KHH01'}
+				,{org:'KHH02',name:'友聯櫃場',cur:'KHH02'}
+				,{org:'KHH03',name:'世新貨櫃',cur:'KHH03'}
+				,{org:'KHH04',name:'東亞櫃場',cur:'KHH04'}
+				,{org:'KHH06',name:'裕楓(原裕豐)',cur:'KHH06'}
+				,{org:'KHH07',name:'海盛櫃場',cur:'KHH07'}
+				,{org:'KHH08',name:'高鳳櫃場',cur:'KHH08'}
+				,{org:'KHH09',name:'宇竑',cur:'KHH09'}
+				,{org:'KHH10',name:'台豐櫃場',cur:'KHH10'}
+				,{org:'KHH12',name:'76號碼頭',cur:'KHH076'}
+				,{org:'KHH13',name:'79號碼頭',cur:'KHH079'}
+				,{org:'KHH14',name:'65號碼頭',cur:'KHH065'}
+				,{org:'KHH16',name:'三濮櫃場',cur:'KHH16'}
+				,{org:'KHH19',name:'70號碼頭',cur:'KHH070'}
+				,{org:'KHH20',name:'海吉櫃場',cur:'KHH20'}
+				,{org:'KHH21',name:'116號碼頭',cur:'KHH116'}
+				,{org:'KHH22',name:'121碼頭',cur:'KHH121'}
+				,{org:'KHH23',name:'120號碼頭',cur:'KHH120'}
+				,{org:'KHH25',name:'118號碼頭',cur:'KHH118'}
+				,{org:'KHH30',name:'78號碼頭',cur:'KHH078'}
+				,{org:'KHH31',name:'75號碼頭',cur:'KHH075'}
+				,{org:'KHH36',name:'42號碼頭',cur:'KHH042'}
+				,{org:'KHH37',name:'69號碼頭',cur:'KHH069'}
+				,{org:'KHH39',name:'108號碼頭',cur:'KHH108'}
+				,{org:'KSS72',name:'68號碼頭',cur:'KHH068'}];
+
 			this.errorHandler = null;
 			function onPageError(error) {
 				alert("An error occurred:\r\n" + error.Message);
@@ -160,8 +188,22 @@
 	                            		$('#txtTimea__'+n).val(HH+':'+MM+':'+SS);
 	                            		$('#txtCasetype__'+n).val($.trim(column[1]));
 	                            		$('#txtContainerno1__'+n).val($.trim(column[0]));
-	                            		$('#txtStraddr__'+n).val($.trim(column[4]));
-	                            		$('#txtEndaddr__'+n).val($.trim(column[5]));
+	                            		var t_addr = $.trim(column[4]);
+	                            		for(var i=0;i<addr.length;i++){
+	                            			if(t_addr==addr[i].org){
+	                            				$('#txtStraddr__'+n).val(addr[i].cur);		
+	                            				break;
+	                            			}
+	                            		}
+	                            		t_addr = $.trim(column[5]);
+	                            		for(var i=0;i<addr.length;i++){
+	                            			if(t_addr==addr[i].org){
+	                            				$('#txtEndaddr__'+n).val(addr[i].cur);		
+	                            				break;
+	                            			}
+	                            		}
+	                            		//$('#txtStraddr__'+n).val($.trim(column[4]));
+	                            		//$('#txtEndaddr__'+n).val($.trim(column[5]));
 	                            		$('#txtMemo__'+n).val($.trim(column[6]));
 	                            		n++;
 	                            	}
