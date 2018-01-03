@@ -15,7 +15,7 @@
 		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
 			//地點代碼對照
-			var addr = [{org:'KHH00',name:'63號碼頭',cur:'KHH063'}
+			var taddr = [{org:'KHH00',name:'63號碼頭',cur:'KHH063'}
 				,{org:'KHH01',name:'亞太櫃場',cur:'KHH01'}
 				,{org:'KHH02',name:'友聯櫃場',cur:'KHH02'}
 				,{org:'KHH03',name:'世新貨櫃',cur:'KHH03'}
@@ -188,20 +188,24 @@
 	                            		$('#txtTimea__'+n).val(HH+':'+MM+':'+SS);
 	                            		$('#txtCasetype__'+n).val($.trim(column[1]));
 	                            		$('#txtContainerno1__'+n).val($.trim(column[0]));
+	                            		var t_straddr = '*'+$.trim(column[4]),t_endaddr = '*'+$.trim(column[5]);
 	                            		var t_addr = $.trim(column[4]);
-	                            		for(var i=0;i<addr.length;i++){
-	                            			if(t_addr==addr[i].org){
-	                            				$('#txtStraddr__'+n).val(addr[i].cur);		
+	                            		for(var j=0;j<taddr.length;j++){
+	                            			if(t_addr==taddr[j].org){
+	                            				t_straddr = taddr[j].cur;		
 	                            				break;
 	                            			}
 	                            		}
+	                            		
 	                            		t_addr = $.trim(column[5]);
-	                            		for(var i=0;i<addr.length;i++){
-	                            			if(t_addr==addr[i].org){
-	                            				$('#txtEndaddr__'+n).val(addr[i].cur);		
+	                            		for(var j=0;j<taddr.length;j++){
+	                            			if(t_addr==taddr[j].org){
+	                            				t_endaddr = taddr[j].cur;		
 	                            				break;
 	                            			}
 	                            		}
+	                            		$('#txtStraddr__'+n).val(t_straddr);
+										$('#txtEndaddr__'+n).val(t_endaddr);
 	                            		//$('#txtStraddr__'+n).val($.trim(column[4]));
 	                            		//$('#txtEndaddr__'+n).val($.trim(column[5]));
 	                            		$('#txtMemo__'+n).val($.trim(column[6]));

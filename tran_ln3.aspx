@@ -17,7 +17,7 @@
 			//萬海移櫃
 			q_tables = 's';
 			var q_name = "borr";
-			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2'
+			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2','txtOrdeno'
 				,'textA01','textA02','textA03','textA04','textA05','textA06'];
 			var q_readonlys = ['txtN05'];
 			var q_readonlyt = [];
@@ -502,6 +502,11 @@
 						</td>
 						<td><span> </span><a class="lbl">代表航次</a></td>
 						<td><input type="text" id="txtV03" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">派工單號</a></td>
+						<td>
+							<input type="text" id="txtOrdeaccy" style="display:none;" />
+							<input type="text" id="txtOrdeno" class="txt c1"/>
+						</td>
 					</tr>
 					<!--<tr>
 						<td><span> </span><a class="lbl">抵達碼頭航次</a></td>
