@@ -1,0 +1,109 @@
+tranorde_borr:--tranorde_borr   tran_ln3	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_bno nvarchar(20) = [1]
+	declare @t_eno nvarchar(20) = [2]
+	-----------------------------------------------------------------------------------------------------
+	declare @bbm table(
+		sel int identity(1,1)
+		,accy nvarchar(20)
+		,noa nvarchar(20)
+		,planid nvarchar(20)
+		,datea nvarchar(20)
+		,begindate nvarchar(20)
+		,enddate nvarchar(20)
+		,boatname nvarchar(20)
+		,ship nvarchar(20)
+		,memo nvarchar(max)
+		,memo2 nvarchar(max)
+		,custno nvarchar(20)
+		,cust nvarchar(100)
+		,custnick nvarchar(30)
+	)
+	declare @bbs table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,caseno nvarchar(20)
+		,casetype nvarchar(20)
+		,carno nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,straddrno nvarchar(20)
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+		,n01 float --數量
+		,n02 float --油桶櫃
+		,n03 float --20'押運
+		,n04 float --40'押運
+		,m01 float --20'OOG附加費
+		,m02 float --40'OOG附加費
+		,memo nvarchar(max)
+	)
+	insert into @bbm(accy,noa,planid,datea,begindate,enddate,boatname,ship,memo,memo2
+		,custno,cust,custnick)
+	select a.accy,a.noa,a.[contract] planid,a.datea
+		,a.date1,a.date2,a.boatname,a.ship,a.memo,a.memo2
+		,custno,comp,nick
+	from view_tranorde a
+	where a.noa between @t_bno and @t_eno
+	
+	insert into @bbs(noa,noq,caseno,casetype,carno,cardealno,cardeal
+		,straddrno,straddr,endaddrno,endaddr,n01,n02,n03,n04,m01,m02,memo)
+	select a.noa,a.noq,a.containerno1 caseno,a.caseno casetype,a.carno,a.driverno cardealno,a.driver cardeal
+		,a.addrno straddrno,a.addr straddr,a.addrno2 endaddrno,a.addr2 endaddr
+		,a.mount n01,a.lengthb n02,a.width n03,a.height n04,a.total m01,a.total2 m02,a.memo
+	from view_tranordes a
+	where a.noa between @t_bno and @t_eno
+	
+	-----------------------------------------------------------------------------------------------
+	declare @accy nvarchar(10)
+	declare @noa nvarchar(20)
+	
+	Begin Transaction [Trans_Name]
+	begin try
+		declare cursor_table cursor for
+		select accy,noa from @bbm group by accy,noa 
+		open cursor_table
+		fetch next from cursor_table
+		into @accy,@noa
+		while(@@FETCH_STATUS <> -1)
+		begin
+			set @cmd = "update tranorde"+@accy+" set enda=1 where noa=@noa"
+			execute sp_executesql @cmd,N'@noa nvarchar(20)',@noa=@noa
+			fetch next from cursor_table
+			into @accy,@noa
+		end
+		close cursor_table
+		deallocate cursor_table
+	
+		insert into borr(vccno,noa,v01,v02,v03,datea,begindate,enddate,memo,memo2,custno,cust,custnick)
+		select 'tran_ln3',a.noa,a.planid,a.boatname,a.ship,a.datea,a.begindate,a.enddate,a.memo,a.memo2
+			,a.custno,a.cust,a.custnick
+		from @bbm a
+		left join borr b on a.noa=b.noa
+		where b.noa is null
+		
+		update borr set vccno='tran_ln3',v01=b.planid,v02=b.boatname,v03=b.ship,datea=b.datea
+			,begindate=b.begindate,enddate=b.enddate,memo=b.memo,memo2=b.memo2
+			,custno=b.custno,cust=b.cust,custnick=b.custnick
+		from borr a
+		left join @bbm b on a.noa=b.noa
+		where b.noa is not null
+		
+		delete borrs where noa between @t_bno and @t_eno
+		 
+		insert into borrs(noa,noq,caseno,casetype,carno,cardealno,cardeal
+		,addrno,addr,addrno2,addr2,n01,n02,n03,n04,m01,m02,memo) 
+		select noa,noq,caseno,casetype,carno,cardealno,cardeal
+		,straddrno,straddr,endaddrno,endaddr,n01,n02,n03,n04,m01,m02,memo
+		from @bbs 
+		 
+		Commit Transaction [Trans_Name] -- 提交所有操作所造成的變更
+		select 1 [status],'done' msg
+	end try
+	begin catch
+		Rollback Transaction [Trans_Name] -- 復原所有操作所造成的變更
+		select 0 [status],error_message() msg
+	end catch;
