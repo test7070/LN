@@ -93,6 +93,14 @@
 
 			function q_funcPost(t_func, result) {
 				switch(t_func) {
+					case 'qtxt.query.tranorde_borr':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							alert(as[0].msg);
+							if(as[0].status=="1")
+								$('#chkEnda').prop('checked',true);
+						}
+						break;
 					default:
 						break;
 				}
@@ -106,6 +114,19 @@
 				q_mask(bbmMask);
 				q_cmbParse("cmbStype", " ,本場,外場");
 				q_cmbParse("cmbCaseno", " ,20'E,40'E,20'F,40'F","s");
+				
+				$('#btn2tran_ln3').click(function(e){
+					if($.trim($('#txtNoa').val()).length==0)
+						return;
+					t_noa = $.trim($('#txtNoa').val());	
+					q_func('qtxt.query.tranorde_borr', 'tranorde_ln.txt,tranorde_borr,' + t_noa + ';' + t_noa+ ';' + t_noa);
+				});
+				$('#lblEnd').click(function(e){
+					if($.trim($('#txtNoa').val()).length==0)
+						return;
+					t_where = JSON.stringify({noa:$.trim($('#txtNoa').val())});
+					q_box("tran_ln3.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where+";"+";", "tran_ln3", "95%", "95%", '');
+				});
 				
 				$('#btnFile').change(function(e){
 					var files = e.target.files;
@@ -321,7 +342,7 @@
             }
 
 			function bbsSave(as) {
-				if (!as['addr']) {
+				if (!as['addr'] && !as['addrno']) {
 					as[bbsKey[1]] = '';
 					return;
 				}
@@ -462,11 +483,13 @@
 					$('#txtDate1').datepicker('destroy');
 					$('#txtDatea2').datepicker('destroy');
 					$('#btnFile').attr('disabled','disabled');
+					$('#btn2tran_ln3').removeAttr('disabled');
 				}else{
 					$('#txtDatea').datepicker();
 					$('#txtDate1').datepicker();
 					$('#txtDate2').datepicker();
 					$('#btnFile').removeAttr('disabled');
+					$('#btn2tran_ln3').attr('disabled','disabled');
 				}
 			}
 
@@ -526,12 +549,12 @@
 			function q_popPost(id) {
 				switch(id){
 					case 'txtCustno':
-						var t_carno = $.trim($('#txtCustno').val());
+						/*var t_carno = $.trim($('#txtCustno').val());
 						if(q_cur==1 && t_carno.length>0){
 							for(var i=1;i<=5;i++)
 								if($.trim($('#textAddr'+i).val()).length==0)
 									$('#textAddrno'+i).val(t_carno+'-');
-						}
+						}*/
 						break;
 				}
 			}
@@ -713,6 +736,11 @@
 						<td><input type="text" id="txtDate1" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期(迄)</a></td>
 						<td><input type="text" id="txtDate2" class="txt c1"/></td>
+						<td>
+							<a id='lblEnd' class="lbl btn" style="float:right;">完工</a>
+							<span> </span>
+							<input id="chkEnda" type="checkbox" style="float:right;"/>
+						</td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">船名</a></td>
@@ -751,7 +779,8 @@
 					</tr>
 					<tr>
 						<td> </td>
-						<td colspan="5"><input id="btnFile"  type="file" /></td>
+						<td colspan="4"><input type="file" id="btnFile"/></td>
+						<td><input type="button" id="btn2tran_ln3" value="完工" style="width:100%;"/></td>
 					</tr>
 				</table>
 			</div>

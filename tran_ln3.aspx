@@ -38,7 +38,8 @@
 			aPop = new Array(['txtAddrno_', 'btnAddr_', 'addr2', 'noa,addr', 'txtAddrno_,txtAddr_', 'addr2_b.aspx']
 				,['txtAddrno2_', 'btnAddr2_', 'addr2', 'noa,addr', 'txtAddrno2_,txtAddr2_', 'addr2_b.aspx']
 				,['txtCardealno_', 'btnCardeal_', 'cardeal', 'noa,nick', 'txtCardealno_,txtCardeal_', 'cardeal_b.aspx']
-				,['txtV02', 'btnBoat', 'boat', 'noa,boat,conn', 'txtV02', 'boat_b.aspx']);
+				,['txtV02', 'btnBoat', 'boat', 'noa,boat,conn', 'txtV02', 'boat_b.aspx']
+				,['txtCustno', 'lblCust', 'cust', 'noa,comp,nick', 'txtCustno,txtCust,txtCustnick', 'cust_b.aspx']);
 			
 			function sum() {
 				if (!(q_cur == 1 || q_cur == 2))
@@ -53,7 +54,14 @@
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
 				q_brwCount();
-				q_content = "where=^^ vccno='tran_ln3'^^";
+				
+				try{
+					t_para = JSON.parse(q_getId()[3]);
+					if(t_para.noa.length>0)
+						q_content = "where=^^ noa='"+t_para.noa+"' and vccno='tran_ln3'^^";
+				}catch(e){
+					q_content = "where=^^ vccno='tran_ln3'^^";
+				}
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 			});
 			function main() {
@@ -502,10 +510,18 @@
 						</td>
 						<td><span> </span><a class="lbl">代表航次</a></td>
 						<td><input type="text" id="txtV03" class="txt c1"/></td>
-						<td><span> </span><a class="lbl">派工單號</a></td>
+						<!--<td><span> </span><a class="lbl">派工單號</a></td>
 						<td>
 							<input type="text" id="txtOrdeaccy" style="display:none;" />
 							<input type="text" id="txtOrdeno" class="txt c1"/>
+						</td>-->
+					</tr>
+					<tr>
+						<td><span> </span><a class="lbl" id="lblCust">客戶</a></td>
+						<td colspan="2">
+							<input type="text" id="txtCustno" class="txt" style="float:left;width:40%;"/>
+							<input type="text" id="txtCust" class="txt" style="float:left;width:60%;"/>
+							<input type="text" id="txtCustnick" class="txt" style="display:none;"/>
 						</td>
 					</tr>
 					<!--<tr>
