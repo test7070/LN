@@ -4,6 +4,7 @@ tranorde_borr:--tranorde_borr   tran_ln3
 	declare @t_bno nvarchar(20) = [1]
 	declare @t_eno nvarchar(20) = [2]
 	-----------------------------------------------------------------------------------------------------
+	-----------------------------------------------------------------------------------------------------
 	declare @bbm table(
 		sel int identity(1,1)
 		,accy nvarchar(20)
@@ -57,6 +58,64 @@ tranorde_borr:--tranorde_borr   tran_ln3
 	from view_tranordes a
 	where a.noa between @t_bno and @t_eno
 	
+	update @bbs set cardealno = ISNULL(b.noa,'')
+	from @bbs a
+	left join cardeal b on a.cardeal=b.nick
+	where len(ISNULL(a.cardealno,''))=0
+	and b.noa is not null
+	
+	update @bbs set cardealno='B00',cardeal='外車'
+	from @bbs a
+	where len(ISNULL(a.cardealno,''))=0
+	
+	update @bbs set straddr = ISNULL(b.addr,'')
+	from @bbs a
+	left join addr2 b on a.straddrno=b.noa
+	where len(ISNULL(a.straddr,''))=0
+	and b.noa is not null
+	
+	update @bbs set endaddr = ISNULL(b.addr,'')
+	from @bbs a
+	left join addr2 b on a.endaddrno=b.noa
+	where len(ISNULL(a.endaddr,''))=0
+	and b.noa is not null
+	-----------------------------------------------------------------------------------------------
+	declare @bbs2 table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,caseno nvarchar(20)
+		,casetype nvarchar(20)
+		,carno nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,straddrno nvarchar(20)
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+		,n01 float --數量
+		,n02 float --油桶櫃
+		,n03 float --20'押運
+		,n04 float --40'押運
+		,m01 float --20'OOG附加費
+		,m02 float --40'OOG附加費
+		,memo nvarchar(max)
+	)
+	insert into @bbs2(noa,caseno,casetype,carno,cardealno,cardeal
+		,straddrno,straddr,endaddrno,endaddr,n01,n02,n03,n04,m01,m02,memo)
+	select noa,caseno,casetype,carno,cardealno,cardeal
+		,straddrno,straddr,endaddrno,endaddr
+		,SUM(ISNULL(n01,0)),SUM(ISNULL(n02,0)),SUM(ISNULL(n03,0)),SUM(ISNULL(n04,0))
+		,SUM(ISNULL(m01,0)),SUM(ISNULL(m01,0))
+		,''
+	from @bbs
+	group by noa,caseno,cardealno,cardeal,casetype,carno
+		,straddrno,straddr,endaddrno,endaddr
+	
+	update @bbs2 set noq= RIGHT('00'+CAST(recno as nvarchar),3)
+	from @bbs2 a
+	left join (select sel,ROW_NUMBER()over(partition by noa order by sel) recno from @bbs2 ) b on a.sel=b.sel
+	
 	-----------------------------------------------------------------------------------------------
 	declare @accy nvarchar(10)
 	declare @noa nvarchar(20)
@@ -98,7 +157,7 @@ tranorde_borr:--tranorde_borr   tran_ln3
 		,addrno,addr,addrno2,addr2,n01,n02,n03,n04,m01,m02,memo) 
 		select noa,noq,caseno,casetype,carno,cardealno,cardeal
 		,straddrno,straddr,endaddrno,endaddr,n01,n02,n03,n04,m01,m02,memo
-		from @bbs 
+		from @bbs2
 		 
 		Commit Transaction [Trans_Name] -- 提交所有操作所造成的變更
 		select 1 [status],'done' msg

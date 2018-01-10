@@ -350,7 +350,7 @@
 			}
 			.dview {
 				float: left;
-				width: 430px;
+				width: 500px;
 				border-width: 0px;
 			}
 			.tview {
