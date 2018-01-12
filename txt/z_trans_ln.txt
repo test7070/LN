@@ -1349,6 +1349,8 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
 	-------------------------------------------------------------------
 	declare @t_page int = 50 --  每頁資料筆數
 	
@@ -1357,31 +1359,34 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 		,page int
 		,gno nvarchar(20)
 		,pno int
-		,noa nvarchar(20)
-		,datea nvarchar(20)--作業日期
+		,noa nvarchar(20) --電腦編號
+		,datea nvarchar(20)--完工日期
+		,v01 nvarchar(max) --船隻編號
 		,v02 nvarchar(max) --船名
 		,v03 nvarchar(max) --航次
 		,boatno nvarchar(max)--船名代碼
-		,v01 nvarchar(max) --船隻編號
 		,mount01 float    --數量
 		,mount02 float    --超高吊架
 		,mount03 float    --鐳仔桶
+		,mount04 float    --數量合計
 		,memo nvarchar(max)
 	)
-	insert into @tmp(gno,pno,noa,datea,v02,v03,boatno,v01
-		,mount01,mount02,mount03,memo)
+	insert into @tmp(gno,pno,noa,datea
+		,v01,v02,v03,boatno
+		,mount01,mount02,mount03,mount04,memo)
 	select '1',1,a.noa,a.datea
-		,a.v02,a.v03,'' boatno,a.v01
+		,a.v01,a.v02,a.v03,'' boatno
 		,b.n15 mount01
 		,b.inteis mount02
 		,b.arrerage mount03
-		,''
+		,ISNULL(b.n15,0)+ISNULL(b.inteis,0)+ISNULL(b.arrerage,0)
+		,a.memo
 	from borr a
 	left join (select noa,SUM(ISNULL(n15,0)) n15
 			,SUM(ISNULL(inteis,0)) inteis
 			,SUM(ISNULL(arrerage,0)) arrerage
 		from borrs where [sign]='borr'  group by noa) b on a.noa=b.noa 
-	where LEFT(a.datea,7) = @t_mon
+	where a.datea between @t_bdate and @t_edate
 	and a.vccno='tran_ln'
 	order by a.noa
 	
@@ -1391,24 +1396,30 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	
 	update @tmp set page = FLOOR( (sel-1)/@t_page) + 1
 	
-	insert into @tmp(page,gno,pno,mount01,mount02,mount03)
-	select page,'2',2,SUM(ISNULL(mount01,0)),SUM(ISNULL(mount02,0)),SUM(ISNULL(mount03,0))
+	insert into @tmp(page,gno,pno,mount01,mount02,mount03,mount04)
+	select page,'2',2,SUM(ISNULL(mount01,0)),SUM(ISNULL(mount02,0)),SUM(ISNULL(mount03,0)),SUM(ISNULL(mount04,0))
 	from @tmp
 	group by page
 	
-	update @tmp set memo = N'不含超高吊架共'+CAST(mount02 as nvarchar)+N'車. 鐳仔桶共'+CAST(mount03 as nvarchar)+N'車'
-	where not(mount02=0 and mount03=0)
-	
+	declare @bno nvarchar(20) = ''
+	declare @eno nvarchar(20) = ''
+	select top 1 @bno = noa from @tmp where pno=1 order by noa 
+	select top 1 @eno = noa from @tmp where pno=1 order by noa desc 
+
 	select gno 
 		,sel rr
-		,@t_mon a01
-		,right(datea,4) b01
-		,v02 b02
-		,v03 b03
-		,boatno b04
-		,dbo.getComma(mount01,-1) b05
-		,v01 b06
-		,memo b07 
+		,"電腦編號："+case when @bno=@eno then @bno else @bno+"~"+@eno end a01
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+"',' "+CHAR(59)+"noa=\'"+noa+"\'','95%','95%','B1')"+char(34)+">"+noa+"</a>" b01
+		,right(datea,5) b02
+		,v01 b03
+		,v02 b04
+		,v03 b05
+		,boatno b06
+		,dbo.getComma(mount01,-1) b07
+		,dbo.getComma(mount02,-1) b08
+		,dbo.getComma(mount03,-1) b09
+		,dbo.getComma(mount04,-1) b10
+		,memo b11 
 	from @tmp order by page,pno,sel;
 
 z_trans_ln03:--z_trans_ln03  z_trans_ln.txt	

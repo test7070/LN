@@ -76,7 +76,10 @@
                         type : '8',
                         name : 'xoption',
                         value : "1@新實單價".split(",")
-                    }]
+                    }, {
+						//[18][19]              11
+						type : '2', name : 'xcust', dbf : 'cust', index : 'noa,nick', src : 'cust_b.aspx'
+					}]
                 });
                 q_popAssign();
 				$('#txtMon').mask(r_picm);
