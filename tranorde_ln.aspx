@@ -96,9 +96,12 @@
 					case 'qtxt.query.tranorde_borr':
 						var as = _q_appendData("tmp0", "", true, true);
 						if (as[0] != undefined) {
-							alert(as[0].msg);
 							if(as[0].status=="1")
 								$('#chkEnda').prop('checked',true);
+							var msg = '';
+							for(var i=0;i<as.length;i++)
+								msg += (msg.length>0?'\n':'') + as[0].msg;
+							alert(msg);
 						}
 						break;
 					default:

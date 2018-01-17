@@ -523,6 +523,12 @@
 							<input type="text" id="txtCust" class="txt" style="float:left;width:60%;"/>
 							<input type="text" id="txtCustnick" class="txt" style="display:none;"/>
 						</td>
+						<td> </td>
+						<td>
+							<a class="lbl btn" style="float:right;">鎖單</a>
+							<span> </span>
+							<input id="chkIsnointe" type="checkbox" style="float:right;"/>
+						</td>
 					</tr>
 					<!--<tr>
 						<td><span> </span><a class="lbl">抵達碼頭航次</a></td>

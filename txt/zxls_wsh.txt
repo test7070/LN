@@ -238,8 +238,7 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 		begin
 			--產生新單據編號
 			select top 1 @maxnoa = noa from borr 
-			where [vccno]='tran_ln' 
-			and noa like @key+replace(left(@datea,7),'/','')+'[0-9,A-Z][0-9][0-9]'
+			where noa like @key+replace(left(@datea,7),'/','')+'[0-9,A-Z][0-9][0-9]'
 			order by noa desc
 			
 			if len(@maxnoa)=0
@@ -251,7 +250,7 @@ zxls_wsh:--zxls_wsh  萬海  船邊  匯入
 				set @nx = (charindex(left(RIGHT(@maxnoa,3),1),@string)-1)*100 + cast(RIGHT(@maxnoa,2) as int)+1
 				set @noa = @key+replace(left(@datea,7),'/','')
 					+ substring(@string,floor(@nx/100)+1,1)
-					+ right(CAST(@nx as nvarchar),2)
+					+ right('00'+CAST(@nx as nvarchar),2)
 			end
 	
 			insert into borr(vccno,noa,datea,v02,v03,v04,v01,begindate,v05,v06,memo,worker)
