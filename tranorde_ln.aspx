@@ -174,6 +174,8 @@
 	                            		MM = (MM.length==1?"0":"") + MM;
 	                            		SS = (SS.length==1?"0":"") + SS;
 	                            		
+	                            		if($.trim(column[0]).length>0)
+	                            			$('#txtContract').val($.trim(column[0]));
 	                            		$('#txtDatea__'+n).val(yy+'/'+mm+'/'+dd);
 	                            		$('#txtTimea__'+n).val(HH+':'+MM+':'+SS);
 	                            		$('#txtCasetype__'+n).val($.trim(column[5]));
