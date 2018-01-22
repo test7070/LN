@@ -1348,9 +1348,11 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	declare @t_user nvarchar(max) = '[4]'
 	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
-	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	--declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_brecno int = case when '#non' = [11] then '' else [11] end
+	declare @t_erecno int = case when '#non' = [12] then '' else [12] end
 	-------------------------------------------------------------------
 	declare @t_page int = 50 --  每頁資料筆數
 	
@@ -1359,6 +1361,7 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 		,page int
 		,gno nvarchar(20)
 		,pno int
+		,recno int
 		,noa nvarchar(20) --電腦編號
 		,datea nvarchar(20)--完工日期
 		,v01 nvarchar(max) --船隻編號
@@ -1390,6 +1393,11 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	and a.vccno='tran_ln'
 	order by a.noa
 	
+	update @tmp set recno=b.recno
+	from @tmp a
+	left join (select sel,ROW_NUMBER()over(order by noa) recno from @tmp) b on a.sel=b.sel
+	delete @tmp where not recno between @t_brecno and @t_erecno
+	
 	update @tmp set boatno=ISNULL(b.noa,'')
 	from @tmp a
 	left join boat b on a.v02=b.boat
@@ -1407,7 +1415,7 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	select top 1 @eno = noa from @tmp where pno=1 order by noa desc 
 
 	select gno 
-		,sel rr
+		,recno rr
 		,"電腦編號："+case when @bno=@eno then @bno else @bno+"~"+@eno end a01
 		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+"',' "+CHAR(59)+"noa=\'"+noa+"\'','95%','95%','B1')"+char(34)+">"+noa+"</a>" b01
 		,right(datea,5) b02
@@ -1420,7 +1428,7 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 		,dbo.getComma(mount03,-1) b09
 		,dbo.getComma(mount04,-1) b10
 		,memo b11 
-	from @tmp order by page,pno,sel;
+	from @tmp order by page,pno,recno;
 
 z_trans_ln03:--z_trans_ln03  z_trans_ln.txt	
 	SET QUOTED_IDENTIFIER OFF
