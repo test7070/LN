@@ -414,7 +414,7 @@
 		,dbo.getComma(total,-1) a06
 	from @tmp order by pno,groupa,sel;
 
-z_trans_ln12: -- z_trans_ln12
+z_trans_ln12: --z_trans_ln12
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
