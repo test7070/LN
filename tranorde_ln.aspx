@@ -154,6 +154,7 @@
 								//bbt
 								if(/本場/g.test(e.target.fileName)){
 									$('#cmbStype').val('本場');
+									var t_planid = new Array();
 									for(var i=0;i<row.length;i++){
 	                            		if(row[i].length == 0)
 	                            			continue;
@@ -163,7 +164,7 @@
 	                            		if(!(date instanceof Date) || isNaN(date.getMonth()))
 	                            			continue;
 	                            		var yy = date.getFullYear()+"";
-	                            		var mm = date.getMonth()+"";
+	                            		var mm = (date.getMonth()+1)+"";
 	                            		var dd = date.getDate()+"";
 	                            		mm = (mm.length==1?"0":"") + mm;
 	                            		dd = (dd.length==1?"0":"") + dd;
@@ -174,8 +175,13 @@
 	                            		MM = (MM.length==1?"0":"") + MM;
 	                            		SS = (SS.length==1?"0":"") + SS;
 	                            		
-	                            		if($.trim(column[0]).length>0)
-	                            			$('#txtContract').val($.trim(column[0]));
+	                            		if($.trim(column[0]).length>0 && t_planid.indexOf($.trim(column[0]))<0)
+	                            			t_planid.push($.trim(column[0]));
+	                            		if($.trim(column[1]).length>0){
+	                            			var t = $.trim(column[1]);
+	                            			$('#txtShip').val($.trim(t.substring(0,4)));
+	                            			$('#txtBoatname').val($.trim(t.substring(4,t.length)));
+	                            		}	
 	                            		$('#txtDatea__'+n).val(yy+'/'+mm+'/'+dd);
 	                            		$('#txtTimea__'+n).val(HH+':'+MM+':'+SS);
 	                            		$('#txtCasetype__'+n).val($.trim(column[5]));
@@ -188,6 +194,11 @@
 	                            		$('#txtMemo__'+n).val($.trim(column[2]));
 	                            		n++;
 	                            	}
+	                            	var t = '';
+	                            	for(var i=0;i<t_planid.length;i++){
+	                            		t += (t.length>0?',':'')+t_planid[i];
+	                            	}
+	                            	$('#txtContract').val(t);
 								}else if(/外場/g.test(e.target.fileName)){
 									$('#cmbStype').val('外場');
 									for(var i=0;i<row.length;i++){
@@ -199,7 +210,7 @@
 	                            		if(!(date instanceof Date) || isNaN(date.getMonth()))
 	                            			continue;
 	                            		var yy = date.getFullYear()+"";
-	                            		var mm = date.getMonth()+"";
+	                            		var mm = (date.getMonth()+1)+"";
 	                            		var dd = date.getDate()+"";
 	                            		mm = (mm.length==1?"0":"") + mm;
 	                            		dd = (dd.length==1?"0":"") + dd;
@@ -210,6 +221,12 @@
 	                            		MM = (MM.length==1?"0":"") + MM;
 	                            		SS = (SS.length==1?"0":"") + SS;
 	                            		
+	                            		//Next_Tfc
+	                            		if($.trim(column[8]).length>0){
+	                            			var t = $.trim(column[8]);
+	                            			$('#txtShip').val($.trim(t.substring(0,4)));
+	                            			$('#txtBoatname').val($.trim(t.substring(4,t.length)));
+	                            		}	
 	                            		$('#txtDatea__'+n).val(yy+'/'+mm+'/'+dd);
 	                            		$('#txtTimea__'+n).val(HH+':'+MM+':'+SS);
 	                            		$('#txtCasetype__'+n).val($.trim(column[1]));
