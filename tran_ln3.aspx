@@ -79,8 +79,6 @@
 				
 				q_cmbParse("cmbCasetype", " ,20'E,40'E,20'F,40'F","s");
 				
-				q_cmbParse("cmbV11"," ,S@S,C@C");
-				
 				$('#lblV02').click(function(e){
 					q_box('boat.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + "" + ";" + r_accy + "_" + r_cno, 'trans', "95%", "95%", m_print);
 				});
@@ -545,11 +543,9 @@
 					</tr>-->
 					<tr>
 						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>
-						<td colspan="3">
+						<td colspan="5">
 							<textarea id="txtMemo" class="txt c1" style="height:75px;"> </textarea>
 						</td>
-						<td><span> </span><a class="lbl">科目</a></td>
-						<td><select id="cmbV11" style="txt c1"> </select></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMemo2" class="lbl">備註(請款憑證)</a></td>

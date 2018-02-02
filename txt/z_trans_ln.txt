@@ -421,181 +421,225 @@ z_trans_ln12: --z_trans_ln12
 	declare @t_db nvarchar(max) = '[2]'
 	declare @t_project nvarchar(max) = '[3]'
 	declare @t_user nvarchar(max) = '[4]'
-	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
-	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	--declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
+	--declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
+	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
+	declare @t_option nvarchar(max) = ''
 	-------------------------------------------------------------------------------------------------------------
-	declare @tmp table(
+	declare @tmpa table(
 		sel int identity(1,1)
 		,noa nvarchar(20)
-		,datea nvarchar(20)
-		,v02 nvarchar(20)
-		,v03 nvarchar(20)
-		,invoice nvarchar(max)
-		,invoiceDate nvarchar(max)
-		
-		,casetype nvarchar(20)
+		,noq nvarchar(10)
+		,planid nvarchar(max)
+		,datea nvarchar(50)
+		,v02 nvarchar(max)--船名
+		,v03 nvarchar(max)--航次
+		,memo2 nvarchar(max)
+		,custno nvarchar(20)
+		,cust nvarchar(max)
 		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
 		,straddrno nvarchar(20)
-		,straddr nvarchar(50)
+		,straddr nvarchar(max)
 		,endaddrno nvarchar(20)
-		,endaddr nvarchar(50)
-		,mount01 float
-		,mount02 float --油桶櫃
-		,mount03 float --20'押運
-		,mount04 float --40'押運
+		,endaddr nvarchar(max)
+		,memo nvarchar(max)
+		,typea nvarchar(20)   --科目
+		,custunit nvarchar(20) 
+		,e20 float
+		,e40 float
+		,f20 float
+		,f40 float
+		,h01 float --油桶櫃
+		,h02 float --20'押運
+		,h03 float --40'押運
+		,h20 float--20'OOG附加費	
+		,h40 float--40'OOG附加費
+		----應收
+		,m_e20 float
+		,m_e40 float
+		,m_f20 float
+		,m_f40 float
+		,m_h01 float --油桶櫃
+		,m_h02 float --20'押運
+		,m_h03 float --40'押運
+		,total float
+		----應付
+		,p_e20 float
+		,p_e40 float
+		,p_f20 float
+		,p_f40 float
+		,p_h01 float --油桶櫃
+		,p_h02 float --20'押運
+		,p_h03 float --40'押運
+		,total02 float
 		
-		,m01 float
-		,m02 float --油桶櫃
-		,m03 float --20'押運
-		,m04 float --40'押運
-		,m05 float --20'OOG附加費
-		,m06 float --40'OOG附加費
-		,total float 
-		
-		,new_item nvarchar(20)
 	)
-	insert into @tmp(noa,datea,v02,v03,invoice,invoiceDate
-		,casetype,cardealno,straddrno,straddr,endaddrno,endaddr
-		,mount01,mount02,mount03,mount04,m05,m06)
-	select b.noa,b.datea,b.v02,b.v03,isnull(b.accno,''),isnull(b.checkno,'')
-		,a.casetype,a.cardealno,a.addrno,a.addr,a.addrno2,a.addr2
-		,a.n01,a.n02,a.n03,a.n04,a.m01,a.m02
+	insert into @tmpa(noa,noq,planid,datea,v02,v03,memo2
+		,custno,cust,custunit
+		,cardealno,cardeal,straddrno,straddr,endaddrno,endaddr,memo
+		,e20,e40,f20,f40,h01,h02,h03,h20,h40)
+	select a.noa,a.noq,isnull(b.v01,'') planid,b.datea
+		--,case when len(isnull(b.begindate,''))=0 then b.datea 
+		--	when isnull(b.begindate,'')=isnull(b.enddate,'') then b.begindate 
+		--	else isnull(b.begindate,'')+'~'+isnull(b.enddate,'') end datea
+		,isnull(b.v02,''),isnull(b.v03,''),isnull(b.memo2,'')
+		,b.custno,b.cust,a.casetype
+		,a.cardealno,a.cardeal
+		,isnull(a.addrno,'') straddrno,isnull(a.addr,'') straddr
+		,isnull(a.addrno2,'') endaddrno,isnull(a.addr2,'') endaddr
+		,isnull(a.memo,'')
+		,case when a.casetype = "20'E" or a.casetype ="20~#$E" then isnull(a.n01,0) else 0 end
+		,case when a.casetype = "40'E" or a.casetype ="40~#$E" then isnull(a.n01,0) else 0 end
+		,case when a.casetype = "20'F" or a.casetype ="20~#$F" then isnull(a.n01,0) else 0 end
+		,case when a.casetype = "40'F" or a.casetype ="40~#$F" then isnull(a.n01,0) else 0 end
+		,isnull(n02,0) h01
+		,isnull(n03,0) h02
+		,isnull(n04,0) h03
+		,isnull(m01,0) h20
+		,isnull(m02,0) h40
 	from borrs a
 	left join borr b on a.noa=b.noa
 	where b.vccno='tran_ln3' 
 	and b.datea between @t_bdate and @t_edate
-	
-	
-	update @tmp set m01 = ROUND( isnull( a.mount01,0) * ISNULL(c.custprice,0),0)
-		,new_item = b.addr
-	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno 
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=a.casetype order by datea desc,noq desc) c
-	where c.noa is not null
-	
-	update @tmp set m02 = ROUND( isnull( a.mount02,0) * ISNULL(c.custprice,0),0)
-		,new_item = b.addr
-	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' and custunit=a.casetype order by datea desc,noq desc) c
-	where c.noa is not null
+	and isnull(b.custno,'') between @t_bcustno and @t_ecustno
+	order by LEFT(b.memo,5),b.datea,b.v01,a.noa,a.noq
 
+	update @tmpa set m_e20 = e20 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_e20 = e20 * ISNULL(c.driverprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit="20~#$E" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
+	update @tmpa set m_f20 = f20 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_f20 = f20 * ISNULL(c.driverprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit="20~#$F" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
+	update @tmpa set m_e40 = e40 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_e40 = e40 * ISNULL(c.driverprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit="40~#$E" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
+	update @tmpa set m_f40 = f40 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_f40 = f40 * ISNULL(c.driverprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit="40~#$F" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
+
+	update @tmpa set m_h01 = h01 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_h01 = h01 * ISNULL(c.driverprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit="油桶櫃" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
+	
+	update @tmpa set m_h02 = h02 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_h02 = h02 * ISNULL(c.driverprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit="20~#$押運" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
 		
-	update @tmp set m03 = ROUND( isnull( a.mount03,0) * ISNULL(c.custprice,0),0)
-		,new_item = b.addr
-	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=N'20~#$押運' and custunit=a.casetype order by datea desc,noq desc) c
-	where c.noa is not null
-
-
-	update @tmp set m04 = ROUND( isnull( a.mount04,0) * ISNULL(c.custprice,0),0)
-		,new_item = b.addr
-	from @tmp a
-	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
-	outer apply(select top 1 * from addrs where noa=b.noa and salesno=a.cardealno and custunit=N'40~#$押運' and custunit=a.casetype order by datea desc,noq desc) c
-	where c.noa is not null
-	
-	update @tmp set total = ISNULL(m01,0)+ISNULL(m02,0)+ISNULL(m03,0)+ISNULL(m04,0)+ISNULL(m05,0)+ISNULL(m06,0)
-
-	--------------------------------------------------------------------------------------------------------------------
-	declare @tmpa table(
-		sel int identity(1,1)
-		,noa nvarchar(20)
-		,invoice nvarchar(max)
-		,invoiceDate nvarchar(max)
-		,new_item nvarchar(20)
-		,tfc_code nvarchar(50)
-		,datea nvarchar(20)
-		,amount float
-	)
-	insert into @tmpa(noa,invoice,invoiceDate,new_item,tfc_code,datea,amount)
-	select noa,invoice,invoiceDate,new_item,isnull(v03,'')+isnull(v02,''),datea,SUM(ISNULL(total,0))
-	from @tmp
-	group by noa,invoice,invoiceDate,new_item,isnull(v03,'')+isnull(v02,''),datea
-	
-	----------------------------------------------------------------------------------------------	
-	declare @invoice nvarchar(max) = ''
-	declare @invoiceDate nvarchar(max) = ''
-	declare @t_invoice nvarchar(max) = ''
-	declare @t_invoiceDate nvarchar(max) = ''
-	declare @t_amount float = 0
-	select @t_amount = SUM(isnull(amount,0)) from @tmpa
-	
-	declare cursor_table cursor for
-	select invoice,invoiceDate from @tmpa group by invoice,invoiceDate
-	open cursor_table
-	fetch next from cursor_table
-	into @invoice,@invoiceDate
-	while(@@FETCH_STATUS <> -1)
-	begin
-		set @t_invoice = @t_invoice + case when len(@invoice)>0 then ',' else '' end + @invoice
-		set @t_invoiceDate = @t_invoiceDate + case when len(@invoiceDate)>0 then ',' else '' end + @invoiceDate
+	update @tmpa set m_h03 = h03 * case when @t_option='1' then ISNULL(c.tggprice,0) else ISNULL(c.custprice,0) end
+		,p_h03 = h03 * ISNULL(c.driverprice,0)
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit="40~#$押運" and x.salesno=a.cardealno and x.datea<=a.datea order by x.datea desc) c
+			
+	update @tmpa set total = ISNULL(m_e20,0)+ISNULL(m_e40,0)+ISNULL(m_f20,0)+ISNULL(m_f40,0)+ISNULL(m_h01,0)
+		+ISNULL(m_h02,0)+ISNULL(m_h03,0)+ISNULL(h20,0)+ISNULL(h40,0)
+		,total02 = ISNULL(p_e20,0)+ISNULL(p_e40,0)+ISNULL(p_f20,0)+ISNULL(p_f40,0)+ISNULL(p_h01,0)
+		+ISNULL(p_h02,0)+ISNULL(p_h03,0)
 		
-		fetch next from cursor_table
-		into @invoice,@invoiceDate
-	end
-	close cursor_table
-	deallocate cursor_table
-	
-
+	update @tmpa set typea=ISNULL(c.typea,'')
+	from @tmpa a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	left join addrs c on b.noa=c.noa and a.custno=c.custno and c.salesno=a.cardealno and a.custunit=c.custunit
+	---------------------------------------------------------------------------------------------------------------
 	declare @tmpb table(
 		sel int identity(1,1)
 		,gno nvarchar(20)
-		,pno nvarchar(20)
-		,id nvarchar(max)
-		,[no] nvarchar(max)
-		,[certificate] nvarchar(max)
-		,[date] nvarchar(max)
-		,amount float
-		,tax_amount float
-		,tol_amount float
+		,pno int 
 		
-		,invoice_seq int
-		,place_code nvarchar(max)
-		,new_item nvarchar(max)
-		,tfc_code nvarchar(max)
-		,date_s nvarchar(max)
-		,dc nvarchar(max)
-		,amount_s float
-		,vendor_code nvarchar(max)
+		,a01 nvarchar(max) --ref_no
+		,a02 nvarchar(max) --ref_date
+		,a03 nvarchar(max) --supply_code
+		,a04 nvarchar(max) --agent_code
+		,a05 nvarchar(max) --depot_code
+		,a06 nvarchar(max) --curr
+		
+		,b01 nvarchar(max) --type
+		,b02 nvarchar(max) --id
+		,b03 nvarchar(max) --no
+		,b04 nvarchar(max) --certificate
+		,b05 nvarchar(max) --date
+		,b06 nvarchar(max) --fmt
+		,b07 nvarchar(max) --cut
+		,b08 nvarchar(max) --tax
+		,b09 nvarchar(max) --reg_no
+		,b10 float --amount
+		,b11 float --tax_amount
+		,b12 float --tol_amount
+		,b13 nvarchar(max) --area
+		
+		,c01 nvarchar(max) --invoice_seq
+		,c02 nvarchar(max) --place_code
+		,c03 nvarchar(max) --new_item
+		,c04 nvarchar(max) --tfc_code
+		,c05 nvarchar(max) --date
+		,c06 nvarchar(max) --d/c
+		,c07 float --amount
+		,c08 nvarchar(max) --vendor_code
+		,c09 nvarchar(max) --nst_code
 	)
-	insert into @tmpb(gno,pno,id,[no],[certificate],[date],amount,tax_amount,tol_amount
-		,invoice_seq,place_code,new_item,tfc_code,date_s,dc,amount_s,vendor_code)
-	select '1',1
-		,LEFT(@t_invoice,2) id,right(LEFT(@t_invoice,10),8) [no]
-		,@t_invoice [certificate],@t_invoiceDate [date]
-		,@t_amount
-		,ROUND(@t_amount*0.05,0) tax_amount
-		,@t_amount+ROUND(@t_amount*0.05,0) tol_amount
-		,row_number()over(order by sel) invoice_seq
-		,'TWKHH' place_code,new_item,tfc_code,[datea] date_s
-		,'D' dc,amount amount_s,'12493583'
-	from @tmpa  
+	insert into @tmpb(gno,pno)select '5',5
+	insert into @tmpb(gno,pno)select '1',1
+	insert into @tmpb(gno,pno,b01,b02,b03,b04,b05,b06,b07,b08,b09,b10,b11,b12,b13)
+	select '2',2,'I' b01,left(a.accno,2) b02,RIGHT(a.accno,8) b03,a.accno b04,a.checkno b05
+		,'21' b06,'1' b07,'1' b08,'12493583' b09
+		,a.total2 b10,ROUND(a.total2*0.05,0) b11,a.total2+ROUND(a.total2*0.05,0) b12
+		,a.v10 b13 
+	from borr a
+	left join(select noa from @tmpa group by noa) b on a.noa=b.noa
+	where b.noa is not null
+	and len(ISNULL(a.accno,''))>0 --發票號碼
+	insert into @tmpb(gno,pno)select '5',5
+	insert into @tmpb(gno,pno)select '3',3
+	insert into @tmpb(pno,gno,c01,c02,c03,c04,c05,c06,c07,c08,c09)
+	select '4',4,sel c01,'TWKHH' c02,typea c03,V03+V02 c04,datea c05,'D' c06,total c07,'12493583' c08,noa+'-'+noq c09
+	from @tmpa
+	order by sel
 	
-	--	select * from @tmpb where tfc_code='E1035A'
-	--return
+	update @tmpb set c07=b.total
+	from @tmpb a
+	outer apply(select sum(isnull(total,0)) total from @tmpa) b
+	where a.pno=3 
 	
-	select gno
-		,id a01
-		,[no] a02
-		,[certificate] a03
-		,[date] a04
-		,amount a05
-		,tax_amount a06
-		,tol_amount a07
-		
-		,invoice_seq b01
-		,place_code b02
-		,new_item b03
-		,tfc_code b04
-		,date_s b05
-		,dc b06
-		,amount_s b07
-		,vendor_code b08
-	from @tmpb;
+	update @tmpb set a03='12493583',a04='TW',a06='TWD'
+	
+	select * from @tmpb;
 
 z_trans_ln10: -- z_trans_ln10
 	SET QUOTED_IDENTIFIER OFF
