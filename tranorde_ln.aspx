@@ -192,6 +192,11 @@
 	                            		$('#txtCardeal__'+n).val($.trim(column[13]));
 	                            		$('#txtCarno__'+n).val($.trim(column[14]));
 	                            		$('#txtMemo__'+n).val($.trim(column[2]));
+	                            		$('#txtV01__'+n).val($.trim(column[15]));
+	                            		$('#txtV02__'+n).val($.trim(column[16]));
+	                            		$('#txtV03__'+n).val($.trim(column[17]));
+	                            		$('#txtV04__'+n).val($.trim(column[18]));
+	                            		$('#txtV05__'+n).val($.trim(column[19]));
 	                            		n++;
 	                            	}
 	                            	var t = '';
@@ -909,7 +914,7 @@
 			</table>
 		</div>
 		<input id="q_sys" type="hidden" />
-		<div id="dbbt" style="width:1100px;">
+		<div id="dbbt" style="width:1600px;">
 			<table id="tbbt">
 				<tbody>
 					<tr class="head" style="color:white; background:#003366;">
@@ -927,6 +932,11 @@
 						<td style="width:100px; text-align: center;">車行</td>
 						<td style="width:100px; text-align: center;">車牌</td>
 						<td style="width:100px; text-align: center;">備註</td>
+						<td style="width:100px; text-align: center;">左超寬</td>
+						<td style="width:100px; text-align: center;">右超寬</td>
+						<td style="width:100px; text-align: center;">超高</td>
+						<td style="width:100px; text-align: center;">前超長</td>
+						<td style="width:100px; text-align: center;">後超長</td>
 					</tr>
 					<tr class="detail">
 						<td>
@@ -944,6 +954,11 @@
 						<td><input class="txt" id="txtCardeal..*" type="text" style="width:95%;"/></td>
 						<td><input class="txt" id="txtCarno..*" type="text" style="width:95%;"/></td>
 						<td><input class="txt" id="txtMemo..*" type="text" style="width:95%;"/></td>
+						<td><input class="txt" id="txtV01..*" type="text" style="width:95%;"/></td>
+						<td><input class="txt" id="txtV02..*" type="text" style="width:95%;"/></td>
+						<td><input class="txt" id="txtV03..*" type="text" style="width:95%;"/></td>
+						<td><input class="txt" id="txtV04..*" type="text" style="width:95%;"/></td>
+						<td><input class="txt" id="txtV05..*" type="text" style="width:95%;"/></td>
 					</tr>
 				</tbody>
 			</table>
