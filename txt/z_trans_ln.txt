@@ -404,8 +404,11 @@
 	from @tmp
 	where gno=1
 	
+	set @cmd = '日期：' + @t_bdate + ' ~ ' + @t_edate
+	
 	select '營收月報表' titlea 
 		,gno
+		,@cmd a00
 		,cust a01
 		,typea a02
 		,dbo.getComma(money01,-1) a03
