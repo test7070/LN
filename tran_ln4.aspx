@@ -1,3 +1,14 @@
+<%@ Page Language="C#" Debug="true"%>
+    <script language="c#" runat="server">  
+		protected void Page_Load(object sender, EventArgs e)
+		{
+		    jwcf wcf = new jwcf();
+		
+		    wcf.q_content("borrg", " worker=$r_userno or $r_rank >= 7 ");
+		    
+		}
+	</script>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
 	<head>
@@ -16,7 +27,7 @@
 		<script type="text/javascript">
 			//外車登帳
 			q_tables = 's';
-			var q_name = "transvcce";
+			var q_name = "borrg";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2','txtOrdeno'
 				,'textA01','textA02','textA03','textA04','textA05','textA06'];
 			var q_readonlys = ['txtN05'];
@@ -54,13 +65,13 @@
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
 				q_brwCount();
-				
+
 				try{
 					t_para = JSON.parse(q_getId()[3]);
 					if(t_para.noa.length>0)
-						q_content = "where=^^ noa='"+t_para.noa+"' and vccno='tran_ln3'^^";
+						q_content = "where=^^ noa='"+t_para.noa+"' and vccno='tran_ln4' ^^";
 				}catch(e){
-					q_content = "where=^^ vccno='tran_ln3'^^";
+					q_content = "where=^^ vccno='tran_ln4'^^";
 				}
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 			});
@@ -75,7 +86,7 @@
 			function mainPost() {
 				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtCheckno',r_picd]);
 				q_mask(bbmMask);
-				document.title = '場外移櫃作業';
+				document.title = '外車登帳作業';
 				
 				q_cmbParse("cmbCasetype", " ,20'E,40'E,20'F,40'F","s");
 				
@@ -135,7 +146,7 @@
 			}
 
 			function bbsSave(as) {
-				if (!as['addr']) {
+				if (!as['caseno'] && !as['checkno'] ) {
 					as[bbsKey[1]] = '';
 					return;
 				}
@@ -167,13 +178,13 @@
 			function _btnSeek() {
 				if (q_cur > 0 && q_cur < 4)
 					return;
-				q_box('tran_ln3_s.aspx', q_name + '_s', "500px", "600px", q_getMsg("popSeek"));
+				q_box('tran_ln4_s.aspx', q_name + '_s', "500px", "600px", q_getMsg("popSeek"));
 			}
 
 			function btnIns() {
 				_btnIns();
 				$('#txtNoa').val('AUTO');
-				$('#txtVccno').val('tran_ln3');
+				$('#txtVccno').val('tran_ln4');
 			}
 
 			function btnModi() {
@@ -197,12 +208,17 @@
 				}
 				refreshBbs();
 				sum();
-				if(q_cur ==1){
+				/*if(q_cur ==1){
 					$('#txtWorker').val(r_name);
 				}else if(q_cur ==2){
 					$('#txtWorker2').val(r_name);
 				}else{
 					alert("error: btnok!");
+				}*/
+				if(q_cur ==1){
+					$('#txtWorker').val(r_userno);
+				}else{
+					$('#txtWorker2').val(r_userno);
 				}
 				var t_noa = trim($('#txtNoa').val());
 				var t_date = trim($('#txtDatea').val()).replace(/\//g,'');
@@ -562,7 +578,7 @@
 				</table>
 			</div>
 		</div>
-		<div style="width: 1250px;">
+		<div style="width: 1600px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
@@ -571,14 +587,20 @@
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號(二)</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:120px;"><a>車行</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>油桶櫃</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>押運櫃</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>儀檢</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>OOG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>危標</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 			</table>
 		</div>
-		<div style="width: 1250px;">
+		<div style="width: 1600px;">
 			<table>
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
@@ -587,14 +609,20 @@
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:120px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>TOTAL</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input id="textA01" class="txt" style="width:90%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 			</table>
 		</div>
-		<div class='dbbs' style="width: 1250px;">
+		<div class='dbbs' style="width: 1600px;">
 			<table id="tbbs" class='tbbs'>
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px;"> </td>
@@ -603,9 +631,15 @@
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號(二)</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:120px;"><a>車行</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>油桶櫃</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>押運櫃</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>儀檢</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>OOG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>危標</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
@@ -615,21 +649,31 @@
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
 					<td style="width:150px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
-					<td style="width:150px;"><input type="text" id="txtCaseno2.*" style="width:95%;"/></td>
-					<td style="width:80px;"><select id="cmbSaction.*" style="width:95%;"> </select></td>
+					<td style="width:150px;"><input type="text" id="txtCheckno.*" style="width:95%;"/></td>
+					<td style="width:80px;"><select id="cmbCasetype.*" style="width:95%;"> </select></td>
 					<td style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>
+					<td style="width:120px">
+						<input type="text" id="txtCardealno.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtCardeal.*" style="float:left;width:55%;"/>
+						<input type="button" id="btnCardeal.*" style="display:none;"/>
+					</td>
 					<td style="width:200px">
 						<input type="text" id="txtAddrno.*" style="float:left;width:35%;"/>
 						<input type="text" id="txtAddr.*" style="float:left;width:55%;"/>
 						<input type="button" id="btnAddr.*" style="display:none;"/>
 					</td>
 					<td style="width:200px">
-						<input type="text" id="txtTel.*" style="float:left;width:35%;"/>
-						<input type="text" id="txtCarpno.*" style="float:left;width:55%;"/>
+						<input type="text" id="txtAddrno2.*" style="float:left;width:35%;"/>
+						<input type="text" id="txtAddr2.*" style="float:left;width:55%;"/>
 						<input type="button" id="btnAddr2.*" style="display:none;"/>
 					</td>
-					<td style="width:50px;"><input type="text" id="txtMount.*" style="width:95%;text-align: right;"/></td>
-					<td style="width:200px;"><input type="text" id="txtMsg.*" style="width:95%;"/></td>
+					<td style="width:50px;"><input type="text" id="txtN01.*" style="width:95%;text-align: right;"/></td>
+					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
+					<td style="width:50px"><input type="checkbox" id="chkChk2.*" style="width:95%;"/></td>
+					<td style="width:50px"><input type="checkbox" id="chkChk3.*" style="width:95%;"/></td>
+					<td style="width:50px"><input type="checkbox" id="chkChk4.*" style="width:95%;"/></td>
+					<td style="width:50px"><input type="checkbox" id="chkChk5.*" style="width:95%;"/></td>
+					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
 			</table>
 		</div>
