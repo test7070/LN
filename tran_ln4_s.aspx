@@ -47,10 +47,12 @@
             	t_voyage = $.trim($('#txtVoyage').val());
             	t_caseno = $.trim($('#txtCaseno').val());
             	t_carno = $.trim($('#txtCarno').val());
+            	t_worker = $.trim($('#txtWorker').val());
             			
 				var t_where = " 1=1 and vccno='tran_ln4'" 
 					+ q_sqlPara2("noa", t_noa)
-					+ q_sqlPara2("datea", t_bdate,t_edate);;
+					+ q_sqlPara2("datea", t_bdate,t_edate)
+					+ q_sqlPara2("worker", t_worker);
                 if(t_v01.length > 0)
                 	t_where += " and charindex('" + t_v01 + "',v01)>0";
                 if(t_voyage.length > 0)
@@ -104,6 +106,10 @@
 				<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a>車牌</a></td>
 					<td><input class="txt" id="txtCarno" type="text" style="width:215px; font-size:medium;" /></td>
+				</tr>
+				<tr class='seek_tr'>
+					<td class='seek'  style="width:20%;"><a>製單員</a></td>
+					<td><input class="txt" id="txtWorker" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 			</table>
 			<!--#include file="../inc/seek_ctrl.inc"-->
