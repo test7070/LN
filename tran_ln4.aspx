@@ -106,6 +106,17 @@
 					$('#lblNo_' + i).text(i + 1);
                     if($('#btnMinus_' + i).hasClass('isAssign'))
                     	continue;
+                    /*$('#txtCaseno_' + i).change(function(e) {
+                    	//檢查是否可以和派工單的資料對應
+                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
+                        MatchData(n);
+                    });	
+                    $('#txtCheckno_' + i).change(function(e) {
+                    	//檢查是否可以和派工單的資料對應
+                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
+                        MatchData(n);
+                    });*/	
+                    	
                     $('#txtCardealno_' + i).bind('contextmenu', function(e) {
                         /*滑鼠右鍵*/
                         e.preventDefault();
@@ -208,13 +219,6 @@
 				}
 				refreshBbs();
 				sum();
-				/*if(q_cur ==1){
-					$('#txtWorker').val(r_name);
-				}else if(q_cur ==2){
-					$('#txtWorker2').val(r_name);
-				}else{
-					alert("error: btnok!");
-				}*/
 				if(q_cur ==1){
 					$('#txtWorker').val(r_userno);
 				}else{
@@ -222,9 +226,6 @@
 				}
 				var t_noa = trim($('#txtNoa').val());
 				var t_date = trim($('#txtDatea').val()).replace(/\//g,'');
-				//t_date = t_date.length == 0 ? q_date() : t_date;
-				//t_date = t_date.replace(/(\d+)\/(\d+)\/\d+/,'$1$2');
-				
 				if (t_noa.length == 0 || t_noa == "AUTO")
 					q_gtnoa(q_name, 'Y' + t_date);
 				else
@@ -240,6 +241,9 @@
 			function q_stPost() {
 				if (!(q_cur == 1 || q_cur == 2))
 					return false;
+				//與派工單匹配
+				var t_noa = $.trim($('#txtNoa').val());
+				q_func('qtxt.query.tranordet_borrgs', 'tranorde_ln.txt,tranordet_borrgs,' + r_userno + ';' + t_noa);
 			}
 
 			function refresh(recno) {
@@ -346,6 +350,29 @@
 			
 			function q_funcPost(t_func, result) {
 				switch(t_func) {
+					case 'qtxt.query.tranordet_borrgs':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							if(as[0].msg.length>0){
+								//error msg
+								alert(as[0].msg);
+								return;
+							}
+							
+							for(var i=0;i<as.length;i++){
+								if(as[i].borrgnoa.length ==0 && as[i].caseno == $('#txtCaseno_'+n).val()){
+									as[i].borrgnoa = $.trim($('#txtNoa').val());
+									as[i].borrgnoq = $.trim($('#txtNoq_'+n).val());
+									$('#txtOrdeno1_'+n).val($.trim($('#txtNoa').val())+'-'+$.trim($('#txtNoq_'+n).val()));
+								}
+								if(as[i].borrgnoa.length ==0 && as[i].caseno == $('#txtCheckno_'+n).val()){
+									as[i].borrgnoa = $.trim($('#txtNoa').val());
+									as[i].borrgnoq = $.trim($('#txtNoq_'+n).val());
+									$('#txtOrdeno2_'+n).val($.trim($('#txtNoa').val())+'-'+$.trim($('#txtNoq_'+n).val()));
+								}
+							}
+						}
+						break;
 					default:
 						break;
 				}
@@ -357,6 +384,58 @@
 				}
 			}
 			
+			function MatchData(n){
+				//與派工單匹配
+				var t_noa = $.trim($('#txtNoa').val());
+				var t_noq = $.trim($('#txtNoq_'+n).val());
+				var t_caseno1 = $.trim($('#txtCaseno_'+n).val()); 
+				var t_caseno2 = $.trim($('#txtCheckno_'+n).val());
+				var t_date = $.trim($('#txtDatea').val()); 
+				q_func('qtxt.query.tranordet_borrgs_'+n, 'tranorde_ln.txt,tranordet_borrgs,' + t_noa + ';' + t_noq + ';' + t_caseno1 + ';' + t_caseno2+ ';' + t_date);
+				
+				
+				/*$.ajax({
+					n : n,
+                    url: 'xxxxx.aspx',
+                    headers: { },
+                    type: 'POST',
+                    data: JSON.stringify({ db:q_db
+                    	,action:"tmp",table:"workj"
+                    	,originImg: '',picno:t_picno
+                    	,orgpara:'',para:t_para}),
+                    dataType: 'text',
+                    timeout: 10000,
+                    success: function(data){
+                    	//回傳檔名
+                    	var file = JSON.parse(data);
+                    	$('#imgPic_'+this.n).attr('src','..\\htm\\htm\\tmp\\'+file.filename+'?'+(new Date().Format("yyyy-MM-dd hh:mm:ss")));
+                    	if($('#txtMemo_'+n).val().substring(0,1)!='*'){
+							$('#txtLengthb_'+n).val(file.lengthb);
+						}
+                    },
+                    complete: function(){ 
+                    },
+                    error: function(jqXHR, exception) {
+                    	$('#imgPic_'+this.n).attr('src','');
+                        var errmsg = this.url+'資料寫入異常。\n';
+                        if (jqXHR.status === 0) {
+                            alert(errmsg+'Not connect.\n Verify Network.');
+                        } else if (jqXHR.status == 404) {
+                            alert(errmsg+'Requested page not found. [404]');
+                        } else if (jqXHR.status == 500) {
+                            alert(errmsg+'Internal Server Error [500].');
+                        } else if (exception === 'parsererror') {
+                            alert(errmsg+'Requested JSON parse failed.');
+                        } else if (exception === 'timeout') {
+                            alert(errmsg+'Time out error.');
+                        } else if (exception === 'abort') {
+                            alert(errmsg+'Ajax request aborted.');
+                        } else {
+                            alert(errmsg+'Uncaught Error.\n' + jqXHR.responseText);
+                        }
+                    }
+                });*/
+			}
 		</script>
 		
 		<style type="text/css">
@@ -648,8 +727,16 @@
 						<input type="text" id="txtNoq.*" style="display:none;"/>
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
-					<td style="width:150px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
-					<td style="width:150px;"><input type="text" id="txtCheckno.*" style="width:95%;"/></td>
+					<td style="width:150px;">
+						<input type="text" id="txtCaseno.*" style="width:95%;"/>
+						<!--對應的派工單-->
+						<input type="text" id="txtOrdeno1.*" style="width:95%;">
+					</td>
+					<td style="width:150px;">
+						<input type="text" id="txtCheckno.*" style="width:95%;"/>
+						<!--對應的派工單-->
+						<input type="text" id="txtOrdeno2.*" style="width:95%;">
+					</td>
 					<td style="width:80px;"><select id="cmbCasetype.*" style="width:95%;"> </select></td>
 					<td style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>
 					<td style="width:120px">
