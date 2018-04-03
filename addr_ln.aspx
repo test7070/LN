@@ -70,7 +70,7 @@
                         q_gt('addr', t_where, 0, 0, 0, "checkAddrno_change", r_accy);
                     }
                 });
-                q_cmbParse("cmbCustunit", " ,20'E,40'E,20'F,40'F,油桶櫃,20'押運,40'押運,20'儀檢,40'儀檢,20'OOG,40'OOG,超高吊架,鐳仔桶","s");
+                q_cmbParse("cmbCustunit", " ,20'E,40'E,20'F,40'F,油桶櫃,20'押運,40'押運,20'儀檢,40'儀檢,20'危標,40'危標,超高吊架,鐳仔桶","s");
            	
            		$('#btnProductno').click(function(e){
            			t_where = "where=^^noa='"+$('#txtProductno').val()+"'^^ order=^^noq^^";
