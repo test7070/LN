@@ -445,7 +445,7 @@
 			}
 
 			function btnPrint() {
-				q_box('z_tranorde.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + $('#txtNoa').val() + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
+				q_box('z_tranorde_ln.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + $('#txtNoa').val() + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
 			}
 
 			function btnOk() {

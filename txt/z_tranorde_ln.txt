@@ -1,0 +1,90 @@
+z_tranorde_ln01:--z_tranorde_ln01	
+	SET QUOTED_IDENTIFIER OFF 
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_bdate nvarchar(20) = case when '#non'=[5] then '' else [5] end
+	declare @t_edate nvarchar(20) = case when '#non'=[6] then char(255) else [6] end
+	declare @t_straddrno nvarchar(20) = case when '#non'=[7] then '' else [7] end
+	declare @t_endaddrno nvarchar(20) = case when '#non'=[8] then '' else [8] end
+	declare @t_option nvarchar(max) = case when '#non'=[9] then '' else [9] end -- 0:all , 1:有對應,  2:未對應
+	--------------------------------------------------------------------------------------------------------------
+	IF OBJECT_ID('tempdb..#z_tranorde_ln01')is not null
+	BEGIN
+		drop table #z_tranorde_ln01
+	END
+	create table #z_tranorde_ln01(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int 
+		,recno int
+		,accy nvarchar(10)
+		,noa nvarchar(20)
+		,noq nvarchar(20)
+		,datea nvarchar(20)
+		,straddr nvarchar(20)
+		,endaddr nvarchar(20)
+		,caseno nvarchar(max)
+		,casetype nvarchar(20)
+		,carno nvarchar(20)
+		,cardeal nvarchar(20)
+		,memo nvarchar(max)
+
+		,tcardeal nvarchar(20)
+
+		,borrgno nvarchar(20)
+		,borrgnoq nvarchar(20)
+
+	)
+	insert into #z_tranorde_ln01(gno,pno,accy,noa,noq,datea,straddr,endaddr,caseno,casetype,carno,cardeal,memo)
+	select '1',1,accy,noa,noq,datea,straddr,endaddr,containerno1 caseno,casetype,carno,cardeal,memo
+	from view_tranordet
+	where datea between @t_bdate and @t_edate
+	and (len(@t_straddrno)=0 or straddr=@t_straddrno)
+	and (len(@t_endaddrno)=0 or endaddr=@t_endaddrno)
+
+	update #z_tranorde_ln01 set borrgno = b.noa,borrgnoq = b.noq,tcardeal=d.nick
+	from #z_tranorde_ln01 a
+	left join borrgs b on b.ordeno1 = a.accy + '-' + a.noa + '-' + a.noq 
+	left join borrg c on b.noa=c.noa
+	left join cardeal d on c.worker = d.noa
+	where b.noa is not null
+
+	update #z_tranorde_ln01 set borrgno = b.noa,borrgnoq = b.noq,tcardeal=d.nick
+	from #z_tranorde_ln01 a
+	left join borrgs b on b.ordeno2 = a.accy + '-' + a.noa + '-' + a.noq 
+	left join borrg c on b.noa=c.noa
+	left join cardeal d on c.worker = d.noa
+	where b.noa is not null
+
+	if @t_option = '1'
+	begin
+		delete #z_tranorde_ln01 where len(isnull(borrgno,'')) = 0
+	end
+	if @t_option = '2'
+	begin
+		delete #z_tranorde_ln01 where len(isnull(borrgno,'')) > 0
+	end
+
+	update #z_tranorde_ln01 set recno=b.recno
+	from #z_tranorde_ln01 a
+	left join (select sel,ROW_NUMBER()over(order by datea,straddr,endaddr,accy,noa,noq) recno from #z_tranorde_ln01) b on a.sel=b.sel
+
+	select gno 
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tranorde_ln.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+"',' "+CHAR(59)+"noa=\'"+noa+"\'','95%','95%','tranorde_ln')"+char(34)+">"+noa+'-'+noq+"</a>" a01
+		,datea a02
+		,straddr a03
+		,endaddr a04
+		,caseno a05
+		,casetype a06
+		,carno a07
+		,cardeal a08
+		,memo a09
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln4.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+"',' "+CHAR(59)+"noa=\'"+borrgno+"\'','95%','95%','tran_ln4')"+char(34)+">"+borrgno+'-'+borrgnoq+"</a>" b01
+		,tcardeal b02
+	from #z_tranorde_ln01
+	order by recno
+	
+	drop table #z_tranorde_ln01;
