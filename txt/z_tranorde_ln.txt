@@ -45,14 +45,14 @@ z_tranorde_ln01:--z_tranorde_ln01
 	and (len(@t_straddrno)=0 or straddr=@t_straddrno)
 	and (len(@t_endaddrno)=0 or endaddr=@t_endaddrno)
 
-	update #z_tranorde_ln01 set borrgno = b.noa,borrgnoq = b.noq,tcardeal=d.nick
+	update #z_tranorde_ln01 set borrgno = b.noa,borrgnoq = b.noq,tcardeal=isnull(d.nick,c.worker)
 	from #z_tranorde_ln01 a
 	left join borrgs b on b.ordeno1 = a.accy + '-' + a.noa + '-' + a.noq 
 	left join borrg c on b.noa=c.noa
 	left join cardeal d on c.worker = d.noa
 	where b.noa is not null
 
-	update #z_tranorde_ln01 set borrgno = b.noa,borrgnoq = b.noq,tcardeal=d.nick
+	update #z_tranorde_ln01 set borrgno = b.noa,borrgnoq = b.noq,tcardeal=isnull(d.nick,c.worker)
 	from #z_tranorde_ln01 a
 	left join borrgs b on b.ordeno2 = a.accy + '-' + a.noa + '-' + a.noq 
 	left join borrg c on b.noa=c.noa
@@ -73,7 +73,8 @@ z_tranorde_ln01:--z_tranorde_ln01
 	left join (select sel,ROW_NUMBER()over(order by datea,straddr,endaddr,accy,noa,noq) recno from #z_tranorde_ln01) b on a.sel=b.sel
 
 	select gno 
-		,"<a href="+CHAR(34)+"JavaScript:q_box('tranorde_ln.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+"',' "+CHAR(59)+"noa=\'"+noa+"\'','95%','95%','tranorde_ln')"+char(34)+">"+noa+'-'+noq+"</a>" a01
+		,recno a00
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tranorde_ln.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+accy+"',' "+CHAR(59)+"noa=\'"+noa+"\'','95%','95%','tranorde_ln')"+char(34)+">"+noa+'-'+noq+"</a>" a01
 		,datea a02
 		,straddr a03
 		,endaddr a04
@@ -84,6 +85,7 @@ z_tranorde_ln01:--z_tranorde_ln01
 		,memo a09
 		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln4.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+"',' "+CHAR(59)+"noa=\'"+borrgno+"\'','95%','95%','tran_ln4')"+char(34)+">"+borrgno+'-'+borrgnoq+"</a>" b01
 		,tcardeal b02
+		,'日期：' + @t_bdate + ' ~ ' + @t_edate c01
 	from #z_tranorde_ln01
 	order by recno
 	
