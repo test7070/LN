@@ -288,7 +288,7 @@ z_tran_ln402:--z_tran_ln402
 	deallocate cursor_table
 
 	------------------------------------------------------------------------------------------------------------
-	declare @t_pagecount int = 20 -- 一頁２０行
+	declare @t_pagecount int = 23 -- 一頁２０行
 	declare @n int
 	
 	declare cursor_table cursor for
