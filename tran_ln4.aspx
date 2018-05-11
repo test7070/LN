@@ -106,12 +106,13 @@
 					$('#lblNo_' + i).text(i + 1);
                     if($('#btnMinus_' + i).hasClass('isAssign'))
                     	continue;
-                    /*$('#txtCaseno_' + i).change(function(e) {
-                    	//檢查是否可以和派工單的資料對應
-                        var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
-                        MatchData(n);
+                    $('#txtCaseno_' + i).change(function(e) {
+                    	$(this).val($.trim($(this).val()));
+                    	if($(this).val().length>0 && !checkCaseno($(this).val())){
+                    		alert('櫃號異常【'+$(this).val()+'】');
+                    	}
                     });	
-                    $('#txtCheckno_' + i).change(function(e) {
+                    /*$('#txtCheckno_' + i).change(function(e) {
                     	//檢查是否可以和派工單的資料對應
                         var n = $(this).attr('id').replace(/^(.*)_(\d+)$/,'$2');
                         MatchData(n);
