@@ -537,7 +537,11 @@
 						<td class="tdZ"> </td>
 					</tr>
 					<tr>
-						<td><span> </span><a class="lbl">船隻編號</a></td>
+						<td>
+							<a style="float:left;">結</a>
+							<input type="checkbox" id="chkEnda" style="float:left;">
+							<span> </span><a class="lbl">船隻編號</a>
+						</td>
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">作業日期</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1" title="作業日期"/></td>
