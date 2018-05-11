@@ -436,6 +436,21 @@
 				}
 			}
 			
+			function checkCaseno(caseno){
+				if(!(/^[A-Z]{4}[0-9]{7}$/.test(caseno))){
+					console.log('櫃號格式異常');
+					return false;
+				}
+				var string = "0123456789A_BCDEFGHIJK_LMNOPQRSTU_VWXYZ";
+				var n = 0;
+				for(var i=0;i<caseno.length-1;i++){
+					n += string.indexOf(caseno.substring(i,i+1)) * Math.pow(2,i);
+				}
+				n = Math.floor((n/11 + 0.09)*10) + '';
+				n = n.substring(n.length-1,n.length);
+				return caseno.substring(caseno.length-1,caseno.length) == n;
+			}
+			
 		</script>
 		
 		<style type="text/css">
