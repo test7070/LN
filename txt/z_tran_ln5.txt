@@ -1,0 +1,126 @@
+z_tran_ln501:--z_tran_ln501
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_userno nvarchar(max) = '[4]'
+	declare @t_user nvarchar(max) = '[5]'	
+	declare @t_bno nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	declare @t_eno nvarchar(20) = case when '#non' = [7] then char(255) else [7] end
+	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_v02 nvarchar(max) = case when '#non' = [10] then '' else [10] end
+	declare @t_v03 nvarchar(max) = case when '#non' = [11] then '' else [11] end
+	-------------------------------------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int 
+		,noa nvarchar(20)
+		,v01 nvarchar(20) -- 船隻編號
+		,datea nvarchar(20) --作業日期
+		,custno nvarchar(20)--客戶
+		,cust nvarchar(50)
+		,partno nvarchar(20)--貨主
+		,part nvarchar(10)
+		,v02 nvarchar(50)--M.V.
+		,v03 nvarchar(50)--VOY.NO.
+		,v04 nvarchar(50)--PORT.
+		,begindate nvarchar(20)--ARRIVAL
+		,v05 nvarchar(50)--BERTHED
+		,v06 nvarchar(50)--WHARF NO
+		,enddate nvarchar(20)--DEPARTURE
+		,v07 nvarchar(50)--ETA AT NEXT PORT
+		,v09 nvarchar(50)--派車日期
+		,v10 nvarchar(50)--完工日期
+		,v11 nvarchar(50)--完工編號
+		
+		,cardealno nvarchar(20) -- 車行
+		,cardeal nvarchar(50)
+		,typea nvarchar(20)--BAY NO.
+		,n01 float--LADEN_DIS_20
+		,n02 float--LADEN_DIS_40
+		,n03 float--LADEN_LOAD_20
+		,n04 float--LADEN_LOAD_40
+		,n05 float--EMPTY_DIS_20
+		,n06 float--EMPTY_DIS_40
+		,n07 float--EMPTY_LOAD_20
+		,n08 float--EMPTY_LOAD_40
+		,n09 float--IN HATCH SHIFT_20
+		,n10 float--IN HATCH SHIFT_40
+		,n11 float--SHIFT_20
+		,n12 float--SHIFT_40
+		,n13 float--RELOAD_20
+		,n14 float--RELOAD_40
+		,n15 float--小計
+		,inteis float--超高吊架
+		,arrerage float--鐳仔桶
+		,n16 float--其他費用
+	)
+	-- borr
+	insert into @tmpa(gno,pno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
+		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
+	select '1',1,a.noa,a.v01,a.datea,a.custno,a.cust,a.partno,a.part,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07,a.v09,a.v10,a.v11
+		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16
+	from borr a
+	left join borrs b on a.noa=b.noa
+	where a.vccno ='tran_ln' 
+	and a.noa between @t_bno and @t_eno
+	and a.datea between @t_bdate and @t_edate
+	and (len(@t_v02)=0 or charindex(@t_v02,a.v02)>0)
+	and (len(@t_v03)=0 or charindex(@t_v03,a.v03)>0)
+	order by a.noa,b.noq
+
+	-- borrg 
+	insert into @tmpa(gno,pno,cardealno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
+		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
+	select '2',2,a.worker,a.ordeno,a.v01,a.datea,a.custno,a.cust,a.partno,a.part,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07,a.v09,a.v10,a.v11
+		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16
+	from borrg a
+	left join borrgs b on a.noa=b.noa
+	left join (select noa from borr group by noa) c on a.ordeno=c.noa
+	where c.noa is not null
+
+	update @tmpa set cardeal=isnull(b.comp,a.cardealno)
+	from @tmpa a
+	left join cardeal b on a.cardealno=b.noa
+
+	select gno
+		,v01 a01
+		,datea a02
+		,cust a03
+		,part a04
+		,v02 a05
+		,v03 a06
+		,v04 a07
+		,begindate a08
+		,v05 a09
+		,v06 a10
+		,enddate a11
+		,v07 a12
+		,v09 a13
+		,v10 a14
+		,v11 a15
+		,cardeal a16
+
+		,typea b01
+		,dbo.getComma(n01,-1)
+		,dbo.getComma(n02,-1)
+		,dbo.getComma(n03,-1)
+		,dbo.getComma(n04,-1)
+		,dbo.getComma(n05,-1)
+		,dbo.getComma(n06,-1)
+		,dbo.getComma(n07,-1)
+		,dbo.getComma(n08,-1)
+		,dbo.getComma(n09,-1)
+		,dbo.getComma(n10,-1)
+		,dbo.getComma(n11,-1)
+		,dbo.getComma(n12,-1)
+		,dbo.getComma(n13,-1)
+		,dbo.getComma(n14,-1)
+		,dbo.getComma(n15,-1)
+		,dbo.getComma(inteis,-1)
+		,dbo.getComma(arrerage,-1)
+		,dbo.getComma(n16,-1)
+	from @tmpa order by noa,pno,sel;

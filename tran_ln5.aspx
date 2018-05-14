@@ -27,7 +27,7 @@
 		<script type="text/javascript">
 			//外車登帳 萬海船邊   
 			q_tables = 's';
-			var q_name = "borr";
+			var q_name = "borrg";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2'
 				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'
 				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14','textA15','textA16','textA17','textA18','textA19'
@@ -252,11 +252,11 @@
 			}
 
 			function btnPrint() {
-				q_box('z_trans_ln.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + JSON.stringify({
-		                    form : 'tran_ln'
-		                    ,noa : trim($('#txtNoa').val())
-		                    ,workno : trim($('#txtV01').val())
-		                }) + ";" + r_accy + "_" + r_cno, 'trans', "95%", "95%", m_print);
+				q_box('z_tran_ln5.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + JSON.stringify({
+		                    form : 'tran_ln5'
+		                    ,noa : trim($('#txtOrdeno').val())
+		                    ,workno : trim($('#txtWorker').val())
+		                }) + ";" + r_accy + "_" + r_cno, 'tran_ln5', "95%", "95%", m_print);
 			}
 			function q_stPost() {
 				if (!(q_cur == 1 || q_cur == 2))
@@ -664,17 +664,17 @@
 						<td><input type="text" id="txtV11" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>
+						<td><span> </span><a id="lblMemo" class="lbl">備註</a></td>
 						<td colspan="5">
 							<textarea id="txtMemo" class="txt c1" style="height:75px;"> </textarea>
 						</td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
+						<td><span> </span><a id="lblWorker" class="lbl">製單員</a></td>
 						<td><input id="txtWorker" type="text"  class="txt c1"/></td>
-						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
+						<td><span> </span><a id="lblWorker2" class="lbl">修改人</a></td>
 						<td><input id="txtWorker2" type="text"  class="txt c1"/></td>
-						<td><span> </span><a id="lblNoa" class="lbl"> </a></td>
+						<td><span> </span><a id="lblNoa" class="lbl">電腦編號</a></td>
 						<td>
 							<input type="text" id="txtNoa" class="txt c1"/>
 							<input type="text" id="txtVccno" style="display:none;"/>
