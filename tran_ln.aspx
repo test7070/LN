@@ -202,11 +202,16 @@
 			}
 
 			function btnPrint() {
-				q_box('z_trans_ln.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + JSON.stringify({
+				/*q_box('z_trans_ln.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + JSON.stringify({
 		                    form : 'tran_ln'
 		                    ,noa : trim($('#txtNoa').val())
 		                    ,workno : trim($('#txtV01').val())
-		                }) + ";" + r_accy + "_" + r_cno, 'trans', "95%", "95%", m_print);
+		                }) + ";" + r_accy + "_" + r_cno, 'trans', "95%", "95%", m_print);*/
+               q_box('z_tran_ln5.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + JSON.stringify({
+		                    form : 'tran_ln5'
+		                    ,noa : trim($('#txtNoa').val())
+		                    ,workno : trim($('#txtWorker').val())
+		                }) + ";" + r_accy + "_" + r_cno, 'tran_ln', "95%", "95%", m_print);
 			}
 			function q_stPost() {
 				if (!(q_cur == 1 || q_cur == 2))

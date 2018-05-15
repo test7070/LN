@@ -17,6 +17,7 @@ z_tran_ln501:--z_tran_ln501
 		sel int identity(1,1)
 		,gno nvarchar(20)
 		,pno int 
+		,recno int
 		,noa nvarchar(20)
 		,v01 nvarchar(20) -- 船隻編號
 		,datea nvarchar(20) --作業日期
@@ -57,12 +58,13 @@ z_tran_ln501:--z_tran_ln501
 		,inteis float--超高吊架
 		,arrerage float--鐳仔桶
 		,n16 float--其他費用
+		,memo nvarchar(max)
 	)
 	-- borr
 	insert into @tmpa(gno,pno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
-		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
+		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16,memo)
 	select '1',1,a.noa,a.v01,a.datea,a.custno,a.cust,a.partno,a.part,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07,a.v09,a.v10,a.v11
-		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16
+		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16,b.memo
 	from borr a
 	left join borrs b on a.noa=b.noa
 	where a.vccno ='tran_ln' 
@@ -75,52 +77,94 @@ z_tran_ln501:--z_tran_ln501
 	-- borrg 
 	insert into @tmpa(gno,pno,cardealno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
 		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
-	select '2',2,a.worker,a.ordeno,a.v01,a.datea,a.custno,a.cust,a.partno,a.part,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07,a.v09,a.v10,a.v11
+	select '3',3,a.worker,a.ordeno,a.v01,a.datea,a.custno,a.cust,a.partno,a.part,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07,a.v09,a.v10,a.v11
 		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16
 	from borrg a
 	left join borrgs b on a.noa=b.noa
-	left join (select noa from borr group by noa) c on a.ordeno=c.noa
+	left join (select noa from @tmpa where pno=1 group by noa) c on a.ordeno=c.noa
 	where c.noa is not null
+	and a.vccno = 'tran_ln5'
 
 	update @tmpa set cardeal=isnull(b.comp,a.cardealno)
 	from @tmpa a
 	left join cardeal b on a.cardealno=b.noa
+	where pno = 3
+	-- tran_ln5 合計
+	insert into @tmpa(gno,pno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
+		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
+	select '2',2,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
+		,typea,sum(isnull(n01,0)),sum(isnull(n02,0)),sum(isnull(n03,0)),sum(isnull(n04,0)),sum(isnull(n05,0))
+		,sum(isnull(n06,0)),sum(isnull(n07,0)),sum(isnull(n08,0)),sum(isnull(n09,0)),sum(isnull(n10,0)),sum(isnull(n11,0))
+		,sum(isnull(n12,0)),sum(isnull(n13,0)),sum(isnull(n14,0)),sum(isnull(n15,0)),sum(isnull(inteis,0)),sum(isnull(arrerage,0)),sum(isnull(n16,0))
+	from @tmpa
+	where pno=3
+	group by noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11,typea
+	
+	-- pno = 3  明細,暫時先不顯示
+	delete @tmpa where pno=3
 
+	update @tmpa set recno = b.recno
+	from @tmpa a
+	left join (select sel,ROW_NUMBER()over(partition by noa order by typea) recno from @tmpa where pno=2) b on a.sel=b.sel
+	-------------------------------------------------------------------------------------------------------------
+	--- 補空白行
+	declare @pagecount int = 25
+	declare @noa nvarchar(20)
+	declare @n int 
+
+	declare cursor_table cursor for
+	select noa,count(1) from @tmpa group by noa
+	open cursor_table
+	fetch next from cursor_table
+	into @noa,@n
+	while(@@FETCH_STATUS <> -1)
+	begin
+		while @n%@pagecount != 0
+		begin
+			insert into @tmpa(gno,pno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06
+				,enddate,v07,v09,v10,v11,cardealno,cardeal)
+			select top 1 '3' gno,3 pno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06
+				,enddate,v07,v09,v10,v11,cardealno,cardeal 
+			from @tmpa where noa = @noa
+
+			set @n=@n+1
+		end
+		fetch next from cursor_table
+		into @noa,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	-------------------------------------------------------------------------------------------------------------
 	select gno
 		,v01 a01
 		,datea a02
-		,cust a03
-		,part a04
-		,v02 a05
-		,v03 a06
-		,v04 a07
-		,begindate a08
-		,v05 a09
-		,v06 a10
-		,enddate a11
-		,v07 a12
-		,v09 a13
-		,v10 a14
-		,v11 a15
-		,cardeal a16
+		,v02 a03
+		,v03 a04
+		,cust a05
+		,part a06
+		,noa a07
 
-		,typea b01
-		,dbo.getComma(n01,-1)
-		,dbo.getComma(n02,-1)
-		,dbo.getComma(n03,-1)
-		,dbo.getComma(n04,-1)
-		,dbo.getComma(n05,-1)
-		,dbo.getComma(n06,-1)
-		,dbo.getComma(n07,-1)
-		,dbo.getComma(n08,-1)
-		,dbo.getComma(n09,-1)
-		,dbo.getComma(n10,-1)
-		,dbo.getComma(n11,-1)
-		,dbo.getComma(n12,-1)
-		,dbo.getComma(n13,-1)
-		,dbo.getComma(n14,-1)
-		,dbo.getComma(n15,-1)
-		,dbo.getComma(inteis,-1)
-		,dbo.getComma(arrerage,-1)
-		,dbo.getComma(n16,-1)
+		,recno rr
+		,cardeal b01
+		,typea b02
+		,dbo.getComma(n01,-1) b03
+		,dbo.getComma(n02,-1) b04
+		,dbo.getComma(n03,-1) b05
+		,dbo.getComma(n04,-1) b06
+		,dbo.getComma(n05,-1) b07
+		,dbo.getComma(n06,-1) b08
+		,dbo.getComma(n07,-1) b09
+		,dbo.getComma(n08,-1) b10
+		,dbo.getComma(n09,-1) b11
+		,dbo.getComma(n10,-1) b12
+		,dbo.getComma(n11,-1) b13
+		,dbo.getComma(n12,-1) b14
+		,dbo.getComma(n13,-1) b15
+		,dbo.getComma(n14,-1) b16
+		,dbo.getComma(n15,-1) b17
+		,dbo.getComma(inteis,-1) b18
+		,dbo.getComma(arrerage,-1) b19
+		,dbo.getComma(n16,-1) b20
+		,memo b21
 	from @tmpa order by noa,pno,sel;
