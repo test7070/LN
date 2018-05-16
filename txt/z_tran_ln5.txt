@@ -88,17 +88,18 @@ z_tran_ln501:--z_tran_ln501
 	update @tmpa set cardeal=isnull(b.comp,a.cardealno)
 	from @tmpa a
 	left join cardeal b on a.cardealno=b.noa
-	where pno = 3
+	where a.pno = 3 and b.noa is not null
 	-- tran_ln5 合計
 	insert into @tmpa(gno,pno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
-		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
+		,typea,cardealno,cardeal,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
 	select '2',2,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
-		,typea,sum(isnull(n01,0)),sum(isnull(n02,0)),sum(isnull(n03,0)),sum(isnull(n04,0)),sum(isnull(n05,0))
+		,typea,cardealno,cardeal
+		,sum(isnull(n01,0)),sum(isnull(n02,0)),sum(isnull(n03,0)),sum(isnull(n04,0)),sum(isnull(n05,0))
 		,sum(isnull(n06,0)),sum(isnull(n07,0)),sum(isnull(n08,0)),sum(isnull(n09,0)),sum(isnull(n10,0)),sum(isnull(n11,0))
 		,sum(isnull(n12,0)),sum(isnull(n13,0)),sum(isnull(n14,0)),sum(isnull(n15,0)),sum(isnull(inteis,0)),sum(isnull(arrerage,0)),sum(isnull(n16,0))
 	from @tmpa
 	where pno=3
-	group by noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11,typea
+	group by noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11,typea,cardealno,cardeal
 	
 	-- pno = 3  明細,暫時先不顯示
 	delete @tmpa where pno=3
