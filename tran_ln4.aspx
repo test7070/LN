@@ -29,7 +29,7 @@
 			q_tables = 's';
 			var q_name = "borrg";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2','txtOrdeno'
-				,'textA01','textA02','textA03','textA04','textA05','textA06'];
+				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'];
 			var q_readonlys = ['txtN05'];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
@@ -143,6 +143,7 @@
                     
                     $('#txtN01_'+i).change(function(e){refreshBbs();});
                     $('#txtTotal2_'+i).change(function(e){refreshBbs();});
+                    $('#txtN16_'+i).change(function(e){refreshBbs();});
 				}
 				_bbsAssign();
 				$('#tbbs').find('tr.data').children().hover(function(e){
@@ -245,7 +246,7 @@
 			}
 			
 			function refreshBbs(){
-				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0;
+				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0;
 				for(var i=0;i<q_bbsCount;i++){
 					//與派工單可對應就變綠色
 					if($.trim($('#txtOrdeno1_'+i).val()).length>0)
@@ -259,6 +260,7 @@
 					//------------------------------------------------------------
 					t01 = q_add(t01,q_float('txtN01_'+i));
 					t06 = q_add(t06,q_float('txtTotal2_'+i));
+					t07 = q_add(t07,q_float('txtN16_'+i));
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
@@ -266,6 +268,7 @@
 				$('#textA04').val(t04);
 				$('#textA05').val(t05);
 				$('#textA06').val(t06);
+				$('#textA07').val(t07);
 			}
 
 			function readonly(t_para, empty) {
@@ -675,6 +678,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>儀檢</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>危標</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>OOG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>其他<BR>費用</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 			</table>
@@ -698,6 +702,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><input id="textA06" class="txt" style="width:90%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><input id="textA07" class="txt" style="width:90%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 			</table>
@@ -721,6 +726,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>儀檢</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>危標</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>OOG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>其他<BR>費用</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
@@ -763,6 +769,7 @@
 					<td style="width:50px"><input type="checkbox" id="chkChk4.*" style="width:95%;"/></td>
 					<td style="width:50px"><input type="checkbox" id="chkChk5.*" style="width:95%;"/></td>
 					<td style="width:80px;"><input type="text" id="txtTotal2.*" style="width:95%;text-align: right;"/></td>
+					<td style="width:80px;"><input type="text" id="txtN16.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
 			</table>
