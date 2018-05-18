@@ -75,7 +75,7 @@
 					},{//[17]                 10
                         type : '8',
                         name : 'xoption',
-                        value : "1@新實單價".split(",")
+                        value : "1@新安單價".split(",")
                     }, {
 						//[18][19]              11
 						type : '2', name : 'xcust', dbf : 'cust', index : 'noa,nick', src : 'cust_b.aspx'
