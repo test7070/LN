@@ -1,4 +1,347 @@
-﻿z_trans_ln08:--z_trans_ln.txt/z_trans_ln08 	
+﻿z_trans_ln12: --z_trans_ln12
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_option nvarchar(max) = case when '#non' = [17] then '' else [17] end
+	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
+	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
+	declare @t_invoice nvarchar(max) = case when '#non' = [20] then '' else [20] end
+	------------------------------------------------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,invoice nvarchar(20)
+		,[date] nvarchar(20)
+		,buyer nvarchar(20)
+		,seller nvarchar(20)
+		,[money] float
+
+		,custno nvarchar(20)
+		,noa nvarchar(20)
+		,datea nvarchar(20)
+		,bsel int
+		,esel int
+	)
+	if len(@t_option)>0
+	begin
+		insert into @tmpa(invoice,[date],buyer,seller,custno,noa,datea)
+		select isnull(v13,''),isnull(v14,''),isnull(v15,''),isnull(v16,''),custno,noa,datea
+		from borr
+		where vccno='tran_ln3' 
+		and isnull(datea,'') between @t_bdate and @t_edate
+		and isnull(custno,'') between @t_bcustno and @t_ecustno
+		and len(isnull(v13,''))>0
+		order by datea,noa
+	end
+	else
+	begin
+		insert into @tmpa(invoice,[date],buyer,seller,custno,noa,datea)
+		select accno,checkno,v10,v12,custno,noa,datea
+		from borr
+		where vccno='tran_ln3' 
+		and isnull(datea,'') between @t_bdate and @t_edate
+		and isnull(custno,'') between @t_bcustno and @t_ecustno
+		and len(isnull(accno,''))>0
+		order by datea,noa
+	end
+	---------------------------------------------------------------------------------------------------
+	declare @tmpb table(
+		sel int identity(1,1)
+		,custno nvarchar(20)
+		,noa nvarchar(20)
+		,noq nvarchar(20)
+		,datea nvarchar(20)
+		,casetype nvarchar(20)
+		,typea nvarchar(20)
+		,cardealno nvarchar(20)
+		,straddrno nvarchar(20)
+		,endaddrno nvarchar(20)
+		,v02 nvarchar(max)
+		,v03 nvarchar(max)
+		,n01 float
+		,n02 float
+		,n03 float
+		,n04 float
+		,m01 float
+		,m02 float
+
+		,n01a float
+		,n02a float
+		,n03a float
+		,n04a float
+		,n01b float
+		,n02b float
+		,n03b float
+		,n04b float
+		,memo nvarchar(max)
+	)
+	insert into @tmpb(custno,noa,noq,datea,casetype,typea,cardealno,straddrno,endaddrno,v02,v03
+		,n01,n02,n03,n04,m01,m02,memo)
+	select b.custno,b.noa,a.noq,b.datea,a.casetype,'' typea,a.cardealno,a.addrno,a.addrno2,b.v02,b.v03
+		,a.n01,a.n02,a.n03,a.n04,a.m01,a.m02,b.memo
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.vccno='tran_ln3' 
+	and isnull(b.datea,'') between @t_bdate and @t_edate
+	and isnull(b.custno,'') between @t_bcustno and @t_ecustno
+	order by b.custno,b.datea,b.noa,a.noq
+
+	update @tmpb set typea=b.typea
+		,n01a = round(isnull(n01,0) *ISNULL(b.custprice,0),0)
+		,n01b = round(isnull(n01,0) *ISNULL(b.tggprice,0),0) 
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit=a.casetype and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n01,0)!=0
+
+	update @tmpb set typea=b.typea
+		,n02a = round(isnull(n02,0) *ISNULL(b.custprice,0),0)
+		,n02b = round(isnull(n02,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='油桶櫃' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n02,0)!=0
+
+	update @tmpb set typea=b.typea
+		,n03a = round(isnull(n03,0) *ISNULL(b.custprice,0),0)
+		,n03b = round(isnull(n03,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='20~#$押運' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n03,0)!=0
+
+	update @tmpb set typea=b.typea
+		,n04a = round(isnull(n04,0) *ISNULL(b.custprice,0),0)
+		,n04b = round(isnull(n04,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='40~#$押運' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n04,0)!=0
+
+	--------------------------------------------------------------------------------------------------------------
+	update @tmpa set bsel=b.sel
+	from @tmpa a
+	outer apply(select top 1 sel from @tmpb where datea=a.datea and noa=a.noa order by datea,noa) b
+
+	declare @sel int, @bsel int, @esel int
+	declare @custno nvarchar(20)
+	declare @noa nvarchar(20)
+	declare @datea nvarchar(20)
+
+	declare cursor_table cursor for	
+	select custno from @tmpa group by custno
+	open cursor_table
+	fetch next from cursor_table
+	into @custno
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		
+		declare cursor_table2 cursor for	
+		select sel,bsel from @tmpa where custno=@custno order by sel
+		open cursor_table2
+		fetch next from cursor_table2
+		into @sel,@bsel
+		while(@@FETCH_STATUS <> -1)
+		begin	
+			select @noa = '', @datea = '', @esel = 0
+			select top 1 @noa=noa,@datea=datea from @tmpa where custno=@custno and sel>@sel order by sel
+
+			select top 1 @esel = sel
+			from @tmpb where custno=@custno
+			and ((datea = @datea and noa<@noa) or datea<@datea ) 
+			order by datea desc,noa desc,sel desc
+
+			update @tmpa set esel = isnull(@esel,0) where sel=@sel
+
+			fetch next from cursor_table2
+			into @sel,@bsel
+		end
+		close cursor_table2
+		deallocate cursor_table2
+
+		select @esel = 0
+		select top 1 @esel = sel from @tmpb where custno=@custno order by sel desc
+		update @tmpa set esel=@esel where custno=@custno and esel=0
+
+		fetch next from cursor_table
+		into @custno
+	end
+	close cursor_table
+	deallocate cursor_table
+
+	if len(@t_option)>0
+	begin
+		update @tmpa set [money] = b.[money]
+		from @tmpa a
+		outer apply(select sum(isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(m01,0)+isnull(m02,0)) [money] 
+			from @tmpb where sel between a.bsel and a.esel) b
+	end
+	else
+	begin
+		update @tmpa set [money] = b.[money]
+		from @tmpa a
+		outer apply(select sum(isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(m01,0)+isnull(m02,0)) [money] 
+			from @tmpb where sel between a.bsel and a.esel) b
+	end
+	--------------------------------------------------------------------------------------------------------------
+	declare @tmpc table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,invoice nvarchar(20)
+		,[date] nvarchar(20)
+		,buyer nvarchar(20)
+		,seller nvarchar(20)
+		,[money] float
+		,custno nvarchar(20)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,datea nvarchar(20)
+		,casetype nvarchar(20)
+		,typea nvarchar(20)
+		,cardealno nvarchar(20)
+		,straddrno nvarchar(20)
+		,endaddrno nvarchar(20)
+		,v02 nvarchar(max)
+		,v03 nvarchar(max)
+		,n01 float
+		,n02 float
+		,n03 float
+		,n04 float
+		,m01 float
+		,m02 float
+
+		,n01a float
+		,n02a float
+		,n03a float
+		,n04a float
+		,memo nvarchar(max)
+	)
+	declare @invoice nvarchar(20)
+	declare @date nvarchar(20)
+	declare @serial nvarchar(20)
+	declare @money float
+
+	declare cursor_table cursor for	
+	select sel,bsel,esel from @tmpa order by sel
+	open cursor_table
+	fetch next from cursor_table
+	into @sel,@bsel,@esel
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		-- header
+		insert into @tmpc(gno,pno,invoice,[date],buyer,seller,[money])
+		select '1',1,a.invoice,a.[date],a.buyer,a.seller,a.[money]
+		from @tmpa a
+		where a.sel=@sel
+		-- invoice detail
+		insert into @tmpc(gno,pno,invoice,[date],buyer,seller,[money])
+		select '2',2,a.invoice,a.[date],a.buyer,a.seller,a.[money]
+		from @tmpa a
+		where a.sel=@sel
+		-- header
+		insert into @tmpc(gno,pno,invoice,[date],buyer,seller,[money])
+		select '3',3,a.invoice,a.[date],a.buyer,a.seller,a.[money]
+		from @tmpa a
+		where a.sel=@sel
+		-- details
+		insert into @tmpc(gno,pno,invoice,[date],buyer,seller,[money]
+			,custno,noa,noq,datea,casetype,typea,straddrno,endaddrno,v02,v03,n01,n02,n03,n04,m01,m02
+			,n01a,n02a,n03a,n04a,memo)
+		select '4',4,a.invoice,a.[date],a.buyer,a.seller,a.[money]
+			,b.custno,b.noa,b.noq,b.datea,b.casetype,b.typea,b.straddrno,b.endaddrno,b.v02,b.v03,b.n01,b.n02,b.n03,b.n04,b.m01,b.m02
+			,b.n01a,b.n02a,b.n03a,b.n04a,b.memo
+		from @tmpa a
+		left join @tmpb b on b.sel between a.bsel and a.esel
+		where a.sel=@sel
+
+		fetch next from cursor_table
+		into @sel,@bsel,@esel
+	end
+	close cursor_table
+	deallocate cursor_table
+	----------------------------------------------------------------------------------------------------------
+	if len(@t_invoice)>0
+		delete @tmpc where invoice!=@t_invoice
+	
+	declare @pagecount int = 50
+	declare @n int
+
+	declare cursor_table cursor for	
+	select invoice,count(1) from @tmpc group by invoice
+	open cursor_table
+	fetch next from cursor_table
+	into @invoice,@n
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		while @n%@pagecount != 0
+		begin
+			insert into @tmpc(gno,pno,invoice)
+			select '5',5,@invoice
+			set @n = @n + 1
+		end
+		fetch next from cursor_table
+		into @invoice,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+
+
+	select gno
+		,'' a01 -- REF_NO
+		,'' a02 --REF_DATE
+		,seller a03 --SUPPLY_CODE
+		,'TW' a04 --AGENT_CODE
+		,'' a05 --DEPOT_CODE
+		,'TWD' a06 --CURR
+
+		,'I' b01--TYPE	
+		,left(invoice,2) b02--ID	
+		,right(invoice,8) b03--NO	
+		,invoice b04--CERTIFICATE	
+		,[date] b05--DATE	
+		,'21' b06--FMT	
+		,'1' b07--CUT	
+		,'1' b08--TAX	
+		,seller b09--REG_NO	
+		,[money] b10--AMOUNT	
+		,round([money]*0.05,0) b11--TAX_AMOUNT	
+		,[money]+round([money]*0.05,0) b12--TOL_AMOUNT	
+		,buyer b13--AREA
+
+		,noa c01--INVOICE_SEQ	
+		,'TWKHH' c02--PLACE_CODE	
+		,typea c03--NEW_ITEM	
+		,isnull(v03,'')+isnull(v02,'') c04--TFC_CODE	
+		,datea c05--DATE	
+		,'D' c06--D/C	
+		,isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(m01,0)+isnull(m02,0) c07--AMOUNT	
+		,seller c08--VENDOR_CODE
+
+	from @tmpc 
+	order by invoice,pno,sel;
+	
+z_trans_ln08:--z_trans_ln.txt/z_trans_ln08 	
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
@@ -906,7 +1249,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 		,dbo.getComma(total,-1) a06
 	from @tmp order by pno,groupa,sel;
 
-z_trans_ln12: --z_trans_ln12
+z_trans_ln12_old: --z_trans_ln12
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'

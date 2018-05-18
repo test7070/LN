@@ -79,7 +79,10 @@
                     }, {
 						//[18][19]              11
 						type : '2', name : 'xcust', dbf : 'cust', index : 'noa,nick', src : 'cust_b.aspx'
-					}]
+					}, {//[20]              12
+                        type : '6',  
+                        name : 'xinvoice'
+                    }]
                 });
                 q_popAssign();
 				$('#txtMon').mask(r_picm);

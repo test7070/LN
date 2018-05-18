@@ -60,7 +60,7 @@
                 	t_where += " and exists(select noq from borrs where borrs.noa=borr.noa and  (charindex('" + t_caseno + "',borrs.caseno)>0))";
                 }   
                 if (t_accno.length > 0)
-                    t_where += " and charindex('" + t_accno + "',accno)>0";
+                    t_where += " and (charindex('" + t_accno + "',accno)>0 or charindex('" + t_accno + "',v13)>0)";
                 if (t_ordeno.length > 0)
                     t_where += " and charindex('" + t_ordeno + "',ordeno)>0";      
                 t_where = ' where=^^' + t_where + '^^ ';

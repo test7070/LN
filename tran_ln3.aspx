@@ -73,7 +73,7 @@
 			}
 
 			function mainPost() {
-				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtCheckno',r_picd]);
+				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtCheckno',r_picd],['txtV14',r_picd]);
 				q_mask(bbmMask);
 				document.title = '場外移櫃作業';
 				
@@ -268,11 +268,13 @@
 					$('#txtBegindate').datepicker('destroy');
 					$('#txtEnddate').datepicker('destroy');
 					$('#txtCheckno').datepicker('destroy');
+					$('#txtV14').datepicker('destroy');
 				}else{
 					$('#txtDatea').datepicker();
 					$('#txtBegindate').datepicker();
 					$('#txtEnddate').datepicker();
 					$('#txtCheckno').datepicker();
+					$('#txtV14').datepicker();
 				}
 			}
 
@@ -370,7 +372,7 @@
 			}
 			.dbbm {
 				float: left;
-				width: 800px;
+				width: 950px;
 				/*margin: -1px;
 				 border: 1px black solid;*/
 				border-radius: 5px;
@@ -484,6 +486,8 @@
 						<td> </td>
 						<td> </td>
 						<td> </td>
+						<td> </td>
+						<td> </td>
 						<td class="tdZ"> </td>
 					</tr>
 					<tr>
@@ -491,8 +495,11 @@
 						<td><input type="text" id="txtV01" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">日期</a></td>
 						<td><input type="text" id="txtDatea" class="txt c1"/></td>
+						
 						<td><span> </span><a class="lbl">發票號碼</a></td>
 						<td><input type="text" id="txtAccno" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">發票號碼#</a></td>
+						<td><input type="text" id="txtV13" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl">作業日期(起)</a></td>
@@ -501,6 +508,9 @@
 						<td><input type="text" id="txtEnddate" class="txt c1"/></td>
 						<td><span> </span><a class="lbl">發票日期</a></td>
 						<td><input type="text" id="txtCheckno" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">發票日期#</a></td>
+						<td><input type="text" id="txtV14" class="txt c1"/></td>
+						
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblV02" class="lbl btn">船名</a></td>
@@ -510,8 +520,11 @@
 						</td>
 						<td><span> </span><a class="lbl">代表航次</a></td>
 						<td><input type="text" id="txtV03" class="txt c1"/></td>
-						<td><span> </span><a class="lbl">發票統編</a></td>
+						<td><span> </span><a class="lbl">買方發票統編</a></td>
 						<td><input type="text" id="txtV10" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">買方發票統編#</a></td>
+						<td><input type="text" id="txtV15" class="txt c1"/></td>
+						
 					</tr>
 					<tr>
 						<td><span> </span><a class="lbl" id="lblCust">客戶</a></td>
@@ -525,8 +538,13 @@
 							<span> </span>
 							<input id="chkIsnointe" type="checkbox" style="float:right;"/>
 						</td>
-						<td><span> </span><a class="lbl">發票金額</a></td>
-						<td><input type="text" id="txtTotal2" class="txt c1 num"/></td>
+						
+						<td><span> </span><a class="lbl">賣方發票統編</a></td>
+						<td><input type="text" id="txtV12" class="txt c1"/></td>
+						<td><span> </span><a class="lbl">賣方發票統編#</a></td>
+						<td><input type="text" id="txtV16" class="txt c1"/></td>
+						<!--<td><span> </span><a class="lbl">發票金額</a></td>
+						<td><input type="text" id="txtTotal2" class="txt c1 num"/></td>-->
 						
 					</tr>
 					<!--<tr>
