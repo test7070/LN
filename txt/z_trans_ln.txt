@@ -360,7 +360,6 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
 	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
 	-------------------------------------------------------------------------------------------
-	-------------------------------------------------------------------------------------------
 	declare @custno nvarchar(20)
 	declare @cust nvarchar(50)
 	declare @noa nvarchar(20)
@@ -703,7 +702,6 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	begin	
 		if charindex(',',@v01)>0
 		begin
-			
 			set @n = 0
 
 			declare cursor_table2 cursor for	
@@ -718,7 +716,6 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 					insert into @tmpb(gno,pno,custno,cust,noa,v01,typea)
 					select '2',1,@custno,@cust,@noa,@v01,@typea
 					set @sel =@@IDENTITY
-					
 				end
 
 				if @n%2 = 0
@@ -730,15 +727,16 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 					update @tmpb set planidb = @item where sel=@sel
 				end
 
-
 				set @n = @n + 1
 				fetch next from cursor_table2
 				into @itemno,@item
 			end
 			close cursor_table2
 			deallocate cursor_table2
-			
 		end
+		begin
+			update @tmpb set planida = isnull(@v01,'') where sel=@sel
+		end 
 		
 		fetch next from cursor_table
 		into @sel,@custno,@cust,@noa,@v01,@typea
