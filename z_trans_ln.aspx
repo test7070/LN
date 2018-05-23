@@ -82,6 +82,12 @@
 					}, {//[20]              12
                         type : '6',  
                         name : 'xinvoice'
+                    }, {
+						//[21]                 13  科目
+						type : '6', name : 'xtype'
+					},{//[22][23]              14
+                        type : '1',
+                        name : 'ynoa'
                     }]
                 });
                 q_popAssign();

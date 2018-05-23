@@ -18,12 +18,12 @@
 			q_tables = 's';
 			var q_name = "borr";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2','txtOrdeno'
-				,'textA01','textA02','textA03','textA04','textA05','textA06'];
-			var q_readonlys = ['txtN05'];
+				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'];
+			var q_readonlys = [];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
 			var bbmMask = [];
-			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0]);
+			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0],['txtN03',10,0],['txtN04',10,0],['txtN05',10,0],['txtN06',10,0],['txtN07',10,0]);
 			var bbsMask = new Array();
 			var bbtNum  = new Array(); 
 			var bbtMask = new Array();
@@ -77,7 +77,21 @@
 				q_mask(bbmMask);
 				document.title = '場外移櫃作業';
 				
-				q_cmbParse("cmbCasetype", " ,20'E,40'E,20'F,40'F","s");
+				var item = " ,20'E,40'E,20'F,40'F";
+                item += ",21-1,21-2,21-3,21-4,21-5,21-6,21-7";
+                item += ",22-1,22-2,22-3,22-4,22-5,22-6,22-7";
+                item += ",23-1,23-2,23-3,23-4,23-5,23-6,23-7";
+                item += ",24-1,24-2,24-3,24-4,24-5,24-6,24-7";
+                item += ",25-1,25-2,25-3,25-4,25-5,25-6,25-7";
+                item += ",26-1,26-2,26-3,26-4,26-5,26-6,26-7";
+                item += ",41-1,41-2,41-3,41-4,41-5,41-6,41-7";
+                item += ",42-1,42-2,42-3,42-4,42-5,42-6,42-7";
+                item += ",43-1,43-2,43-3,43-4,43-5,43-6,43-7";
+                item += ",44-1,44-2,44-3,44-4,44-5,44-6,44-7";
+                item += ",45-1,45-2,45-3,45-4,45-5,45-6,45-7";
+                item += ",46-1,46-2,46-3,46-4,46-5,46-6,46-7";
+                
+				q_cmbParse("cmbCasetype", item,"s");
 				
 				$('#lblV02').click(function(e){
 					q_box('boat.aspx?' + r_userno + ";" + r_name + ";" + q_time + ";" + "" + ";" + r_accy + "_" + r_cno, 'trans', "95%", "95%", m_print);
@@ -122,8 +136,9 @@
                     $('#txtN02_'+i).change(function(e){refreshBbs();});
                     $('#txtN03_'+i).change(function(e){refreshBbs();});
                     $('#txtN04_'+i).change(function(e){refreshBbs();});
-                    $('#txtM01_'+i).change(function(e){refreshBbs();});
-                    $('#txtM02_'+i).change(function(e){refreshBbs();});
+                    $('#txtN05_'+i).change(function(e){refreshBbs();});
+                    $('#txtN06_'+i).change(function(e){refreshBbs();});
+                    $('#txtN07_'+i).change(function(e){refreshBbs();});
 				}
 				_bbsAssign();
 				$('#tbbs').find('tr.data').children().hover(function(e){
@@ -232,26 +247,15 @@
 			}
 			
 			function refreshBbs(){
-				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0;
+				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0;
 				for(var i=0;i<q_bbsCount;i++){
 					t01 += q_float('txtN01_'+i);
 					t02 += q_float('txtN02_'+i);
 					t03 += q_float('txtN03_'+i);
 					t04 += q_float('txtN04_'+i);
-					tt05=0;
-					tt06=0;
-					try{
-						tt05 = eval($('#txtM01_'+i).val());
-					}catch(e){tt05=0;}
-					try{
-						tt06 = eval($('#txtM02_'+i).val());
-					}catch(e){tt06=0;}
-					tt05 = isNaN(tt05)?0:tt05;
-					tt06 = isNaN(tt06)?0:tt06;
-					$('#txtN05_'+i).val(tt05);
-					$('#txtN06_'+i).val(tt06);
-					t05 += tt05; 
-					t06 += tt06;
+					t05 += q_float('txtN05_'+i);
+					t06 += q_float('txtN06_'+i);
+					t07 += q_float('txtN07_'+i);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
@@ -259,6 +263,7 @@
 				$('#textA04').val(t04);
 				$('#textA05').val(t05);
 				$('#textA06').val(t06);
+				$('#textA07').val(t07);
 			}
 
 			function readonly(t_para, empty) {
@@ -590,21 +595,22 @@
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
+					<!--<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
 					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
 					<!--<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>油桶櫃</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點*</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>油桶櫃<br>數量</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>20'押運</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>40'押運</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>20'OOG<br>附加費</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>40'OOG<br>附加費</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>油桶櫃</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>押運</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>OOG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>超重</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>危標</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>其他</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 			</table>
@@ -614,7 +620,7 @@
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"> </td>
+					<!--<td align="center" colspan="1" rowspan="3" style="width:50px;"> </td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
 					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"> </td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
@@ -627,8 +633,9 @@
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA02" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA03" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA04" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><input id="textA05" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><input id="textA06" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA05" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA06" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA07" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 			</table>
@@ -638,21 +645,22 @@
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px;"> </td>
 					<td align="center" style="width:50px;"> </td>
-					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>
+					<!--<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>請款</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號</a></td>
 					<!--<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>E/F</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
 					<!--<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>油桶櫃</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車牌</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>車行</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>起點*</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>迄點</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>油桶櫃<br>數量</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>20'押運</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>40'押運</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>20'OOG<br>附加費</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:100px;"><a>40'OOG<br>附加費</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>油桶櫃</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>押運</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>OOG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>超重</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>危標</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>其他</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 
@@ -662,11 +670,9 @@
 						<input type="text" id="txtNoq.*" style="display:none;"/>
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
-					<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
+					<!--<td style="width:50px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>-->
 					<td style="width:150px;"><input type="text" id="txtCaseno.*" style="width:95%;"/></td>
-					<!--<td style="width:50px;"><input type="text" id="txtEf.*" list="listEf" style="width:95%;"/></td>-->
 					<td style="width:80px;"><select id="cmbCasetype.*" style="width:95%;"> </select></td>
-						<!--<input type="text" id="txtCasetype.*" list="listCasetype" style="width:95%;"/></td>-->
 					<!--<td style="width:60px"><input type="checkbox" id="chkChk2.*" style="width:95%;"/></td>-->
 					<td style="width:100px;"><input type="text" id="txtCarno.*" style="width:95%;"/></td>
 					<td style="width:100px">
@@ -688,30 +694,13 @@
 					<td style="width:70px;"><input type="text" id="txtN02.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:70px;"><input type="text" id="txtN03.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:70px;"><input type="text" id="txtN04.*" style="width:95%;text-align: right;"/></td>
-					<td style="width:100px;">
-						<input type="text" id="txtM01.*" style="width:95%;text-align:right;"/>
-						<input type="text" id="txtN05.*" style="display:none;"/>
-					</td>
-					<td style="width:100px;">
-						<input type="text" id="txtM02.*" style="width:95%;text-align:right;"/>
-						<input type="text" id="txtN06.*" style="display:none;"/>
-					</td>
+					<td style="width:70px;"><input type="text" id="txtN05.*" style="width:95%;text-align: right;"/></td>
+					<td style="width:70px;"><input type="text" id="txtN06.*" style="width:95%;text-align: right;"/></td>
+					<td style="width:70px;"><input type="text" id="txtN07.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
 			</table>
 		</div>
-		<datalist id="listEf">
-			<option value="E"> </option>
-			<option value="F"> </option>
-		</datalist>
-		<datalist id="listCasetype">
-			<option>20'E</option>
-			<option>40'E</option>
-			<option>20'F</option>
-			<option>40'F</option>
-			<option>20'押運</option>
-			<option>40'押運</option>
-		</datalist>
 		<input id="q_sys" type="hidden" />
 	</body>
 </html>
