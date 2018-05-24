@@ -63,26 +63,48 @@
 		,v02 nvarchar(max)
 		,v03 nvarchar(max)
 		,n01 float
-		,n02 float
-		,n03 float
-		,n04 float
-		,m01 float
-		,m02 float
+		,n02 float--油桶櫃	
+		,n03 float--押運
+		,n04 float--超重
+		,n05 float--危標	
+		,n06 float--其他
 
+		--應收
 		,n01a float
-		,n02a float
-		,n03a float
-		,n04a float
+		,n02a float--油桶櫃
+		,n03a float--押運	
+		,n03a2 float--20押運
+		,n03a4 float--40押運
+		,n04a float--超重
+		,n04a2 float--20超重
+		,n04a4 float--40超重
+		,n05a float--危標
+		,n05a2 float--20危標
+		,n05a4 float--40危標	
+		,n06a float--其他
+		,n06a2 float--20其他
+		,n06a4 float--40其他
+		--請款
 		,n01b float
-		,n02b float
-		,n03b float
-		,n04b float
+		,n02b float--油桶櫃	
+		,n03b float--押運
+		,n03b2 float--20押運
+		,n03b4 float--40押運
+		,n04b float--超重
+		,n04b2 float--20超重
+		,n04b4 float--40超重
+		,n05b float--危標
+		,n05b2 float--20危標
+		,n05b4 float--40危標	
+		,n06b float--其他
+		,n06b2 float--20其他
+		,n06b4 float--40其他
 		,memo nvarchar(max)
 	)
 	insert into @tmpb(custno,noa,noq,datea,casetype,typea,cardealno,straddrno,endaddrno,v02,v03
-		,n01,n02,n03,n04,m01,m02,memo)
+		,n01,n02,n03,n04,n05,n06,memo)
 	select b.custno,b.noa,a.noq,b.datea,a.casetype,'' typea,a.cardealno,a.addrno,a.addrno2,b.v02,b.v03
-		,a.n01,a.n02,a.n03,a.n04,a.m01,a.m02,b.memo
+		,a.n01,a.n02,a.n03,a.n04,a.n05,a.n06,b.memo
 	from borrs a
 	left join borr b on a.noa=b.noa
 	where b.vccno='tran_ln3' 
@@ -90,7 +112,7 @@
 	and isnull(b.custno,'') between @t_bcustno and @t_ecustno
 	order by b.custno,b.datea,b.noa,a.noq
 
-	update @tmpb set typea=b.typea
+	update @tmpb set typea=case when len(isnull(a.typea,''))=0 then b.typea else isnull(a.typea,'') end
 		,n01a = round(isnull(n01,0) *ISNULL(b.custprice,0),0)
 		,n01b = round(isnull(n01,0) *ISNULL(b.tggprice,0),0) 
 	from @tmpb a
@@ -114,9 +136,9 @@
 			order by x.datea desc) b
 	where isnull(a.n02,0)!=0
 
-	update @tmpb set typea=b.typea
-		,n03a = round(isnull(n03,0) *ISNULL(b.custprice,0),0)
-		,n03b = round(isnull(n03,0) *ISNULL(b.tggprice,0),0)
+	--20'押運
+	update @tmpb set n03a2 = round(isnull(n03,0) *ISNULL(b.custprice,0),0)
+		,n03b2 = round(isnull(n03,0) *ISNULL(b.tggprice,0),0)
 	from @tmpb a
 	outer apply(select top 1 x.* 
 		from addrs x
@@ -124,11 +146,12 @@
 		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno=a.custno and x.custunit='20~#$押運' and x.salesno=a.cardealno and x.datea<=a.datea 
 			order by x.datea desc) b
-	where isnull(a.n03,0)!=0
+	where isnull(a.n03,0)!=0 
+	and left(a.casetype,1)='2'  -- 第一碼為2表示 20呎櫃
 
-	update @tmpb set typea=b.typea
-		,n04a = round(isnull(n04,0) *ISNULL(b.custprice,0),0)
-		,n04b = round(isnull(n04,0) *ISNULL(b.tggprice,0),0)
+	--40'押運
+	update @tmpb set n03a4 = round(isnull(n03,0) *ISNULL(b.custprice,0),0)
+		,n03b4 = round(isnull(n03,0) *ISNULL(b.tggprice,0),0)
 	from @tmpb a
 	outer apply(select top 1 x.* 
 		from addrs x
@@ -136,8 +159,95 @@
 		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
 			and x.custno=a.custno and x.custunit='40~#$押運' and x.salesno=a.cardealno and x.datea<=a.datea 
 			order by x.datea desc) b
-	where isnull(a.n04,0)!=0
+	where isnull(a.n03,0)!=0 
+	and left(a.casetype,1)='4'  -- 第一碼為4表示 40呎櫃
+	
+	--20超重
+	update @tmpb set n04a2 = round(isnull(n04,0) *ISNULL(b.custprice,0),0)
+		,n04b2 = round(isnull(n04,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='20~#$超重' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n04,0)!=0 
+	and left(a.casetype,1)='2'  -- 第一碼為2表示 20呎櫃
 
+	--40超重
+	update @tmpb set n04a4 = round(isnull(n04,0) *ISNULL(b.custprice,0),0)
+		,n04b4 = round(isnull(n04,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='40~#$超重' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n04,0)!=0 
+	and left(a.casetype,1)='4'  -- 第一碼為4表示 40呎櫃
+
+	--20危標
+	update @tmpb set n05a2 = round(isnull(n05,0) *ISNULL(b.custprice,0),0)
+		,n05b2 = round(isnull(n05,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='20~#$危標' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n05,0)!=0 
+	and left(a.casetype,1)='2'  -- 第一碼為2表示 20呎櫃
+
+	--40危標
+	update @tmpb set n05a4 = round(isnull(n05,0) *ISNULL(b.custprice,0),0)
+		,n05b4 = round(isnull(n05,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='40~#$危標' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n05,0)!=0 
+	and left(a.casetype,1)='4'  -- 第一碼為4表示 40呎櫃
+
+	--20其他
+	update @tmpb set n06a2 = round(isnull(n06,0) *ISNULL(b.custprice,0),0)
+		,n06b2 = round(isnull(n06,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='20~#$其他' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n06,0)!=0 
+	and left(a.casetype,1)='2'  -- 第一碼為2表示 20呎櫃
+
+	--40其他
+	update @tmpb set n06a4 = round(isnull(n06,0) *ISNULL(b.custprice,0),0)
+		,n06b4 = round(isnull(n06,0) *ISNULL(b.tggprice,0),0)
+	from @tmpb a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit='40~#$其他' and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	where isnull(a.n06,0)!=0 
+	and left(a.casetype,1)='4'  -- 第一碼為4表示 40呎櫃
+
+	update @tmpb set n03a = isnull(n03a2,0)+isnull(n03a4,0)
+		,n03b = isnull(n03b2,0)+isnull(n03b4,0)
+		,n04a = isnull(n04a2,0)+isnull(n04a4,0)
+		,n04b = isnull(n04b2,0)+isnull(n04b4,0)
+		,n05a = isnull(n05a2,0)+isnull(n05a4,0)
+		,n05b = isnull(n05b2,0)+isnull(n05b4,0)
+		,n06a = isnull(n06a2,0)+isnull(n06a4,0)
+		,n06b = isnull(n06b2,0)+isnull(n06b4,0)
 	--------------------------------------------------------------------------------------------------------------
 	update @tmpa set bsel=b.sel
 	from @tmpa a
@@ -193,14 +303,14 @@
 	begin
 		update @tmpa set [money] = b.[money]
 		from @tmpa a
-		outer apply(select sum(isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(m01,0)+isnull(m02,0)) [money] 
+		outer apply(select sum(isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(n05b,0)+isnull(n06b,0)) [money] 
 			from @tmpb where sel between a.bsel and a.esel) b
 	end
 	else
 	begin
 		update @tmpa set [money] = b.[money]
 		from @tmpa a
-		outer apply(select sum(isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(m01,0)+isnull(m02,0)) [money] 
+		outer apply(select sum(isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0)) [money] 
 			from @tmpb where sel between a.bsel and a.esel) b
 	end
 	--------------------------------------------------------------------------------------------------------------
@@ -228,13 +338,15 @@
 		,n02 float
 		,n03 float
 		,n04 float
-		,m01 float
-		,m02 float
+		,n05 float
+		,n06 float
 
 		,n01a float
 		,n02a float
 		,n03a float
 		,n04a float
+		,n05a float
+		,n06a float
 		,memo nvarchar(max)
 	)
 	declare @invoice nvarchar(20)
@@ -266,11 +378,12 @@
 		where a.sel=@sel
 		-- details
 		insert into @tmpc(gno,pno,invoice,[date],buyer,seller,[money]
-			,custno,noa,noq,datea,casetype,typea,straddrno,endaddrno,v02,v03,n01,n02,n03,n04,m01,m02
-			,n01a,n02a,n03a,n04a,memo)
+			,custno,noa,noq,datea,casetype,typea,straddrno,endaddrno,v02,v03,n01,n02,n03,n04,n05,n06
+			,n01a,n02a,n03a,n04a,n05a,n06a,memo)
 		select '4',4,a.invoice,a.[date],a.buyer,a.seller,a.[money]
-			,b.custno,b.noa,b.noq,b.datea,b.casetype,b.typea,b.straddrno,b.endaddrno,b.v02,b.v03,b.n01,b.n02,b.n03,b.n04,b.m01,b.m02
-			,b.n01a,b.n02a,b.n03a,b.n04a,b.memo
+			,b.custno,b.noa,b.noq,b.datea,b.casetype,b.typea,b.straddrno,b.endaddrno,b.v02,b.v03
+			,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06
+			,b.n01a,b.n02a,b.n03a,b.n04a,b.n05a,b.n06a,b.memo
 		from @tmpa a
 		left join @tmpb b on b.sel between a.bsel and a.esel
 		where a.sel=@sel
@@ -335,7 +448,7 @@
 		,isnull(v03,'')+isnull(v02,'') c04--TFC_CODE	
 		,datea c05--DATE	
 		,'D' c06--D/C	
-		,isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(m01,0)+isnull(m02,0) c07--AMOUNT	
+		,isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0) c07--AMOUNT	
 		,seller c08--VENDOR_CODE
 
 	from @tmpc 
@@ -360,13 +473,6 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
 	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
 	-------------------------------------------------------------------------------------------
-	declare @custno nvarchar(20)
-	declare @cust nvarchar(50)
-	declare @noa nvarchar(20)
-	declare @v01 nvarchar(max)
-	declare @n int
-	declare @pagecount int = 30
-
 	declare @tmpa table(
 		sel int identity(1,1)
 		--客戶
@@ -394,58 +500,29 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		--訖點	
 		,endaddrno nvarchar(50)
 		,endaddr nvarchar(50)
-		--20'重櫃	
-		,f20 float
-		,f20a float --應收金額
-		,f20b float --請款金額
-		,f20c float --應付金額
-		--40'重櫃
-		,f40 float
-		,f40a float	
-		,f40b float
-		,f40c float	
-		--20'空櫃
-		,e20 float
-		,e20a float
-		,e20b float
-		,e20c float	
-		--40'空櫃
-		,e40 float
-		,e40a float
-		,e40b float
-		,e40c float	
+		--櫃型
+		,casetype nvarchar(20)
+		--數量	
+		,n01 float
 		--油桶櫃	
 		,n02 float
-		,n02a float
-		,n02b float
-		,n02c float
-		--20'押運	
-		,n03 float
-		,n03a float
-		,n03b float
-		,n03c float
-		--40'押運
-		,n04 float
-		,n04a float
-		,n04b float
-		,n04c float	
-		--20'OOG附加費
-		,m01 float
-		--40'OOG附加費
-		,m02 float
+		--押運
+		,n03 float	
+		--超重
+		,n04 float	
+		--危標
+		,n05 float	
+		--其他
+		,n06 float
 		--備註
 		,memo nvarchar(max)
 	)
 	insert into @tmpa(custno,cardealno,noa,v01,typea,datea,bdate,edate,v02,v03
-		,straddrno,straddr,endaddrno,endaddr
-		,f20,f40,e20,e40,n02,n03,n04,m01,m02,memo)
+		,straddrno,straddr,endaddrno,endaddr,casetype
+		,n01,n02,n03,n04,n05,n06,memo)
 	select b.custno,a.cardealno,a.noa,b.v01,'' typea,b.datea,b.begindate bdate,b.enddate edate,b.v02,b.v03
-		,a.addrno straddrno,a.addr straddr,a.addrno2 endaddrno,a.addr2 endaddr
-		,case when a.casetype = "20'F" or a.casetype ="20~#$F" then isnull(a.n01,0) else 0 end f20
-		,case when a.casetype = "40'F" or a.casetype ="40~#$F" then isnull(a.n01,0) else 0 end f40
-		,case when a.casetype = "20'E" or a.casetype ="20~#$E" then isnull(a.n01,0) else 0 end e20
-		,case when a.casetype = "40'E" or a.casetype ="40~#$E" then isnull(a.n01,0) else 0 end e40
-		,a.n02,a.n03,a.n04,a.m01,a.m02,a.memo
+		,a.addrno straddrno,a.addr straddr,a.addrno2 endaddrno,a.addr2 endaddr,a.casetype
+		,isnull(n01,0),isnull(n02,0),isnull(n03,0),isnull(n04,0),isnull(n05,0),isnull(n06,0),ltrim(rtrim(isnull(a.memo,'')))
 	from borrs a
 	left join borr b on a.noa=b.noa
 	where b.vccno = 'tran_ln3'
@@ -459,156 +536,20 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	update @tmpa set cust = b.nick
 	from @tmpa a
 	left join cust b on a.custno=b.noa 
-
-	--20'重櫃 f20 float
-	update @tmpa set typea=b.typea
-		,f20a = round(a.f20 * b.custprice,0)
-		,f20b = round(a.f20 * b.tggprice , 0)
-		,f20c = round(a.f20 * b.driverprice , 0)
-	from @tmpa a
-	outer apply(
-		select top 1 x.* 
-		from addrs x 
-		left join addr y on x.noa=y.noa
-		where a.custno = x.custno
-			and x.custunit = "20~#$F"
-			and y.straddrno = a.straddrno
-			and y.endaddrno = a.endaddrno
-			and a.cardealno = x.salesno
-			and x.datea<=a.datea
-		order by x.datea desc
-		) b
-	where isnull(a.f20,0)!=0
-	--40'重櫃 f40 float
-	update @tmpa set typea=b.typea
-		,f40a = round(a.f40 * b.custprice,0)
-		,f40b = round(a.f40 * b.tggprice , 0)
-		,f40c = round(a.f40 * b.driverprice , 0)
-	from @tmpa a
-	outer apply(
-		select top 1 x.* 
-		from addrs x 
-		left join addr y on x.noa=y.noa
-		where a.custno = x.custno
-			and x.custunit = "40~#$F"
-			and y.straddrno = a.straddrno
-			and y.endaddrno = a.endaddrno
-			and a.cardealno = x.salesno
-			and x.datea<=a.datea
-		order by x.datea desc
-		) b
-	where isnull(a.f40,0)!=0
-	--20'空櫃 e20 float
-	update @tmpa set typea=b.typea
-		,e20a = round(a.e20 * b.custprice,0)
-		,e20b = round(a.e20 * b.tggprice , 0)
-		,e20c = round(a.e20 * b.driverprice , 0)
-	from @tmpa a
-	outer apply(
-		select top 1 x.* 
-		from addrs x 
-		left join addr y on x.noa=y.noa
-		where a.custno = x.custno
-			and x.custunit = "20~#$E"
-			and y.straddrno = a.straddrno
-			and y.endaddrno = a.endaddrno
-			and a.cardealno = x.salesno
-			and x.datea<=a.datea
-		order by x.datea desc
-		) b
-	where isnull(a.e20,0)!=0
-	--40'空櫃 e40 float
-	update @tmpa set typea=b.typea
-		,e40a = round(a.e40 * b.custprice,0)
-		,e40b = round(a.e40 * b.tggprice , 0)
-		,e40c = round(a.e40 * b.driverprice , 0)
-	from @tmpa a
-	outer apply(
-		select top 1 x.* 
-		from addrs x 
-		left join addr y on x.noa=y.noa
-		where a.custno = x.custno
-			and x.custunit = "40~#$E"
-			and y.straddrno = a.straddrno
-			and y.endaddrno = a.endaddrno
-			and a.cardealno = x.salesno
-			and x.datea<=a.datea
-		order by x.datea desc
-		) b
-	where isnull(a.e40,0)!=0
-	--油桶櫃	  n02 float
-	update @tmpa set typea=b.typea
-		,n02a = round(a.n02 * b.custprice,0)
-		,n02b = round(a.n02 * b.tggprice , 0)
-		,n02c = round(a.n02 * b.driverprice , 0)
-	from @tmpa a
-	outer apply(
-		select top 1 x.* 
-		from addrs x 
-		left join addr y on x.noa=y.noa
-		where a.custno = x.custno
-			and x.custunit = "油桶櫃"
-			and y.straddrno = a.straddrno
-			and y.endaddrno = a.endaddrno
-			and a.cardealno = x.salesno
-			and x.datea<=a.datea
-		order by x.datea desc
-		) b
-	where isnull(a.n02,0)!=0
-	--20'押運 n03 float
-	update @tmpa set typea=b.typea
-		,n03a = round(a.n03 * b.custprice,0)
-		,n03b = round(a.n03 * b.tggprice , 0)
-		,n03c = round(a.n03 * b.driverprice , 0)
-	from @tmpa a
-	outer apply(
-		select top 1 x.* 
-		from addrs x 
-		left join addr y on x.noa=y.noa
-		where a.custno = x.custno
-			and x.custunit = "20~#$押運"
-			and y.straddrno = a.straddrno
-			and y.endaddrno = a.endaddrno
-			and a.cardealno = x.salesno
-			and x.datea<=a.datea
-		order by x.datea desc
-		) b
-	where isnull(a.n03,0)!=0
-	--40'押運 n04 float
-	update @tmpa set typea=b.typea
-		,n04a = round(a.n04 * b.custprice,0)
-		,n04b = round(a.n04 * b.tggprice , 0)
-		,n04c = round(a.n04 * b.driverprice , 0)
-	from @tmpa a
-	outer apply(
-		select top 1 x.* 
-		from addrs x 
-		left join addr y on x.noa=y.noa
-		where a.custno = x.custno
-			and x.custunit = "40~#$押運"
-			and y.straddrno = a.straddrno
-			and y.endaddrno = a.endaddrno
-			and a.cardealno = x.salesno
-			and x.datea<=a.datea
-		order by x.datea desc
-		) b
-	where isnull(a.n04,0)!=0
-	--------------------------------------------------------------------------------------------------------------------
+	-----------------------------------------------------------------------------------------------------------------------
 	declare @tmpb table(
 		sel int identity(1,1)
 		,gno nvarchar(20)
 		,pno int
-		,recno int
-		--客戶
 		,custno nvarchar(20)
-		,cust nvarchar(50)
-		--電腦編號
+		,cust nvarchar(40)
+		--電腦編號	
 		,noa nvarchar(20)
 		--PLAN_ID	
-		,v01 nvarchar(max)	
+		,v01 nvarchar(max)
 		,planida nvarchar(max)
 		,planidb nvarchar(max)
-		--科目編號	addrs.typea
+		--科目編號
 		,typea nvarchar(20)
 		--作業日期	
 		,datea nvarchar(20)
@@ -619,82 +560,63 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		--航次	
 		,v03 nvarchar(50)
 		--起點	
-		,straddrno nvarchar(50)
+		,straddrno nvarchar(20)
 		,straddr nvarchar(50)
 		--訖點	
-		,endaddrno nvarchar(50)
+		,endaddrno nvarchar(20)
 		,endaddr nvarchar(50)
-		--20'重櫃	
-		,f20 float
-		,f20a float --應收金額
-		,f20b float --請款金額
-		,f20c float --應付金額
-		--40'重櫃
-		,f40 float
-		,f40a float	
-		,f40b float
-		,f40c float	
-		--20'空櫃
-		,e20 float
-		,e20a float
-		,e20b float
-		,e20c float	
-		--40'空櫃
-		,e40 float
-		,e40a float
-		,e40b float
-		,e40c float	
-		--油桶櫃	
-		,n02 float
-		,n02a float
-		,n02b float
-		,n02c float
-		--20'押運	
-		,n03 float
-		,n03a float
-		,n03b float
-		,n03c float
-		--40'押運
-		,n04 float
-		,n04a float
-		,n04b float
-		,n04c float	
-		--20'OOG附加費
-		,m01 float
-		--40'OOG附加費
-		,m02 float
-		--金額合計
-		,totala float
-		,totalb float
-		,totalc float
-		--備註
+		,x01 float--20'重櫃
+		,x02 float--40'重櫃
+		,x03 float--20'空櫃
+		,x04 float--40'空櫃	
+		,x05 float--油桶櫃	
+		,x06 float--20'押運	
+		,x07 float--40'押運
+		,x08 float--20'超重	
+		,x09 float--40'超重	
+		,x10 float--20'危標	
+		,x11 float--40'危標	
+		,x12 float--20'其他
+		,x13 float--40'其他
+		,x14 float--20'OOG
+		,x15 float--40'OOG
 		,memo nvarchar(max)
 	)
-	insert into @tmpb(gno,pno,custno,cust,noa,v01,typea,datea,bdate,edate,v02,v03
-		,straddrno,straddr,endaddrno,endaddr,memo
-		,f20,f20a,f20b,f20c,f40,f40a,f40b,f40c,e20,e20a,e20b,e20c,e40,e40a,e40b,e40c
-		,n02,n02a,n02b,n02c,n03,n03a,n03b,n03c,n04,n04a,n04b,n04c,m01,m02)
-	select '1' gno,1 pno,custno,cust,noa,v01,typea,datea,bdate,edate,v02,v03
-		,straddrno,straddr,endaddrno,endaddr,memo
-		,sum(isnull(f20,0)),sum(isnull(f20a,0)),sum(isnull(f20b,0)),sum(isnull(f20c,0))
-		,sum(isnull(f40,0)),sum(isnull(f40a,0)),sum(isnull(f40b,0)),sum(isnull(f40c,0))
-		,sum(isnull(e20,0)),sum(isnull(e20a,0)),sum(isnull(e20b,0)),sum(isnull(e20c,0))
-		,sum(isnull(e40,0)),sum(isnull(e40a,0)),sum(isnull(e40b,0)),sum(isnull(e40c,0))
-		,sum(isnull(n02,0)),sum(isnull(n02a,0)),sum(isnull(n02b,0)),sum(isnull(n02c,0))
-		,sum(isnull(n03,0)),sum(isnull(n03a,0)),sum(isnull(n03b,0)),sum(isnull(n03c,0))
-		,sum(isnull(n04,0)),sum(isnull(n04a,0)),sum(isnull(n04b,0)),sum(isnull(n04c,0))
-		,sum(isnull(m01,0)),sum(isnull(m02,0))
+	insert into @tmpb(gno,pno,custno,cust,noa,v01,typea,datea,bdate,edate,v02,v03,straddrno,straddr,endaddrno,endaddr
+		,x01,x02,x03,x04,x05,x06,x07,x08,x09,x10,x11,x12,x13,x14,x15,memo)
+	select '1',1,custno,cust,noa,v01,typea,datea,bdate,edate,v02,v03,straddrno,straddr,endaddrno,endaddr
+		,sum(case when casetype='20~#$F' then isnull(n01,0) else 0 end) x01--20'重櫃
+		,sum(case when casetype='40~#$F' then isnull(n01,0) else 0 end) x02 --40'重櫃
+		,sum(case when casetype='20~#$E' then isnull(n01,0) else 0 end) x03 --20'空櫃
+		,sum(case when casetype='40~#$E' then isnull(n01,0) else 0 end) x04 --40'空櫃	
+		,sum(isnull(n02,0)) x05 --油桶櫃	
+		,sum(case when left(casetype,1)='2' then isnull(n03,0) else 0 end) x06 --20'押運	
+		,sum(case when left(casetype,1)='4' then isnull(n03,0) else 0 end) x07 --40'押運
+		,sum(case when left(casetype,1)='2' then isnull(n04,0) else 0 end) x08 --20'超重	
+		,sum(case when left(casetype,1)='4' then isnull(n04,0) else 0 end) x09 --40'超重	
+		,sum(case when left(casetype,1)='2' then isnull(n05,0) else 0 end) x10 --20'危標	
+		,sum(case when left(casetype,1)='4' then isnull(n05,0) else 0 end) x11 --40'危標	
+		,sum(case when left(casetype,1)='2' then isnull(n06,0) else 0 end) x12 --20'其他
+		,sum(case when left(casetype,1)='4' then isnull(n06,0) else 0 end) x13 --40'其他
+		,sum(case when left(casetype,1)='2' and charindex('-',casetype)>0 then isnull(n03,0) else 0 end) x14 --20'OOG	
+		,sum(case when left(casetype,1)='4' and charindex('-',casetype)>0 then isnull(n03,0) else 0 end) x15 --40'OOG
+		,memo
 	from @tmpa
-	group by custno,cust,noa,v01,typea,datea,bdate,edate,v02,v03
-		,straddrno,straddr,endaddrno,endaddr,memo
+	group by custno,cust,noa,v01,typea,datea,bdate,edate,v02,v03,straddrno,straddr,endaddrno,endaddr,memo
+	----------------------------------------------------------------------------------------------------------------------------
 	--- PLAN ID
 	declare @sel int
 	declare @itemno nvarchar(max)
 	declare @item nvarchar(max)
 	declare @typea nvarchar(20)
+	declare @v01 nvarchar(max)
+	declare @n int
+	declare @custno nvarchar(20)
+	declare @cust nvarchar(50)
+	declare @noa nvarchar(20)
 
 	declare cursor_table cursor for	
-	select sel,custno,cust,noa,v01,typea from @tmpb where gno = '1'
+	select sel,custno,cust,noa,v01,typea from @tmpb where gno = '1' 
 	open cursor_table
 	fetch next from cursor_table
 	into @sel,@custno,@cust,@noa,@v01,@typea
@@ -734,6 +656,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 			close cursor_table2
 			deallocate cursor_table2
 		end
+		else
 		begin
 			update @tmpb set planida = isnull(@v01,'') where sel=@sel
 		end 
@@ -743,29 +666,22 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	end
 	close cursor_table
 	deallocate cursor_table
-
+	
 	-- 合計
 	insert into @tmpb(gno,pno,custno,cust
-		,f20,f20a,f20b,f20c,f40,f40a,f40b,f40c,e20,e20a,e20b,e20c,e40,e40a,e40b,e40c
-		,n02,n02a,n02b,n02c,n03,n03a,n03b,n03c,n04,n04a,n04b,n04c,m01,m02)
+		,x01,x02,x03,x04,x05,x06,x07,x08
+		,x09,x10,x11,x12,x13,x14,x15)
 	select '3' gno,3 pno,custno,cust
-		,sum(isnull(f20,0)),sum(isnull(f20a,0)),sum(isnull(f20b,0)),sum(isnull(f20c,0))
-		,sum(isnull(f40,0)),sum(isnull(f40a,0)),sum(isnull(f40b,0)),sum(isnull(f40c,0))
-		,sum(isnull(e20,0)),sum(isnull(e20a,0)),sum(isnull(e20b,0)),sum(isnull(e20c,0))
-		,sum(isnull(e40,0)),sum(isnull(e40a,0)),sum(isnull(e40b,0)),sum(isnull(e40c,0))
-		,sum(isnull(n02,0)),sum(isnull(n02a,0)),sum(isnull(n02b,0)),sum(isnull(n02c,0))
-		,sum(isnull(n03,0)),sum(isnull(n03a,0)),sum(isnull(n03b,0)),sum(isnull(n03c,0))
-		,sum(isnull(n04,0)),sum(isnull(n04a,0)),sum(isnull(n04b,0)),sum(isnull(n04c,0))
-		,sum(isnull(m01,0)),sum(isnull(m02,0))
+		,sum(isnull(x01,0)),sum(isnull(x02,0)),sum(isnull(x03,0)),sum(isnull(x04,0)),sum(isnull(x05,0))
+		,sum(isnull(x06,0)),sum(isnull(x07,0)),sum(isnull(x08,0)),sum(isnull(x09,0)),sum(isnull(x10,0))
+		,sum(isnull(x11,0)),sum(isnull(x12,0)),sum(isnull(x13,0)),sum(isnull(x14,0)),sum(isnull(x15,0))
 	from @tmpb
 	where pno = 1
 	group by custno,cust
 
-	update @tmpb set totala = isnull(f20a,0)+isnull(f40a,0)+isnull(e20a,0)+isnull(e40a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(m01,0)+isnull(m02,0)
-		,totalb = isnull(f20b,0)+isnull(f40b,0)+isnull(e20b,0)+isnull(e40b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(m01,0)+isnull(m02,0)
-		,totalc = isnull(f20c,0)+isnull(f40c,0)+isnull(e20c,0)+isnull(e40c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(m01,0)+isnull(m02,0)
-
 	--空白行
+	declare @pagecount int = 30
+
 	declare cursor_table cursor for	
 	select custno,cust,count(1) from @tmpb group by custno,cust
 	open cursor_table
@@ -785,6 +701,7 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	close cursor_table
 	deallocate cursor_table
 
+	-------------------------------------------------------------------------------------------------------------------
 	select gno
 		, @t_bdate + '～' + @t_edate a01
 		, '客戶：' + case when @t_option = '1' then '新實' else cust end a02
@@ -797,25 +714,22 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 		,v03 b06
 		,straddr b07
 		,endaddr b08
-		,case when f20 is null then '' else dbo.getComma(f20,-1) end b09
-		,case when f40 is null then '' else dbo.getComma(f40,-1) end b10
-		,case when e20 is null then '' else dbo.getComma(e20,-1) end b11
-		,case when e40 is null then '' else dbo.getComma(e40,-1) end b12
-		,case when n02 is null then '' else dbo.getComma(n02,-1) end b13
-		,case when n03 is null then '' else dbo.getComma(n03,-1) end b14
-		,case when n04 is null then '' else dbo.getComma(n04,-1) end b15
-		-- 應收、請款
-		,case when @t_option != '1' then dbo.getComma(f20a,-1) else dbo.getComma(f20b,-1) end b16
-		,case when @t_option != '1' then dbo.getComma(f40a,-1) else dbo.getComma(f40b,-1) end b17
-		,case when @t_option != '1' then dbo.getComma(e20a,-1) else dbo.getComma(e20b,-1) end b18
-		,case when @t_option != '1' then dbo.getComma(e40a,-1) else dbo.getComma(e40b,-1) end b19
-		,case when @t_option != '1' then dbo.getComma(n02a,-1) else dbo.getComma(n02b,-1) end b20
-		,case when @t_option != '1' then dbo.getComma(n03a,-1) else dbo.getComma(n03b,-1) end b21
-		,case when @t_option != '1' then dbo.getComma(n04a,-1) else dbo.getComma(n04b,-1) end b22	
-		,dbo.getComma(m01,-1) b23
-		,dbo.getComma(m02,-1) b24
-		,memo b25
-		,case when @t_option != '1' then dbo.getComma(totala,-1) else dbo.getComma(totalb,-1) end b26
+		,case when x01 is null then '' else dbo.getComma(x01,-1) end b09
+		,case when x02 is null then '' else dbo.getComma(x02,-1) end b10
+		,case when x03 is null then '' else dbo.getComma(x03,-1) end b11
+		,case when x04 is null then '' else dbo.getComma(x04,-1) end b12
+		,case when x05 is null then '' else dbo.getComma(x05,-1) end b13
+		,case when x06 is null then '' else dbo.getComma(x06,-1) end b14
+		,case when x07 is null then '' else dbo.getComma(x07,-1) end b15
+		,case when x08 is null then '' else dbo.getComma(x08,-1) end b16
+		,case when x09 is null then '' else dbo.getComma(x09,-1) end b17
+		,case when x10 is null then '' else dbo.getComma(x10,-1) end b18
+		,case when x11 is null then '' else dbo.getComma(x11,-1) end b19
+		,case when x12 is null then '' else dbo.getComma(x12,-1) end b20
+		,case when x13 is null then '' else dbo.getComma(x13,-1) end b21
+		,case when x14 is null then '' else dbo.getComma(x14,-1) end b22
+		,case when x15 is null then '' else dbo.getComma(x15,-1) end b23
+		,memo b24
 	from @tmpb
 	order by custno,pno,noa,typea,gno,sel;
 

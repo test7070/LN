@@ -18,12 +18,12 @@
 			q_tables = 's';
 			var q_name = "borr";
 			var q_readonly = ['txtNoa','txtWorker', 'txtWorker2','txtOrdeno'
-				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'];
+				,'textA01','textA02','textA03','textA04','textA05','textA06'];
 			var q_readonlys = [];
 			var q_readonlyt = [];
 			var bbmNum = new Array();
 			var bbmMask = [];
-			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0],['txtN03',10,0],['txtN04',10,0],['txtN05',10,0],['txtN06',10,0],['txtN07',10,0]);
+			var bbsNum = new Array(['txtN01',10,0],['txtN02',10,0],['txtN03',10,0],['txtN04',10,0],['txtN05',10,0],['txtN06',10,0]);
 			var bbsMask = new Array();
 			var bbtNum  = new Array(); 
 			var bbtMask = new Array();
@@ -138,7 +138,6 @@
                     $('#txtN04_'+i).change(function(e){refreshBbs();});
                     $('#txtN05_'+i).change(function(e){refreshBbs();});
                     $('#txtN06_'+i).change(function(e){refreshBbs();});
-                    $('#txtN07_'+i).change(function(e){refreshBbs();});
 				}
 				_bbsAssign();
 				$('#tbbs').find('tr.data').children().hover(function(e){
@@ -247,15 +246,16 @@
 			}
 			
 			function refreshBbs(){
-				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0;
+				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0;
 				for(var i=0;i<q_bbsCount;i++){
-					t01 += q_float('txtN01_'+i);
+					//櫃型  casetype :  OOG的不要算,即 21-1、21-2.....都不算
+					if($('#cmbCasetype_'+i).val().indexOf('-')<0)
+						t01 += q_float('txtN01_'+i);
 					t02 += q_float('txtN02_'+i);
 					t03 += q_float('txtN03_'+i);
 					t04 += q_float('txtN04_'+i);
 					t05 += q_float('txtN05_'+i);
 					t06 += q_float('txtN06_'+i);
-					t07 += q_float('txtN07_'+i);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
@@ -263,7 +263,6 @@
 				$('#textA04').val(t04);
 				$('#textA05').val(t05);
 				$('#textA06').val(t06);
-				$('#textA07').val(t07);
 			}
 
 			function readonly(t_para, empty) {
@@ -607,7 +606,6 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>油桶櫃</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>押運</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>OOG</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>超重</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>危標</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>其他</a></td>
@@ -635,7 +633,6 @@
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA04" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA05" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA06" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><input id="textA07" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"> </td>
 				</tr>
 			</table>
@@ -657,7 +654,6 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>數量</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>油桶櫃</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>押運</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>OOG</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>超重</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>危標</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:70px;"><a>其他</a></td>
@@ -696,7 +692,6 @@
 					<td style="width:70px;"><input type="text" id="txtN04.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:70px;"><input type="text" id="txtN05.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:70px;"><input type="text" id="txtN06.*" style="width:95%;text-align: right;"/></td>
-					<td style="width:70px;"><input type="text" id="txtN07.*" style="width:95%;text-align: right;"/></td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
 			</table>
