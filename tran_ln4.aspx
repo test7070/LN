@@ -86,7 +86,7 @@
 			function mainPost() {
 				bbmMask = new Array(['txtDatea', r_picd],['txtBegindate', r_picd],['txtEnddate',r_picd],['txtCheckno',r_picd]);
 				q_mask(bbmMask);
-				document.title = '外車登帳作業';
+				document.title = '外車登帳(移櫃)';
 				
 				q_cmbParse("cmbCasetype", " ,20'E,40'E,20'F,40'F","s");
 				
@@ -712,7 +712,7 @@
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px;"><span style="display:block;width:50px;height:5px;"> </span></td>
 					<td align="center" style="width:50px;"><span style="display:block;width:50px;height:5px;"> </span></td>
-					<td align="center" colspan="1" rowspan="1" style="width:30px;"><a>請<br>款</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:30px;"><span style="display:block;width:30px;height:5px;"><a>請<br>款</a></span></td>
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號(一)</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號(二)</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
