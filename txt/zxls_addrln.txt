@@ -92,7 +92,6 @@ zxls_addrln:--zxls_addrln 2018/05/25
 	left join addrs c on b.noa=c.noa
 	where b.noa is not null
 
-
 	-- 有錯誤就放棄
 	Begin Transaction [Trans_Name]
 	begin try
@@ -128,16 +127,16 @@ zxls_addrln:--zxls_addrln 2018/05/25
 		from @tmpa a
 		left join addr b on a.rateId=b.noa
 		left join addr2 c on a.straddrno=c.noa
-		left join addr2 d on a.endaddrno=c.noa
+		left join addr2 d on a.endaddrno=d.noa
 		--  endaddr -> straddr
 		insert into addr(noa,addr,productno,straddrno,straddr,endaddrno,endaddr)
-		select a.rateId+'-'+a.straddrno+'-'+a.endaddrno noa
+		select a.rateId+'-'+a.endaddrno+'-'+a.straddrno noa
 			,b.addr addr,'' productno
 			,a.endaddrno,c.addr straddr,a.straddrno,d.addr endaddr
 		from @tmpa a
 		left join addr b on a.rateId=b.noa
 		left join addr2 c on a.endaddrno=c.noa
-		left join addr2 d on a.straddrno=c.noa
+		left join addr2 d on a.straddrno=d.noa
 
 		----addrs
 		insert into addrs(noa,noq,datea,custprice,tggprice,driverprice,salesno,sales,memo,custunit,custno,cust,typea)
