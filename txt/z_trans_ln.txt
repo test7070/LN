@@ -536,6 +536,16 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	update @tmpa set cust = b.nick
 	from @tmpa a
 	left join cust b on a.custno=b.noa 
+	
+	update @tmpa set typea=case when len(isnull(a.typea,''))=0 then b.typea else isnull(a.typea,'') end
+	from @tmpa a
+	outer apply(select top 1 x.* 
+		from addrs x
+		left join addr y on x.noa=y.noa
+		where a.straddrno=y.straddrno and a.endaddrno=y.endaddrno
+			and x.custno=a.custno and x.custunit=a.casetype and x.salesno=a.cardealno and x.datea<=a.datea 
+			order by x.datea desc) b
+	--where isnull(a.n01,0)!=0
 	-----------------------------------------------------------------------------------------------------------------------
 	declare @tmpb table(
 		sel int identity(1,1)
