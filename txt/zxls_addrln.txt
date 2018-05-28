@@ -92,6 +92,8 @@ zxls_addrln:--zxls_addrln 2018/05/25
 	left join addrs c on b.noa=c.noa
 	where b.noa is not null
 
+	--注意!!  2018/05/28
+	update  #zxls_addr_ln2 set custunit = replace(custunit,"'","~#$")
 	-- 有錯誤就放棄
 	Begin Transaction [Trans_Name]
 	begin try

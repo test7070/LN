@@ -1,4 +1,307 @@
-﻿z_trans_ln12: --z_trans_ln12
+﻿z_trans_ln13:--z_trans_ln13	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_straddrno nvarchar(20) = case when '#non' = [13] then '' else [13] end
+	declare @t_endaddrno nvarchar(20) = case when '#non' = [14] then '' else [14] end
+	declare @t_option nvarchar(max) = case when '#non' = [17] then '' else [17] end
+	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
+	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
+	declare @t_bno nvarchar(20) = case when '#non' = [22] then '' else [22] end
+	declare @t_eno nvarchar(20) = case when '#non' = [23] then char(255) else [23] end
+	-----------------------------------------------------------------------------------
+	IF OBJECT_ID('tempdb..#z_trans_ln13')is not null
+	BEGIN
+		drop table #z_trans_ln13
+	END
+	create table #z_trans_ln13(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,datea nvarchar(20)
+		,typea nvarchar(20)
+		,v02 nvarchar(50)
+		,v03 nvarchar(50)
+		,straddrno nvarchar(20)
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+		,casetype nvarchar(20)
+		,custno nvarchar(20)
+		,cardealno nvarchar(20)
+		,n01 float--數量	
+		,n02 float--油桶櫃
+		,n03 float--押運	
+		,n04 float--超重	
+		,n05 float--危標	
+		,n06 float--其他
+
+		--應收
+		,n01a float
+		,n02a float
+		,n03a float
+		,n03a2 float
+		,n03a4 float
+		,n04a float
+		,n04a2 float
+		,n04a4 float
+		,n05a float
+		,n05a2 float
+		,n05a4 float
+		,n06a float
+		,n06a2 float
+		,n06a4 float
+		--請款
+		,n01b float
+		,n02b float
+		,n03b float
+		,n03b2 float
+		,n03b4 float
+		,n04b float
+		,n04b2 float
+		,n04b4 float
+		,n05b float
+		,n05b2 float
+		,n05b4 float
+		,n06b float
+		,n06b2 float
+		,n06b4 float
+		--應付
+		,n01c float
+		,n02c float
+		,n03c float
+		,n03c2 float
+		,n03c4 float
+		,n04c float
+		,n04c2 float
+		,n04c4 float
+		,n05c float
+		,n05c2 float
+		,n05c4 float
+		,n06c float
+		,n06c2 float
+		,n06c4 float
+	)
+	insert into #z_trans_ln13(noa,noq,datea,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype,custno,cardealno
+		,n01,n02,n03,n04,n05,n06)
+	select a.noa,a.noq,b.datea,'' typea,b.v02,b.v03,a.addrno,a.addr,a.addrno2,a.addr2,a.casetype,b.custno,a.cardealno
+		,a.n01,a.n02,a.n03,a.n04,a.n05,a.n06
+	from borrs a
+	left join borr b on a.noa=b.noa
+	where b.vccno='tran_ln3'
+	and isnull(b.custno,'') between @t_bcustno and @t_ecustno
+	and isnull(b.datea,'') between @t_bdate and @t_edate
+	and isnull(b.noa,'') between @t_bno and @t_eno
+	and (len(@t_straddrno)=0 or a.addrno=@t_straddrno)
+	and (len(@t_endaddrno)=0 or a.addrno2=@t_endaddrno)
+	-----------------------------------------------------------------------------------------------------------
+	update #z_trans_ln13 set typea=c.typea
+		,n01a = round(n01 * c.custprice,0)
+		,n01b = round(n01 * c.tggprice,0)
+		,n01c = round(n01 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+
+	--油桶櫃數量 n02
+	update #z_trans_ln13 set 
+		n02a = round(n02 * c.custprice,0)
+		,n02b = round(n02 * c.tggprice,0)
+		,n02c = round(n02 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+	--20'押運 n03
+	update #z_trans_ln13 set
+		n03a2 = round(n03 * c.custprice,0)
+		,n03b2 = round(n03 * c.tggprice,0)
+		,n03c2 = round(n03 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+	--40'押運 n03
+	update #z_trans_ln13 set
+		n03a4 = round(n03 * c.custprice,0)
+		,n03b4 = round(n03 * c.tggprice,0)
+		,n03c4 = round(n03 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null	
+	
+	--20'超重 n04
+	update #z_trans_ln13 set
+		n04a2 = round(n04 * c.custprice,0)
+		,n04b2 = round(n04 * c.tggprice,0)
+		,n04c2 = round(n04 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='20~#$超重' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+
+	--40'超重 n04 	 
+	update #z_trans_ln13 set
+		n04a4 = round(n04 * c.custprice,0)
+		,n04b4 = round(n04 * c.tggprice,0)
+		,n04c4 = round(n04 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='40~#$超重' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+
+	--20'危標 n05
+	update #z_trans_ln13 set
+		n05a2 = round(n05 * c.custprice,0)
+		,n05b2 = round(n05 * c.tggprice,0)
+		,n05c2 = round(n05 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='20~#$危標' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+
+	--40'危標 n05	 
+	update #z_trans_ln13 set
+		n05a4 = round(n05 * c.custprice,0)
+		,n05b4 = round(n05 * c.tggprice,0)
+		,n05c4 = round(n05 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='40~#$危標' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+	
+	--20'其他 n06
+	update #z_trans_ln13 set
+		n06a2 = round(n06 * c.custprice,0)
+		,n06b2 = round(n06 * c.tggprice,0)
+		,n06c2 = round(n06 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+	
+	--40'其他 n06
+	update #z_trans_ln13 set
+		n06a4 = round(n06 * c.custprice,0)
+		,n06b4 = round(n06 * c.tggprice,0)
+		,n06c4 = round(n06 * c.driverprice,0)
+	from #z_trans_ln13 a
+	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
+	outer apply(select top 1 * from addrs 
+		where noa=b.noa and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c
+	where b.noa is not null
+	-------------------------------------------------------------------------------------------------------------
+	update #z_trans_ln13 set n03a = isnull(n03a2,0) + isnull(n03a4,0),n03b = isnull(n03b2,0) + isnull(n03b4,0),n03c = isnull(n03c2,0) + isnull(n03c4,0)
+		,n04a = isnull(n04a2,0) + isnull(n04a4,0),n04b = isnull(n04b2,0) + isnull(n04b4,0),n04c = isnull(n04c2,0) + isnull(n04c4,0)
+		,n05a = isnull(n05a2,0) + isnull(n05a4,0),n05b = isnull(n05b2,0) + isnull(n05b4,0),n05c = isnull(n05c2,0) + isnull(n05c4,0)
+		,n06a = isnull(n06a2,0) + isnull(n06a4,0),n06b = isnull(n06b2,0) + isnull(n06b4,0),n06c = isnull(n06c2,0) + isnull(n06c4,0)
+	
+	update #z_trans_ln13 set casetype=replace(casetype,'~#$',"'")
+	----------------------------------------------------------------------------------------------------------------
+	declare @tmpb table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,recno int
+		,noa nvarchar(20)--電腦編號	
+		,typea nvarchar(20)--科目	
+		,v02 nvarchar(50)--船名	
+		,v03 nvarchar(50)--航次	
+		,straddrno nvarchar(20)--起點	
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)--訖點	
+		,endaddr nvarchar(50)
+		,casetype nvarchar(20)--規格	
+		,mount01 float--自運數量
+		,money01 float--自運收入	
+		,mount02 float--外車數量
+		,money02 float--應付外車
+		,money03 float--代運收入
+	
+		,tmount float--數量小計
+		,tmoney float--合計
+	)
+	if len(@t_option)>0
+	begin
+		insert into @tmpb(gno,pno,noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype
+			,mount01,money01,mount02,money02,money03)
+		select '1',1,noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype
+			,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
+			,sum(case when left(cardealno,1)='A' then isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(n05b,0)+isnull(n06b,0) else 0 end) money01
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0) end) mount02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(n05c,0)+isnull(n06c,0) end) money02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01b-n01c,0)+isnull(n02b-n02c,0)+isnull(n03b-n03c,0)+isnull(n04b-n04c,0)+isnull(n05b-n05c,0)+isnull(n06b-n06c,0) end) money03
+		from #z_trans_ln13
+		group by noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype
+	end
+	else
+	begin
+		insert into @tmpb(gno,pno,noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype
+			,mount01,money01,mount02,money02,money03)
+		select '1',1,noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype
+			,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
+			,sum(case when left(cardealno,1)='A' then isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0) else 0 end) money01
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0) end) mount02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(n05c,0)+isnull(n06c,0) end) money02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01a-n01c,0)+isnull(n02a-n02c,0)+isnull(n03a-n03c,0)+isnull(n04a-n04c,0)+isnull(n05a-n05c,0)+isnull(n06a-n06c,0) end) money03
+		from #z_trans_ln13
+		group by noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype
+	end
+	update @tmpb set tmount = isnull(mount01,0)+isnull(mount02,0)
+		,tmoney = isnull(money01,0)+isnull(money02,0)+isnull(money03,0)
+	--i之後 CASETYPE  可能會有OOG的  21-1,21-2 ...
+	update @tmpb set recno=b.recno
+	from @tmpb a
+	left join(select sel,ROW_NUMBER()over(order by noa,substring(casetype,2,1),casetype) recno from @tmpb ) b on a.sel=b.sel
+
+	--合計
+	insert into @tmpb(gno,pno,mount01,money01,mount02,money02,money03,tmount,tmoney)
+	select '2',2,sum(isnull(mount01,0)),sum(isnull(money01,0))
+		,sum(isnull(mount02,0)),sum(isnull(money02,0))
+		,sum(isnull(money03,0))
+		,sum(isnull(tmount,0)),sum(isnull(tmoney,0))
+	from @tmpb
+
+	select gno
+		,case when len(@t_option)>0 then '新實' else '' end b01
+		,recno a01
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a02 
+		,typea a03
+		,v02 a04
+		,v03 a05
+		,straddr a06
+		,endaddr a07
+		,casetype a08
+		,dbo.getComma(mount01,-1) a09
+		,dbo.getComma(money01,-1) a10
+		,dbo.getComma(mount02,-1) a11
+		,dbo.getComma(money02,-1) a12
+		,dbo.getComma(money03,-1) a13
+		,dbo.getComma(tmount,-1) a14
+		,dbo.getComma(tmoney,-1) a15
+	from @tmpb
+	order by pno,recno
+
+	drop table #z_trans_ln13;
+
+
+z_trans_ln12: --z_trans_ln12
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
@@ -441,8 +744,8 @@
 		,round([money]*0.05,0) b11--TAX_AMOUNT	
 		,[money]+round([money]*0.05,0) b12--TOL_AMOUNT	
 		,buyer b13--AREA
-
-		,noa c01--INVOICE_SEQ	
+		
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" c01--INVOICE_SEQ	 
 		,'TWKHH' c02--PLACE_CODE	
 		,typea c03--NEW_ITEM	
 		,isnull(v03,'')+isnull(v02,'') c04--TFC_CODE	
