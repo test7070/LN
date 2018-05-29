@@ -1,4 +1,4 @@
-﻿z_trans_ln14:--z_trans_ln14	
+﻿z_trans_ln15:--z_trans_ln15
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
@@ -7,24 +7,13 @@
 	declare @t_user nvarchar(max) = '[4]'
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
-	declare @t_straddrno nvarchar(20) = case when '#non' = [13] then '' else [13] end
-	declare @t_endaddrno nvarchar(20) = case when '#non' = [14] then '' else [14] end
-	declare @t_option nvarchar(max) = case when '#non' = [17] then '' else [17] end
-	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
-	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
-	declare @t_bno nvarchar(20) = case when '#non' = [22] then '' else [22] end
-	declare @t_eno nvarchar(20) = case when '#non' = [23] then char(255) else [23] end
-
-	SET QUOTED_IDENTIFIER OFF 
-	declare @t_bdate nvarchar(20) = '2018/01/01'
-	declare @t_edate nvarchar(20) = '2018/01/31'
 	-------------------------------------------------------------------------------------------------------------
 	-- tran_ln3 場外移櫃
-	IF OBJECT_ID('tempdb..#z_trans_ln14a')is not null
+	IF OBJECT_ID('tempdb..#z_trans_ln15a')is not null
 	BEGIN
-		drop table #z_trans_ln14a
+		drop table #z_trans_ln15a
 	END
-	create table #z_trans_ln14a(
+	create table #z_trans_ln15a(
 		sel int identity(1,1)
 		,noa nvarchar(20)
 		,straddrno nvarchar(20)
@@ -37,20 +26,20 @@
 		,n05 float--危標	
 		,n06 float--其他
 	)
-	insert into #z_trans_ln14a(noa,straddrno,endaddrno,casetype,n01,n02,n03,n04,n05,n06)
+	insert into #z_trans_ln15a(noa,straddrno,endaddrno,casetype,n01,n02,n03,n04,n05,n06)
 	select a.noa,a.addrno,a.addrno2,a.casetype,a.n01,a.n02,a.n03,a.n04,a.n05,a.n06
 	from borrs a
 	left join borr b on a.noa=b.noa
 	where b.vccno = 'tran_ln3'
 	and b.datea between @t_bdate and @t_edate
 
-	update #z_trans_ln14a set casetype = replace(casetype,'~#$',"'")
+	update #z_trans_ln15a set casetype = replace(casetype,'~#$',"'")
 	--------------------------------------------------------------------------------------------
-	IF OBJECT_ID('tempdb..#z_trans_ln14b')is not null
+	IF OBJECT_ID('tempdb..#z_trans_ln15b')is not null
 	BEGIN
-		drop table #z_trans_ln14b
+		drop table #z_trans_ln15b
 	END
-	create table #z_trans_ln14b(
+	create table #z_trans_ln15b(
 		sel int identity(1,1)
 		,gno nvarchar(20)
 		,pno int
@@ -77,9 +66,18 @@
 		,x06 float--OOG	
 		,x07 float--其他費用
 
+		--未付數量
+		,y01 float--數量	
+		,y02 float--油桶櫃	
+		,y03 float--押運	
+		,y04 float--儀檢
+		,y05 float--超重	
+		,y06 float--危標	
+		,y07 float--OOG
+		,y08 float--其他
 	)
 	-- 除20'E,40'E,20'F,40'F  其餘都當作OOG
-	insert into #z_trans_ln14b(gno,pno,noa,straddrno,endaddrno,m01,m02,m03,m04,m05,m06,m07)
+	insert into #z_trans_ln15b(gno,pno,noa,straddrno,endaddrno,m01,m02,m03,m04,m05,m06,m07)
 	select '1' gno,1 pno,noa,straddrno,endaddrno
 		,sum(isnull(case casetype when "20'F" then n01 when "20'E" then n01 when "40'F" then n01 when "40'E" then n01 else 0 end,0))
 		,sum(isnull(n02,0))
@@ -88,7 +86,7 @@
 		,sum(isnull(n05,0))
 		,sum(isnull(n06,0))
 		,sum(isnull(case casetype when "20'F" then 0 when "20'E" then 0 when "40'F" then 0 when "40'E" then 0 else n01 end,0))
-	from #z_trans_ln14a
+	from #z_trans_ln15a
 	group by noa,straddrno,endaddrno
 	------------------------------------------------------------------------------------------------------------------------------
 	declare @noa nvarchar(20)
@@ -97,7 +95,7 @@
 	declare @a01 float,@a02 float,@a03 float,@a04 float,@a05 float,@a06 float,@a07 float
 
 	declare cursor_table cursor for	
-	select noa from #z_trans_ln14b group by noa
+	select noa from #z_trans_ln15b group by noa
 	open cursor_table
 	fetch next from cursor_table
 	into @noa
@@ -122,14 +120,14 @@
 		into @straddrno,@endaddrno,@a01,@a02,@a03,@a04,@a05,@a06,@a07
 		while(@@FETCH_STATUS <> -1)
 		begin	
-			if exists(select * from #z_trans_ln14b where noa=@noa and straddrno=@straddrno and endaddrno=@endaddrno)
+			if exists(select * from #z_trans_ln15b where noa=@noa and straddrno=@straddrno and endaddrno=@endaddrno)
 			begin
-				update #z_trans_ln14b set x01 = @a01,x02 = @a02,x03 = @a03,x04 = @a04
+				update #z_trans_ln15b set x01 = @a01,x02 = @a02,x03 = @a03,x04 = @a04
 					,x05 = @a05,x06 = @a06,x07 = @a07 where noa=@noa and straddrno=@straddrno and endaddrno=@endaddrno
 			end
 			else 
 			begin
-				insert into #z_trans_ln14b(gno,pno,noa,straddrno,endaddrno,x01,x02,x03,x04,x05,x06,x07)
+				insert into #z_trans_ln15b(gno,pno,noa,straddrno,endaddrno,x01,x02,x03,x04,x05,x06,x07)
 				select '1',1,@noa,@straddrno,@endaddrno,@a01,@a02,@a03,@a04,@a05,@a06,@a07
 			end
 
@@ -146,28 +144,73 @@
 	close cursor_table
 	deallocate cursor_table
 	---------------------------------------------------------------------------------------------------------------------------
-	update #z_trans_ln14b set straddr=b.addr
-	from #z_trans_ln14b a
+	update #z_trans_ln15b set straddr=b.addr
+	from #z_trans_ln15b a
 	left join addr2 b on a.straddrno=b.noa
-	update #z_trans_ln14b set endaddr=b.addr
-	from #z_trans_ln14b a
+	update #z_trans_ln15b set endaddr=b.addr
+	from #z_trans_ln15b a
 	left join addr2 b on a.endaddrno=b.noa
 
-	update #z_trans_ln14b set recno=b.recno
-	from #z_trans_ln14b a
-	left join (select sel,ROW_NUMBER()over(order by pno,noa,straddrno,endaddrno) recno from #z_trans_ln14b) b on a.sel=b.sel
+	update #z_trans_ln15b set recno=b.recno
+	from #z_trans_ln15b a
+	left join (select sel,ROW_NUMBER()over(order by pno,noa,straddrno,endaddrno) recno from #z_trans_ln15b) b on a.sel=b.sel
 
-	insert into #z_trans_ln14b(gno,pno,m01,m02,m03,m04,m05,m06,m07,x01,x02,x03,x04,x05,x06,x07)
+	update #z_trans_ln15b set y01 = isnull(m01,0)-isnull(x01,0)--數量	
+		,y02 = isnull(m02,0)-isnull(x02,0)--油桶櫃	
+		,y03 = isnull(m03,0)-isnull(x03,0)--押運	
+		,y04 = -isnull(x04,0)--儀檢
+		,y05 = isnull(m04,0)--超重	
+		,y06 = isnull(m05,0)-isnull(x05,0)--危標	
+		,y07 = isnull(m07,0)-isnull(x06,0)--OOG
+		,y08 = isnull(m06,0)-isnull(x07,0)--其他
+
+
+	insert into #z_trans_ln15b(gno,pno,m01,m02,m03,m04,m05,m06,m07,x01,x02,x03,x04,x05,x06,x07
+		,y01,y02,y03,y04,y05,y06,y07,y08)
 	select '2',2
 		,sum(isnull(m01,0)),sum(isnull(m02,0)),sum(isnull(m03,0)),sum(isnull(m04,0)),sum(isnull(m05,0)),sum(isnull(m06,0)),sum(isnull(m07,0))
 		,sum(isnull(x01,0)),sum(isnull(x02,0)),sum(isnull(x03,0)),sum(isnull(x04,0)),sum(isnull(x05,0)),sum(isnull(x06,0)),sum(isnull(x07,0))
-	from #z_trans_ln14b
+		,sum(isnull(y01,0)),sum(isnull(y02,0)),sum(isnull(y03,0)),sum(isnull(y04,0))
+		,sum(isnull(y05,0)),sum(isnull(y06,0)),sum(isnull(y07,0)),sum(isnull(y08,0))
+	from #z_trans_ln15b
 	where pno=1
 
-	select * from #z_trans_ln14b order by pno,noa,straddrno,endaddrno
+	select gno
+		,case when @t_bdate=@t_edate then @t_bdate else @t_bdate + ' ~ '+ @t_edate end x01
+		,recno a01
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a02 
+		,straddr a03
+		,endaddr a04
 
-	drop table #z_trans_ln14a
-	drop table #z_trans_ln14b;
+		,dbo.getComma(m01,-1) b01--數量	
+		,dbo.getComma(m02,-1) b02--油桶櫃	
+		,dbo.getComma(m03,-1) b03--押運	
+		,dbo.getComma(m04,-1) b04--超重	
+		,dbo.getComma(m05,-1) b05--危標	
+		,dbo.getComma(m07,-1) b06--OOG
+		,dbo.getComma(m06,-1) b07--其他
+
+		,dbo.getComma(x01,-1) c01--數量	
+		,dbo.getComma(x02,-1) c02--油桶櫃	
+		,dbo.getComma(x03,-1) c03--押運櫃
+		,dbo.getComma(x04,-1) c04--儀檢
+		,dbo.getComma(x05,-1) c05--危標
+		,dbo.getComma(x06,-1) c06--OOG	
+		,dbo.getComma(x07,-1) c07--其他費用
+		 
+		,dbo.getComma(y01,-1) d01--數量
+		,dbo.getComma(y02,-1) d02--油桶櫃
+		,dbo.getComma(y03,-1) d03--押運	
+		,dbo.getComma(y04,-1) d04--儀檢
+		,dbo.getComma(y05,-1) d05--超重	
+		,dbo.getComma(y06,-1) d06--危標	
+		,dbo.getComma(y07,-1) d07--OOG
+		,dbo.getComma(y08,-1) d08--其他
+	from #z_trans_ln15b 
+	order by pno,noa,straddrno,endaddrno
+
+	drop table #z_trans_ln15a
+	drop table #z_trans_ln15b;
 
 z_trans_ln13:--z_trans_ln13	
 	SET QUOTED_IDENTIFIER OFF
