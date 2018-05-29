@@ -36,6 +36,7 @@ z_tran_ln402:--z_tran_ln402
 		,chk4 bit --borrgs 儀檢
 		,chk5 bit --borrgs 危標
 		,total2 float --borrgs OOG
+		,n16 float --其他費用
 		,memo nvarchar(max) --borrgs
 		,ordeno1 nvarchar(30)--borrgs
 		,ordeno2 nvarchar(30)--borrgs
@@ -43,10 +44,10 @@ z_tran_ln402:--z_tran_ln402
 		,[money] float
 	)
 	insert into @tmpa(gno,pno,cardealno,noa,datea,caseno1,caseno2,casetype
-		,n01,chk1,chk2,chk3,chk4,chk5,total2
+		,n01,chk1,chk2,chk3,chk4,chk5,total2,n16
 		,memo,ordeno1,ordeno2)
 	select '1',1,b.worker,b.noa,b.datea,a.caseno,a.checkno,a.casetype
-		,a.n01,a.chk1,a.chk2,a.chk3,a.chk4,a.chk5,a.total2
+		,a.n01,a.chk1,a.chk2,a.chk3,a.chk4,a.chk5,a.total2,a.n16
 		,a.memo,a.ordeno1,a.ordeno2
 	from borrgs a
 	left join borrg b on a.noa=b.noa
@@ -110,7 +111,7 @@ z_tran_ln402:--z_tran_ln402
 	declare @casetype nvarchar(20)
 	declare @straddrno nvarchar(30)
 	declare @endaddrno nvarchar(30)
-	declare @n01 float,@total2 float
+	declare @n01 float,@total2 float,@n16 float
 	declare @chk1 bit,@chk2 bit,@chk3 bit,@chk4 bit,@chk5 bit
 	
 	declare @price float,@money float
@@ -118,13 +119,13 @@ z_tran_ln402:--z_tran_ln402
 	
 	declare cursor_table cursor for
 	select sel,datea,casetype,straddr,endaddr
-		,n01,isnull(chk1,0),isnull(chk2,0),isnull(chk3,0),isnull(chk4,0),isnull(chk5,0),total2 
+		,n01,isnull(chk1,0),isnull(chk2,0),isnull(chk3,0),isnull(chk4,0),isnull(chk5,0),total2,n16 
 		from @tmpa 
 		where isnull(chk1,0)=1 -- 只計算請款的
 	open cursor_table
 	fetch next from cursor_table
 	into @sel,@datea,@casetype,@straddrno,@endaddrno
-		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2 
+		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16
 	while(@@FETCH_STATUS <> -1)
 	begin
 		select @price = 0, @money = 0
@@ -198,12 +199,12 @@ z_tran_ln402:--z_tran_ln402
 		
 		fetch next from cursor_table
 		into @sel,@datea,@casetype,@straddrno,@endaddrno
-		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2 
+		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16 
 	end
 	close cursor_table
 	deallocate cursor_table
 	
-	update @tmpa set [money]=round(ISNULL(n01,0)*ISNULL(price,0),0) + ISNULL(total2,0)
+	update @tmpa set [money]=round(ISNULL(n01,0)*ISNULL(price,0),0) + ISNULL(total2,0) + ISNULL(n16,0)
 	------------------------------------------------------------------------------------------------------------
 	declare @tmpb table(
 		sel int identity(1,1)
@@ -221,6 +222,7 @@ z_tran_ln402:--z_tran_ln402
 		,chk4 int
 		,chk5 int
 		,total2 float
+		,n16 float
 		,[money] float
 		
 		,tax float
@@ -239,7 +241,7 @@ z_tran_ln402:--z_tran_ln402
 	
 	update @tmpb set n01=ISNULL(b.n01,0)
 		,chk2=ISNULL(b.chk2,0),chk3=ISNULL(b.chk3,0),chk4=ISNULL(b.chk4,0),chk5=ISNULL(b.chk5,0)
-		,total2=ISNULL(b.total2,0),[money]=ISNULL(b.[money],0)
+		,total2=ISNULL(b.total2,0),n16=isnull(b.n16,0),[money]=ISNULL(b.[money],0)
 	from @tmpb a
 	left join(select cardealno,cardeal,noa,straddr,endaddr,casetype 
 		,SUM(ISNULL(n01,0)) n01 
@@ -248,6 +250,7 @@ z_tran_ln402:--z_tran_ln402
 		,SUM(case when isnull(chk4,0)=1 then 1 else 0 end) chk4
 		,SUM(case when isnull(chk5,0)=1 then 1 else 0 end) chk5
 		,SUM(ISNULL(total2,0)) total2
+		,SUM(ISNULL(n16,0)) n16
 		,SUM(ISNULL([money],0)) [money]
 	from @tmpa 
 	group by cardealno,cardeal,noa,straddr,endaddr,casetype) b 
@@ -323,9 +326,10 @@ z_tran_ln402:--z_tran_ln402
 		,dbo.getComma(chk3,-1) a07--油櫃	
 		,dbo.getComma(chk4,-1) a08--押運	
 		,dbo.getComma(chk5,-1) a09--危險櫃	
-		,dbo.getComma(total2,-1) a10--附加費	
-		,dbo.getComma([money],-1) a11--運費小計	
-		,'' a12--備註	
+		,dbo.getComma(total2,-1) a10--OOG	
+		,dbo.getComma(n16,-1) a11--其他費用
+		,dbo.getComma([money],-1) a12--運費小計	
+		,'' a13--備註	
 		,dbo.getComma([money],-1) c01
 		,dbo.getComma([tax],-1) c02
 		,dbo.getComma([total],-1) c03
@@ -369,6 +373,7 @@ z_tran_ln401:--z_tran_ln401
 		,chk4 bit --borrgs 儀檢
 		,chk5 bit --borrgs 危標
 		,total2 float --borrgs OOG
+		,n16 float--其他費用
 		,memo nvarchar(max) --borrgs
 		,ordeno1 nvarchar(30)--borrgs
 		,ordeno2 nvarchar(30)--borrgs
@@ -376,10 +381,10 @@ z_tran_ln401:--z_tran_ln401
 		,[money] float
 	)
 	insert into @tmpa(gno,pno,cardealno,noa,datea,caseno1,caseno2,casetype
-		,n01,chk1,chk2,chk3,chk4,chk5,total2
+		,n01,chk1,chk2,chk3,chk4,chk5,total2,n16
 		,memo,ordeno1,ordeno2)
 	select '1',1,b.worker,b.noa,b.datea,a.caseno,a.checkno,a.casetype
-		,a.n01,a.chk1,a.chk2,a.chk3,a.chk4,a.chk5,a.total2
+		,a.n01,a.chk1,a.chk2,a.chk3,a.chk4,a.chk5,a.total2,a.n16
 		,a.memo,a.ordeno1,a.ordeno2
 	from borrgs a
 	left join borrg b on a.noa=b.noa
@@ -442,7 +447,7 @@ z_tran_ln401:--z_tran_ln401
 	declare @casetype nvarchar(20)
 	declare @straddrno nvarchar(30)
 	declare @endaddrno nvarchar(30)
-	declare @n01 float,@total2 float
+	declare @n01 float,@total2 float,@n16 float
 	declare @chk1 bit,@chk2 bit,@chk3 bit,@chk4 bit,@chk5 bit
 	
 	declare @price float,@money float
@@ -450,13 +455,13 @@ z_tran_ln401:--z_tran_ln401
 	
 	declare cursor_table cursor for
 	select sel,datea,casetype,straddr,endaddr
-		,n01,isnull(chk1,0),isnull(chk2,0),isnull(chk3,0),isnull(chk4,0),isnull(chk5,0),total2 
+		,n01,isnull(chk1,0),isnull(chk2,0),isnull(chk3,0),isnull(chk4,0),isnull(chk5,0),total2 ,n16
 		from @tmpa 
 		where isnull(chk1,0)=1 -- 只計算請款的
 	open cursor_table
 	fetch next from cursor_table
 	into @sel,@datea,@casetype,@straddrno,@endaddrno
-		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2 
+		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16
 	while(@@FETCH_STATUS <> -1)
 	begin
 		select @price = 0, @money = 0
@@ -530,12 +535,12 @@ z_tran_ln401:--z_tran_ln401
 		
 		fetch next from cursor_table
 		into @sel,@datea,@casetype,@straddrno,@endaddrno
-		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2 
+		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16 
 	end
 	close cursor_table
 	deallocate cursor_table
 	
-	update @tmpa set [money]=round(ISNULL(n01,0)*ISNULL(price,0),0) + ISNULL(total2,0)
+	update @tmpa set [money]=round(ISNULL(n01,0)*ISNULL(price,0),0) + ISNULL(total2,0) + ISNULL(n16,0)
 	------------------------------------------------------------------------------------------------------------
 	insert into @tmpa(gno,pno,cardealno,cardeal,[money])
 	select '2',2,cardealno,cardeal,sum(ISNULL([money],0)) 
@@ -584,7 +589,8 @@ z_tran_ln401:--z_tran_ln401
 		,case when ISNULL(chk3,0)=1 then '*' else '' end a12--押運	
 		,case when ISNULL(chk4,0)=1 then '*' else '' end a13--儀檢
 		,case when ISNULL(chk5,0)=1 then '*' else '' end a14--危險櫃	
-		,dbo.getComma(total2,0) a15--附加費	
-		,dbo.getComma([money],0) a16--運費小計	
-		,memo a17--備註
+		,dbo.getComma(total2,0) a15--OOG
+		,dbo.getComma(n16,0) a16--其他費用	
+		,dbo.getComma([money],0) a17--運費小計	
+		,memo a18--備註
 	from @tmpa order by cardealno,pno,sel;
