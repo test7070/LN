@@ -58,13 +58,15 @@ z_tran_ln501:--z_tran_ln501
 		,inteis float--超高吊架
 		,arrerage float--鐳仔桶
 		,n16 float--其他費用
+		,n17 float--補洞
+		,n18 float--OOG
 		,memo nvarchar(max)
 	)
 	-- borr
 	insert into @tmpa(gno,pno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
-		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16,memo)
+		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16,n17,n18,memo)
 	select '1',1,a.noa,a.v01,a.datea,a.custno,a.cust,a.partno,a.part,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07,a.v09,a.v10,a.v11
-		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16,b.memo
+		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16,b.n17,b.n18,b.memo
 	from borr a
 	left join borrs b on a.noa=b.noa
 	where a.vccno ='tran_ln' 
@@ -76,9 +78,9 @@ z_tran_ln501:--z_tran_ln501
 
 	-- borrg 
 	insert into @tmpa(gno,pno,cardealno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
-		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
+		,typea,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16,n17,n18)
 	select '3',3,a.worker,a.ordeno,a.v01,a.datea,a.custno,a.cust,a.partno,a.part,a.v02,a.v03,a.v04,a.begindate,a.v05,a.v06,a.enddate,a.v07,a.v09,a.v10,a.v11
-		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16
+		,b.typea,b.n01,b.n02,b.n03,b.n04,b.n05,b.n06,b.n07,b.n08,b.n09,b.n10,b.n11,b.n12,b.n13,b.n14,b.n15,b.inteis,b.arrerage,b.n16,b.n17,b.n18
 	from borrg a
 	left join borrgs b on a.noa=b.noa
 	left join (select noa from @tmpa where pno=1 group by noa) c on a.ordeno=c.noa
@@ -91,12 +93,13 @@ z_tran_ln501:--z_tran_ln501
 	where a.pno = 3 and b.noa is not null
 	-- tran_ln5 合計
 	insert into @tmpa(gno,pno,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
-		,typea,cardealno,cardeal,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16)
+		,typea,cardealno,cardeal,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,n15,inteis,arrerage,n16,n17,n18)
 	select '2',2,noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11
 		,typea,cardealno,cardeal
 		,sum(isnull(n01,0)),sum(isnull(n02,0)),sum(isnull(n03,0)),sum(isnull(n04,0)),sum(isnull(n05,0))
 		,sum(isnull(n06,0)),sum(isnull(n07,0)),sum(isnull(n08,0)),sum(isnull(n09,0)),sum(isnull(n10,0)),sum(isnull(n11,0))
-		,sum(isnull(n12,0)),sum(isnull(n13,0)),sum(isnull(n14,0)),sum(isnull(n15,0)),sum(isnull(inteis,0)),sum(isnull(arrerage,0)),sum(isnull(n16,0))
+		,sum(isnull(n12,0)),sum(isnull(n13,0)),sum(isnull(n14,0)),sum(isnull(n15,0)),sum(isnull(inteis,0)),sum(isnull(arrerage,0))
+		,sum(isnull(n16,0)),sum(isnull(n17,0)),sum(isnull(n18,0))
 	from @tmpa
 	where pno=3
 	group by noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11,typea,cardealno,cardeal
@@ -167,5 +170,7 @@ z_tran_ln501:--z_tran_ln501
 		,dbo.getComma(inteis,-1) b18
 		,dbo.getComma(arrerage,-1) b19
 		,dbo.getComma(n16,-1) b20
-		,memo b21
+		,dbo.getComma(n17,-1) b21
+		,dbo.getComma(n18,-1) b22
+		,memo b23
 	from @tmpa order by noa,pno,sel;

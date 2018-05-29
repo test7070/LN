@@ -2144,6 +2144,9 @@ z_trans_ln09:--z_trans_ln09 z_trans_ln.txt
 		,N13 float
 		,N14 float
 		,N15 float
+		,N16 float
+		,N17 float
+		,N18 float
 		
 		,inteis float
 		,arrerage float
@@ -2151,11 +2154,12 @@ z_trans_ln09:--z_trans_ln09 z_trans_ln.txt
 		,casecount float
 	)
 	insert into @tmp(gno,pno,noa,v01,v02,v03,v06
-		,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,N15,inteis,arrerage,casecount)
+		,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,N15,N16,N17,N18,inteis,arrerage,casecount)
 	select '1',1,a.noa,a.v01,a.v02,a.v03,a.v06  
 		,SUM(ISNULL(b.n01,0)),SUM(ISNULL(b.n02,0)),SUM(ISNULL(b.n03,0)),SUM(ISNULL(b.n04,0)),SUM(ISNULL(b.n05,0))
 		,SUM(ISNULL(b.n06,0)),SUM(ISNULL(b.n07,0)),SUM(ISNULL(b.n08,0)),SUM(ISNULL(b.n09,0)),SUM(ISNULL(b.n10,0))
 		,SUM(ISNULL(b.n11,0)),SUM(ISNULL(b.n12,0)),SUM(ISNULL(b.n13,0)),SUM(ISNULL(b.n14,0)),SUM(ISNULL(b.n15,0))
+		,SUM(ISNULL(b.n16,0)),SUM(ISNULL(b.n17,0)),SUM(ISNULL(b.n18,0))
 		,SUM(ISNULL(b.inteis,0)),SUM(ISNULL(b.arrerage,0))
 		,SUM(case when len(isnull(b.caseno,''))>0 then 1 else 0 end)
 	from borr a 
@@ -2165,10 +2169,11 @@ z_trans_ln09:--z_trans_ln09 z_trans_ln.txt
 	group by a.noa,a.v01,a.v02,a.v03,a.v06
 	order by a.v01
 	
-	insert into @tmp(gno,pno,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,N15,inteis,arrerage,casecount)
+	insert into @tmp(gno,pno,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14,N15,N16,N17,N18,inteis,arrerage,casecount)
 	select '2',2,SUM(ISNULL(n01,0)),SUM(ISNULL(n02,0)),SUM(ISNULL(n03,0)),SUM(ISNULL(n04,0)),SUM(ISNULL(n05,0))
 		,SUM(ISNULL(n06,0)),SUM(ISNULL(n07,0)),SUM(ISNULL(n08,0)),SUM(ISNULL(n09,0)),SUM(ISNULL(n10,0))
 		,SUM(ISNULL(n11,0)),SUM(ISNULL(n12,0)),SUM(ISNULL(n13,0)),SUM(ISNULL(n14,0)),SUM(ISNULL(n15,0))
+		,SUM(ISNULL(n16,0)),SUM(ISNULL(n17,0)),SUM(ISNULL(n18,0))
 		,SUM(ISNULL(inteis,0)),SUM(ISNULL(arrerage,0)),SUM(ISNULL(casecount,0))
 	from @tmp 
 	where pno=1
