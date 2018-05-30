@@ -32,6 +32,7 @@
 				,'textA01','textA02','textA03','textA04','textA05','textA06','textA07'
 				,'textA08','textA09','textA10','textA11','textA12','textA13','textA14'
 				,'textA15','textA16','textA17','textA18','textA19','textA20','textA21'
+				,'textA22','textA23'
 				,'txtOrdeno','txtV01','txtDatea','txtCustno','txtCust','txtPartno','txtPart','txtV02','txtV03','txtV04'
 				,'txtBegindate','txtV05','txtV06'];
 			var q_readonlys = ['txtN15'];
@@ -43,7 +44,7 @@
 				,['txtN07',10,0],['txtN08',10,0],['txtN09',10,0],['txtN10',10,0]
 				,['txtN11',10,0],['txtN12',10,0],['txtN13',10,0],['txtN14',10,0],['txtN15',10,0]
 				,['txtInteis',10,0],['txtArrerage',10,0]
-				,['txtN16',10,0],['txtN17',10,0],['txtN18',10,0]);
+				,['txtN16',10,0],['txtN17',10,0],['txtN18',10,0],['txtN19',10,0],['txtN20',10,0]);
 			var bbsMask = new Array();
 			var bbtNum  = new Array(); 
 			var bbtMask = new Array();
@@ -161,6 +162,8 @@
                     $('#txtN16_'+i).change(function(e){refreshBbs();});
                     $('#txtN17_'+i).change(function(e){refreshBbs();});
                     $('#txtN18_'+i).change(function(e){refreshBbs();});
+                    $('#txtN19_'+i).change(function(e){refreshBbs();});
+                    $('#txtN20_'+i).change(function(e){refreshBbs();});
 				}
 				_bbsAssign();
 				$('#tbbs').find('tr.data').children().hover(function(e){
@@ -302,7 +305,8 @@
 			function refreshBbs(){
 				var t01=0,t02=0,t03=0,t04=0,t05=0,t06=0,t07=0
 					,t08=0,t09=0,t10=0,t11=0,t12=0,t13=0,t14=0
-					,t15=0,t16=0,t17=0,t18=0,t19=0,t20=0,t21=0;
+					,t15=0,t16=0,t17=0,t18=0,t19=0,t20=0,t21=0
+					,t22=0,t23=0;
 				
 				for(var i=0;i<q_bbsCount;i++){
 					t01 += q_float('txtN01_'+i);
@@ -331,7 +335,10 @@
 					t18 += q_float('txtN16_'+i);
 					t19 += q_float('txtN17_'+i);
 					t20 += q_float('txtN18_'+i);
-					t21 += t + q_float('txtInteis_'+i) + q_float('txtArrerage_'+i);
+					t21 += q_float('txtN19_'+i);
+					t22 += q_float('txtN20_'+i);
+					t23 += t + q_float('txtInteis_'+i) + q_float('txtArrerage_'+i)
+						+q_float('txtN16_'+i)+q_float('txtN17_'+i)+q_float('txtN18_'+i)+q_float('txtN19_'+i)+q_float('txtN20_'+i);
 				}
 				$('#textA01').val(t01);
 				$('#textA02').val(t02);
@@ -355,6 +362,8 @@
 				$('#textA19').val(t19);	
 				$('#textA20').val(t20);	
 				$('#textA21').val(t21);	
+				$('#textA22').val(t22);	
+				$('#textA23').val(t23);	
 			}
 
 			function readonly(t_para, empty) {
@@ -708,9 +717,9 @@
 					<td align="center" colspan="1" rowspan="3" style="width:50px;"><a>小計</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>超高<BR>吊架</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>鐳仔桶</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>其他<br>費用</a></td>
+					<td align="center" colspan="2" rowspan="2"><a>其他</td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>補洞</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>OOG</a></td>
+					<td align="center" colspan="2" rowspan="2"><a>OOG</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr style='color:white; background:#003366;' > 	
@@ -754,8 +763,10 @@
 					<!--  -->
 					<!--  -->
 					<!--  -->
-					<!-- CASENO -->
-					<!-- CASETYPE -->
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>40'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>20'</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>40'</a></td>
 					<!-- MEMO -->
 				</tr>
 			</table>
@@ -787,7 +798,9 @@
 					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA18" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA19" class="txt" style="width:95%;text-align:right;"/></td>
 					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA20" class="txt" style="width:95%;text-align:right;"/></td>
-					<td align="center" colspan="1" rowspan="1" style="width:200px;"><input id="textA21" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA21" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><input id="textA22" class="txt" style="width:95%;text-align:right;"/></td>
+					<td align="center" colspan="1" rowspan="1" style="width:200px;"><input id="textA23" class="txt" style="width:95%;text-align:right;"/></td>
 				</tr>
 			</table>
 		</div>
@@ -815,9 +828,11 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a> </a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>超高<BR>吊架</a></td>
 					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>鐳仔桶</a></td>
-					<td align="center" colspan="1" rowspan="3" style="width:60px;"><a>其他費用</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>20'</a></td><!--其他-->
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>40'</a></td><!--其他-->
 					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>補洞</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>OOG</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>20'</a></td><!--OOG-->
+					<td align="center" colspan="1" rowspan="1" style="width:60px;"><a>40'</a></td><!--OOG-->
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>MEMO</a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
@@ -852,6 +867,8 @@
 					<td style="width:60px;"><input type="text" id="txtN16.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:60px;"><input type="text" id="txtN17.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:60px;"><input type="text" id="txtN18.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:60px;"><input type="text" id="txtN19.*" style="width:95%;text-align:right;"/></td>
+					<td style="width:60px;"><input type="text" id="txtN20.*" style="width:95%;text-align:right;"/></td>
 					<td style="width:200px;"><input type="text" id="txtMemo.*" style="width:95%;"/></td>
 				</tr>
 			</table>
