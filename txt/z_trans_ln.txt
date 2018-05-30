@@ -1,4 +1,164 @@
-﻿z_trans_ln14:--z_trans_ln.txt/z_trans_ln14	
+﻿z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_user nvarchar(max) = '[4]'
+	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	declare @t_bdate nvarchar(10) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(10) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_xsela nvarchar(10) = case when '#non' = [11] then '' else [11] end
+	declare @t_xselb nvarchar(10) = case when '#non' = [12] then '' else [12] end
+	declare @t_bno nvarchar(20) = case when '#non' = [22] then '' else [22] end
+	declare @t_eno nvarchar(20) = case when '#non' = [23] then char(255) else [23] end
+	----------------------------------------------------------------------------------------------
+	declare @t_bsel int = 0
+	declare @t_esel int = 0
+	begin try
+		set @t_bsel = cast(@t_xsela as int)
+		set @t_esel = cast(@t_xselb as int)
+	end try
+	begin catch
+		set @t_bsel = 0
+		set @t_esel = 0
+	end catch
+	
+	declare @tmp table(
+		sel int identity(1,1),
+		recno int,
+		pp int,
+		qq int,
+		gno nvarchar(1),
+		noa nvarchar(100),
+		v01 nvarchar(20),
+		workdate nvarchar(100),
+		MV nvarchar(100),
+		VN nvarchar(100),
+		LD2 float,
+		LD4 float,
+		LL2 float,
+		LL4 float,
+		ED2 float,
+		ED4 float,
+		EL2 float,
+		EL4 float,
+		SH float,
+		RE float,
+		T2 float,
+		T4 float,
+		G2 float,
+		G4 float,
+		inteis float,--超高吊架
+		arrerage float--鐳仔桶
+		,n16 float --20'其他	
+		,n17 float --40'其他	
+		,n18 float --補洞	
+		,n19 float --20'OOG
+		,n20 float --40'OOG
+		,total float
+	)
+		insert into @tmp (gno,noa,workdate
+			,v01,MV,VN
+			,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE			
+			,T2,T4
+			,inteis,arrerage
+			,n16,n17,n18,n19,n20
+			,total)
+		select '1',a.noa,a.datea
+			,a.v01,a.v02,a.v03
+			,sum(isnull(n01,0)),sum(isnull(n02,0)),sum(isnull(n03,0)),sum(isnull(n04,0))
+			,sum(isnull(n05,0)),sum(isnull(n06,0)),sum(isnull(n07,0)),sum(isnull(n08,0))
+			,sum(isnull(b.n11,0)+isnull(b.n13,0))/*SHIFT*/
+			,sum(isnull(b.n12,0)+isnull(b.n14,0))/*RELOAD*/
+			,sum(isnull(b.n01,0)+isnull(b.N03,0)+isnull(b.N05,0)+isnull(b.n07,0)+isnull(b.n11,0)+isnull(b.n13,0))/*T2*/
+			,sum(isnull(b.n02,0)+isnull(b.n04,0)+isnull(b.n06,0)+isnull(b.n08,0)+isnull(b.n12,0)+isnull(b.n14,0))/*T4*/
+			,sum(isnull(b.inteis,0)),sum(isnull(b.arrerage,0))
+			,sum(isnull(n16,0)),sum(isnull(n17,0)),sum(isnull(n18,0)),sum(isnull(n19,0)),sum(isnull(n20,0))
+			,sum(isnull(b.n01,0)+isnull(b.n02,0)+isnull(b.n03,0)+isnull(b.n04,0)
+				+isnull(b.n05,0)+isnull(b.n06,0)+isnull(b.n07,0)+isnull(b.n08,0)
+				+isnull(b.n11,0)+isnull(b.n12,0)+isnull(b.n13,0)+isnull(b.n14,0)
+				+isnull(b.inteis,0)+isnull(b.arrerage,0)
+				+isnull(n16,0)+isnull(n17,0)+isnull(n18,0)+isnull(n19,0)+isnull(n20,0))/*Total*/
+		from borr a
+		left join borrs b on a.noa=b.noa
+		where a.vccno='tran_ln' 
+		and (len(@t_mon)=0 or substring(a.datea,1,len(a.datea)-3) = @t_mon ) 
+		and a.datea between @t_bdate and @t_edate
+		and b.[sign]!='borrs'
+		group by a.noa,a.datea,a.v01,a.v02,a.v03
+		
+		delete @tmp where not sel between @t_bsel and @t_esel 
+		delete @tmp where not noa between @t_bno and @t_eno
+		-------------------------------------------------------------------------------------------------------
+		-- 40筆一個合計
+		declare @t_pagecount int = 40
+		update @tmp set recno=b.recno
+		from @tmp a
+		left join (select sel,ROW_NUMBER()over(order by sel) recno from @tmp ) b on a.sel=b.sel
+
+		update @tmp set pp = (recno-1)%@t_pagecount + 1, qq = floor((recno-1)/@t_pagecount) + 1
+		----合計
+		insert into @tmp (qq,recno,gno,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total,inteis,arrerage
+			,n16,n17,n18,n19,n20)
+		select qq,998,'2',SUM(LD2),SUM(LD4),SUM(LL2),SUM(LL4),SUM(ED2),SUM(ED4),SUM(EL2),SUM(EL4),SUM(SH),SUM(RE),
+			SUM(T2),SUM(T4),SUM(total),SUM(isnull(inteis,0)),sum(isnull(arrerage,0))
+			,sum(n16),sum(n17),sum(n18),sum(n19),sum(n20)
+		from @tmp
+		group by qq
+		--累計
+		insert into @tmp (qq,recno,gno,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE,T2,T4,total,inteis,arrerage
+			,n16,n17,n18,n19,n20)
+		select a.qq,999,'3',SUM(b.LD2),SUM(b.LD4),SUM(b.LL2),SUM(b.LL4),SUM(b.ED2),SUM(b.ED4),SUM(b.EL2),SUM(b.EL4)
+			,SUM(b.SH),SUM(b.RE),SUM(b.T2),SUM(b.T4),SUM(b.total),SUM(isnull(b.inteis,0)),sum(isnull(b.arrerage,0))
+			,sum(b.n16),sum(b.n17),sum(b.n18),sum(b.n19),sum(b.n20)
+		from @tmp a
+		left join @tmp b on b.gno='2' and a.qq>=b.qq
+		where a.gno='2'
+		group by a.qq
+		--*************************************************************************************
+		declare @minsel int = 0 , @maxsel int = 0
+		select @minsel=min(sel),@maxsel = MAX(sel) from @tmp where gno='1'
+
+
+		set @cmd = "日期：" + case when @t_bdate=@t_edate then @t_bdate else @t_bdate+' ~ '+@t_edate end
+		set @cmd = @cmd + case when @t_bno=@t_eno then "　單號："+@t_bno
+								when @t_bno='' and @t_eno=char(255) then ''
+								else "　單號："+@t_bno+" ~ "+@t_eno end
+
+		select gno
+			,@cmd b01
+			--,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"v01=\'"+v01+"\'','95%','95%','')"+char(34)+">"+cast(sel as nvarchar)+"</a>" rr --序
+			,cast(sel as nvarchar) rr --序
+			,'新安運輸 '+@t_mon+' 船邊作業量統計表('+cast(@minsel as nvarchar)+'~'+cast(@maxsel as nvarchar)+')' titlea
+			,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a00 
+			,v01 a01	 
+			,right(workdate,5) a02	
+			,MV +'/' + VN a03	
+			,LD2 a04	
+			,LD4 a05	
+			,LL2 a06	
+			,LL4 a07	
+			,ED2 a08	 
+			,ED4 a09	
+			,EL2 a10	
+			,EL4 a11	
+			,SH	 a12 
+			,RE	 a13
+			,T2	 a14
+			,T4	 a15
+			,inteis a16
+			,arrerage a17
+			,n16 a18
+			,n17 a19
+			,n18 a20
+			,n19 a21
+			,n20 a22
+			,Total a23
+			,(@t_user) as worker 
+		from @tmp a order by qq,recno;
+
+z_trans_ln14:--z_trans_ln.txt/z_trans_ln14	
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
 	declare @t_path nvarchar(max) = '[1]'
@@ -3762,7 +3922,7 @@ z_trans_ln08_old:--z_trans_ln.txt/z_trans_ln08
 	from @tmpb order by pno,recno,sel;
 	
 ---------------------------------------------------------------------------------
-z_trans_ln05:--z_trans_ln05 z_trans_ln.txt
+z_trans_ln05_old:--z_trans_ln05 z_trans_ln.txt
 	SET QUOTED_IDENTIFIER OFF
 	declare @t_user nvarchar(max) = '[4]'
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
