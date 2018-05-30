@@ -213,6 +213,21 @@
 				}
 				refreshBbs();
 				sum();
+				
+				var errmsg = "";
+				for(var i=0;i<q_bbsCount;i++){
+					caseno = $.trim($('#txtCaseno_' + i).val());
+					if(caseno.length>0 && !checkCaseno(caseno)){
+                		errmsg += (errmsg.length>0?"\n":"")+caseno; 	
+                	}
+                	caseno2 = $.trim($('#txtCheckno_' + i).val());
+					if(caseno2.length>0 && !checkCaseno(caseno2)){
+                		errmsg += (errmsg.length>0?"\n":"")+caseno2; 	
+                	}
+				}
+				if(errmsg.length>0){
+					alert('櫃號異常\n'+ errmsg);
+				}
 				if(q_cur ==1){
 					$('#txtWorker').val(r_userno);
 				}else{
