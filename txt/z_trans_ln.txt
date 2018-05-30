@@ -10,6 +10,8 @@
 	declare @t_edate nvarchar(10) = case when '#non' = [9] then char(255) else [9] end
 	declare @t_xsela nvarchar(10) = case when '#non' = [11] then '' else [11] end
 	declare @t_xselb nvarchar(10) = case when '#non' = [12] then '' else [12] end
+	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
+	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
 	declare @t_bno nvarchar(20) = case when '#non' = [22] then '' else [22] end
 	declare @t_eno nvarchar(20) = case when '#non' = [23] then char(255) else [23] end
 	----------------------------------------------------------------------------------------------
@@ -33,6 +35,7 @@
 		noa nvarchar(100),
 		v01 nvarchar(20),
 		workdate nvarchar(100),
+		custno nvarchar(20),
 		MV nvarchar(100),
 		VN nvarchar(100),
 		LD2 float,
@@ -58,14 +61,14 @@
 		,n20 float --40'OOG
 		,total float
 	)
-		insert into @tmp (gno,noa,workdate
+		insert into @tmp (gno,noa,workdate,custno
 			,v01,MV,VN
 			,LD2,LD4,LL2,LL4,ED2,ED4,EL2,EL4,SH,RE			
 			,T2,T4
 			,inteis,arrerage
 			,n16,n17,n18,n19,n20
 			,total)
-		select '1',a.noa,a.datea
+		select '1',a.noa,a.datea,a.custno
 			,a.v01,a.v02,a.v03
 			,sum(isnull(n01,0)),sum(isnull(n02,0)),sum(isnull(n03,0)),sum(isnull(n04,0))
 			,sum(isnull(n05,0)),sum(isnull(n06,0)),sum(isnull(n07,0)),sum(isnull(n08,0))
@@ -86,10 +89,11 @@
 		and (len(@t_mon)=0 or substring(a.datea,1,len(a.datea)-3) = @t_mon ) 
 		and a.datea between @t_bdate and @t_edate
 		and b.[sign]!='borrs'
-		group by a.noa,a.datea,a.v01,a.v02,a.v03
+		group by a.noa,a.datea,a.custno,a.v01,a.v02,a.v03
 		
 		delete @tmp where not sel between @t_bsel and @t_esel 
 		delete @tmp where not noa between @t_bno and @t_eno
+		delete @tmp where not custno between @t_bcustno and @t_ecustno
 		-------------------------------------------------------------------------------------------------------
 		-- 40筆一個合計
 		declare @t_pagecount int = 40
@@ -775,8 +779,18 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 		set @cmd = ''
 	end catch
 	
+	declare @bcust nvarchar(max) = ''
+	declare @ecust nvarchar(max) = ''
+	select @bcust = nick from cust where noa=@t_bcustno
+	select @ecust = nick from cust where noa=@t_ecustno
+	declare @cmd2 nvarchar(max)
+	set @cmd2 = "日期：" + case when @t_bdate=@t_edate then @t_bdate else @t_bdate+' ~ '+@t_edate end
+	set @cmd2 = @cmd2 + case when @t_bcustno=@t_ecustno then "　客戶："+@bcust
+							when @t_bcustno='' and @t_ecustno=char(255) then ''
+							else "　客戶："+@bcust+" ~ "+@ecust end
+							
 	select @cmd + '營收月報表' titlea 
-		,'' a00
+		,@cmd2 a00
 		,gno
 		,cust a01
 		,item a02
@@ -1375,6 +1389,12 @@ z_trans_ln15:--z_trans_ln15
 	declare @t_user nvarchar(max) = '[4]'
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_straddrno nvarchar(20) = case when '#non' = [13] then '' else [13] end
+	declare @t_endaddrno nvarchar(20) = case when '#non' = [14] then '' else [14] end
+	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
+	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
+	declare @t_bno nvarchar(20) = case when '#non' = [22] then '' else [22] end
+	declare @t_eno nvarchar(20) = case when '#non' = [23] then char(255) else [23] end
 	-------------------------------------------------------------------------------------------------------------
 	-- tran_ln3 場外移櫃
 	IF OBJECT_ID('tempdb..#z_trans_ln15a')is not null
@@ -1399,7 +1419,11 @@ z_trans_ln15:--z_trans_ln15
 	from borrs a
 	left join borr b on a.noa=b.noa
 	where b.vccno = 'tran_ln3'
-	and b.datea between @t_bdate and @t_edate
+	and isnull(b.custno,'') between @t_bcustno and @t_ecustno
+	and isnull(b.datea,'') between @t_bdate and @t_edate
+	and isnull(b.noa,'') between @t_bno and @t_eno
+	and (len(@t_straddrno)=0 or a.addrno=@t_straddrno)
+	and (len(@t_endaddrno)=0 or a.addrno2=@t_endaddrno)
 
 	update #z_trans_ln15a set casetype = replace(casetype,'~#$',"'")
 	--------------------------------------------------------------------------------------------
@@ -3066,6 +3090,8 @@ z_trans_ln14_old:--z_trans_ln.txt/z_trans_ln14
 	begin catch
 		set @cmd = ''
 	end catch
+	
+	
 	
 	select @cmd + '營收月報表' titlea 
 		,gno

@@ -693,7 +693,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>儀檢</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>危標</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>OOG</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>其他<BR>費用</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>其他</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 			</table>
@@ -741,7 +741,7 @@
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>儀檢</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a>危標</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>OOG</a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>其他<BR>費用</a></td>
+					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>其他</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:200px;"><a>備註</a></td>
 				</tr>
 				<tr class="data" style='background:#cad3ff;'>
