@@ -285,7 +285,8 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno  and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
-
+	and c.noa is not null
+	
 	--油桶櫃數量 n02
 	update #z_trans_ln13 set 
 		n02a = round(n02 * c.custprice,0)
@@ -296,6 +297,8 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno  and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
+	
 	--20'押運 n03
 	update #z_trans_ln13 set
 		n03a2 = round(n03 * c.custprice,0)
@@ -306,6 +309,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='2'
 	--40'押運 n03
 	update #z_trans_ln13 set
@@ -317,6 +321,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null	
+	and c.noa is not null
 	and left(a.casetype,1)='4'
 	--20'超重 n04
 	update #z_trans_ln13 set
@@ -328,6 +333,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$超重' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='2'
 	--40'超重 n04 	 
 	update #z_trans_ln13 set
@@ -339,6 +345,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$超重' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='4'
 	--20'危標 n05
 	update #z_trans_ln13 set
@@ -350,6 +357,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$危標' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='2'
 	--40'危標 n05	 
 	update #z_trans_ln13 set
@@ -361,6 +369,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$危標' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='4'
 	--20'其他 n06
 	update #z_trans_ln13 set
@@ -372,6 +381,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='2'
 	--40'其他 n06
 	update #z_trans_ln13 set
@@ -383,6 +393,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='4'
 	-------------------------------------------------------------------------------------------------------------
 	update #z_trans_ln13 set n03a = isnull(n03a2,0) + isnull(n03a4,0),n03b = isnull(n03b2,0) + isnull(n03b4,0),n03c = isnull(n03c2,0) + isnull(n03c4,0)
@@ -1776,6 +1787,7 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 
 	--油桶櫃數量 n02
 	update #z_trans_ln13 set 
@@ -1787,6 +1799,8 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
+	
 	--20'押運 n03
 	update #z_trans_ln13 set
 		n03a2 = round(n03 * c.custprice,0)
@@ -1797,6 +1811,7 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='2'
 	--40'押運 n03
 	update #z_trans_ln13 set
@@ -1808,6 +1823,7 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null	
+	and c.noa is not null
 	and left(a.casetype,1)='4'
 	--20'超重 n04
 	update #z_trans_ln13 set
@@ -1830,6 +1846,7 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$超重' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='4'
 	--20'危標 n05
 	update #z_trans_ln13 set
@@ -1841,6 +1858,7 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$危標' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='2'
 	--40'危標 n05	 
 	update #z_trans_ln13 set
@@ -1852,6 +1870,7 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$危標' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='4'
 	--20'其他 n06
 	update #z_trans_ln13 set
@@ -1863,6 +1882,7 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='2'
 	--40'其他 n06
 	update #z_trans_ln13 set
@@ -1874,6 +1894,7 @@ z_trans_ln13:--z_trans_ln13
 	outer apply(select top 1 * from addrs 
 		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
+	and c.noa is not null
 	and left(a.casetype,1)='4'
 	-------------------------------------------------------------------------------------------------------------
 	update #z_trans_ln13 set n03a = isnull(n03a2,0) + isnull(n03a4,0),n03b = isnull(n03b2,0) + isnull(n03b4,0),n03c = isnull(n03c2,0) + isnull(n03c4,0)
@@ -1923,6 +1944,11 @@ z_trans_ln13:--z_trans_ln13
 	end
 	else
 	begin
+		--沒勾新安單價,除001萬海,其餘金額都歸0
+		update #z_trans_ln13 set n01a=0,n02a=0,n03a=0,n04a=0,n05a=0,n06a=0
+			,n01b=0,n02b=0,n03b=0,n04b=0,n05b=0,n06b=0
+		where custno!='001'
+		
 		insert into @tmpb(gno,pno,noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype,memo
 			,mount01,money01,mount02,money02,money03)
 		select '1',1,noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype,memo
@@ -1934,8 +1960,7 @@ z_trans_ln13:--z_trans_ln13
 		from #z_trans_ln13
 		group by noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype,memo
 		
-		--沒勾新安單價,除001萬海,其餘金額都歸0
-		update @tmpa set money01=0,money02=0,money03=0 where custno!='001'
+		
 	end
 	update @tmpb set tmount = isnull(mount01,0)+isnull(mount02,0)
 		,tmoney = isnull(money01,0)+isnull(money02,0)+isnull(money03,0)
