@@ -679,7 +679,7 @@
 				<tr style='color:white; background:#003366;' > 				
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><input class="btn"  id="btnPlus" type="button" value='+' style="font-weight: bold;"  /></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><a style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
-					<td align="center" colspan="1" rowspan="1" style="width:30px;"><a>請<br>款</a></td>
+					<!--<td align="center" colspan="1" rowspan="1" style="width:30px;"><a>請<br>款</a></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號(一)</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號(二)</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
@@ -703,7 +703,7 @@
 				<tr style='color:white; background:#003366;' > 	
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><span style="display:block;width:50px;height:5px;"> </span></td>
 					<td align="center" colspan="1" rowspan="1" style="width:50px;"><span style="display:block;width:50px;height:5px;"> </span></td>
-					<td align="center" colspan="1" rowspan="1" style="width:30px;"><span style="display:block;width:30px;height:5px;"> </span></td>
+					<!--<td align="center" colspan="1" rowspan="1" style="width:30px;"><span style="display:block;width:30px;height:5px;"> </span></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"> </td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"> </td>
@@ -727,7 +727,7 @@
 				<tr style="color:white; background:#003366;display:none;" >
 					<td align="center" style="width:50px;"><span style="display:block;width:50px;height:5px;"> </span></td>
 					<td align="center" style="width:50px;"><span style="display:block;width:50px;height:5px;"> </span></td>
-					<td align="center" colspan="1" rowspan="1" style="width:30px;"><span style="display:block;width:30px;height:5px;"><a>請<br>款</a></span></td>
+					<!--<td align="center" colspan="1" rowspan="1" style="width:30px;"><span style="display:block;width:30px;height:5px;"><a>請<br>款</a></span></td>-->
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號(一)</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:150px;"><a>櫃號(二)</a></td>
 					<td align="center" colspan="1" rowspan="1" style="width:80px;"><a>櫃型</a></td>
@@ -750,7 +750,7 @@
 						<input type="text" id="txtNoq.*" style="display:none;"/>
 					</td>
 					<td style="width:50px"><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;width:95%;"> </a></td>
-					<td style="width:30px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>
+					<!--<td style="width:30px"><input type="checkbox" id="chkChk1.*" style="width:95%;"/></td>-->
 					<td style="width:150px;">
 						<input type="text" id="txtCaseno.*" style="width:95%;"/>
 						<!--對應的派工單-->
