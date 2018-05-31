@@ -176,6 +176,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	declare @t_type nvarchar(max) = case when '#non' = [26] then '' else [26] end
 	declare @t_option nvarchar(max) = case when '#non' = [17] then '' else [17] end
 	----------------------------------------------------------------------------------------------------------------
+	----------------------------------------------------------------------------------------------------------------
 	declare @tmpa table(
 		sel int identity(1,1)
 		,gno nvarchar(20)
@@ -278,110 +279,110 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	-----------------------------------------------------------------------------------------------------------
 	update #z_trans_ln13 set typea=c.typea
 		,n01a = round(n01 * c.custprice,0)
-		,n01b = round(n01 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n01b = round(n01 * c.tggprice,0)
 		,n01c = round(n01 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno  and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 
 	--油桶櫃數量 n02
 	update #z_trans_ln13 set 
 		n02a = round(n02 * c.custprice,0)
-		,n02b = round(n02 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n02b = round(n02 * c.tggprice,0)
 		,n02c = round(n02 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno  and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	--20'押運 n03
 	update #z_trans_ln13 set
 		n03a2 = round(n03 * c.custprice,0)
-		,n03b2 = round(n03 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n03b2 = round(n03 * c.tggprice,0)
 		,n03c2 = round(n03 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='2'
 	--40'押運 n03
 	update #z_trans_ln13 set
 		n03a4 = round(n03 * c.custprice,0)
-		,n03b4 = round(n03 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n03b4 = round(n03 * c.tggprice,0)
 		,n03c4 = round(n03 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null	
 	and left(a.casetype,1)='4'
 	--20'超重 n04
 	update #z_trans_ln13 set
 		n04a2 = round(n04 * c.custprice,0)
-		,n04b2 = round(n04 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n04b2 = round(n04 * c.tggprice,0)
 		,n04c2 = round(n04 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='20~#$超重' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$超重' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='2'
 	--40'超重 n04 	 
 	update #z_trans_ln13 set
 		n04a4 = round(n04 * c.custprice,0)
-		,n04b4 = round(n04 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n04b4 = round(n04 * c.tggprice,0)
 		,n04c4 = round(n04 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='40~#$超重' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$超重' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='4'
 	--20'危標 n05
 	update #z_trans_ln13 set
 		n05a2 = round(n05 * c.custprice,0)
-		,n05b2 = round(n05 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n05b2 = round(n05 * c.tggprice,0)
 		,n05c2 = round(n05 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='20~#$危標' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$危標' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='2'
 	--40'危標 n05	 
 	update #z_trans_ln13 set
 		n05a4 = round(n05 * c.custprice,0)
-		,n05b4 = round(n05 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n05b4 = round(n05 * c.tggprice,0)
 		,n05c4 = round(n05 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='40~#$危標' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$危標' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='4'
 	--20'其他 n06
 	update #z_trans_ln13 set
 		n06a2 = round(n06 * c.custprice,0)
-		,n06b2 = round(n06 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n06b2 = round(n06 * c.tggprice,0)
 		,n06c2 = round(n06 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='2'
 	--40'其他 n06
 	update #z_trans_ln13 set
 		n06a4 = round(n06 * c.custprice,0)
-		,n06b4 = round(n06 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n06b4 = round(n06 * c.tggprice,0)
 		,n06c4 = round(n06 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='4'
 	-------------------------------------------------------------------------------------------------------------
@@ -750,8 +751,8 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	--=============================================================================================================
 	if len(@t_option)>0
 	begin
-		--001 萬海  改為   H001 新安
-		update @tmpa set custno='H001' where custno='001'
+		--001 萬海  改為  002 新實運輸
+		update @tmpa set custno='002' where custno='001'
 	end
 
 	update @tmpa set cust=isnull(b.nick,a.custno)
@@ -806,7 +807,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	select top 1 @priceshow=a.price_show
 	from authority a 
 	left join nhpe b on a.sssno=b.noa
-	where a.noa='z_trans_ln' and b.namea='Z001'
+	where a.noa='z_trans_ln' and b.namea=@t_user
 	
 	if isnull(@priceshow,0)=0
 	begin
@@ -1390,7 +1391,7 @@ z_trans_ln03:--z_trans_ln03
 	select top 1 @priceshow=a.price_show
 	from authority a 
 	left join nhpe b on a.sssno=b.noa
-	where a.noa='z_trans_ln' and b.namea='Z001'
+	where a.noa='z_trans_ln' and b.namea=@t_user
 	
 	if isnull(@priceshow,0)=0
 	begin
@@ -1762,110 +1763,110 @@ z_trans_ln13:--z_trans_ln13
 	-----------------------------------------------------------------------------------------------------------
 	update #z_trans_ln13 set typea=c.typea
 		,n01a = round(n01 * c.custprice,0)
-		,n01b = round(n01 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n01b = round(n01 * c.tggprice,0)
 		,n01c = round(n01 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit=a.casetype and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 
 	--油桶櫃數量 n02
 	update #z_trans_ln13 set 
 		n02a = round(n02 * c.custprice,0)
-		,n02b = round(n02 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n02b = round(n02 * c.tggprice,0)
 		,n02c = round(n02 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='油桶櫃' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	--20'押運 n03
 	update #z_trans_ln13 set
 		n03a2 = round(n03 * c.custprice,0)
-		,n03b2 = round(n03 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n03b2 = round(n03 * c.tggprice,0)
 		,n03c2 = round(n03 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='2'
 	--40'押運 n03
 	update #z_trans_ln13 set
 		n03a4 = round(n03 * c.custprice,0)
-		,n03b4 = round(n03 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n03b4 = round(n03 * c.tggprice,0)
 		,n03c4 = round(n03 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$押運' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null	
 	and left(a.casetype,1)='4'
 	--20'超重 n04
 	update #z_trans_ln13 set
 		n04a2 = round(n04 * c.custprice,0)
-		,n04b2 = round(n04 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n04b2 = round(n04 * c.tggprice,0)
 		,n04c2 = round(n04 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='20~#$超重' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$超重' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='2'
 	--40'超重 n04 	 
 	update #z_trans_ln13 set
 		n04a4 = round(n04 * c.custprice,0)
-		,n04b4 = round(n04 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n04b4 = round(n04 * c.tggprice,0)
 		,n04c4 = round(n04 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='40~#$超重' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$超重' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='4'
 	--20'危標 n05
 	update #z_trans_ln13 set
 		n05a2 = round(n05 * c.custprice,0)
-		,n05b2 = round(n05 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n05b2 = round(n05 * c.tggprice,0)
 		,n05c2 = round(n05 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='20~#$危標' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$危標' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='2'
 	--40'危標 n05	 
 	update #z_trans_ln13 set
 		n05a4 = round(n05 * c.custprice,0)
-		,n05b4 = round(n05 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n05b4 = round(n05 * c.tggprice,0)
 		,n05c4 = round(n05 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='40~#$危標' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$危標' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='4'
 	--20'其他 n06
 	update #z_trans_ln13 set
 		n06a2 = round(n06 * c.custprice,0)
-		,n06b2 = round(n06 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n06b2 = round(n06 * c.tggprice,0)
 		,n06c2 = round(n06 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='2'
 	--40'其他 n06
 	update #z_trans_ln13 set
 		n06a4 = round(n06 * c.custprice,0)
-		,n06b4 = round(n06 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n06b4 = round(n06 * c.tggprice,0)
 		,n06c4 = round(n06 * c.driverprice,0)
 	from #z_trans_ln13 a
 	left join addr b on a.straddrno=b.straddrno and a.endaddrno=b.endaddrno
 	outer apply(select top 1 * from addrs 
-		where noa=b.noa and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c
+		where noa=b.noa and custno=a.custno and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c
 	where b.noa is not null
 	and left(a.casetype,1)='4'
 	-------------------------------------------------------------------------------------------------------------
@@ -1963,7 +1964,7 @@ z_trans_ln13:--z_trans_ln13
 	select top 1 @priceshow=a.price_show
 	from authority a 
 	left join nhpe b on a.sssno=b.noa
-	where a.noa='z_trans_ln' and b.namea='Z001'
+	where a.noa='z_trans_ln' and b.namea=@t_user
 	
 	if isnull(@priceshow,0)=0
 	begin
@@ -2439,7 +2440,7 @@ z_trans_ln12: --z_trans_ln12
 	select top 1 @priceshow=a.price_show
 	from authority a 
 	left join nhpe b on a.sssno=b.noa
-	where a.noa='z_trans_ln' and b.namea='Z001'
+	where a.noa='z_trans_ln' and b.namea=@t_user
 	
 	if isnull(@priceshow,0)=0
 	begin
@@ -3641,7 +3642,7 @@ z_trans_ln10: -- z_trans_ln10
 	select top 1 @priceshow=a.price_show
 	from authority a 
 	left join nhpe b on a.sssno=b.noa
-	where a.noa='z_trans_ln' and b.namea='Z001'
+	where a.noa='z_trans_ln' and b.namea=@t_user
 	
 	if isnull(@priceshow,0)=0
 	begin
