@@ -801,6 +801,18 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 							when @t_bcustno='' and @t_ecustno=char(255) then ''
 							else "　客戶："+@bcust+" ~ "+@ecust end
 	set @cmd2 = @cmd2 + case when len(@t_type)>0 then "　收入內容：" + @t_type else "" end
+	
+	declare @priceshow int = 0
+	select top 1 @priceshow=a.price_show
+	from authority a 
+	left join nhpe b on a.sssno=b.noa
+	where a.noa='z_trans_ln' and b.namea='Z001'
+	
+	if isnull(@priceshow,0)=0
+	begin
+		delete @tmpa
+		insert into @tmpa(gno)select '1'
+	end
 							
 	select @cmd + '營收月報表' titlea 
 		,@cmd2 a00
@@ -1373,23 +1385,51 @@ z_trans_ln03:--z_trans_ln03
 	set @cmd = @cmd + case when @t_bcustno=@t_ecustno then "　客戶："+@bcust
 							when @t_bcustno='' and @t_ecustno=char(255) then ''
 							else "　客戶："+@bcust+" ~ "+@ecust end
-
-	select gno
-		,@cmd b01
-		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a01 
-		,v01 a02
-		,v02 a03
-		,v03 a04
-		,dbo.getComma(mount01,-1) a05
-		,dbo.getComma(money01,-1) a06
-		,dbo.getComma(mount02,-1) a07
-		,dbo.getComma(money02,-1) a08
-		,dbo.getComma(money03,-1) a09
-		,dbo.getComma(mount,-1) a10
-		,dbo.getComma([money],-1) a11
-		,memo a12 
-	from @tmpb
-	order by pno,recno
+	
+	declare @priceshow int = 0
+	select top 1 @priceshow=a.price_show
+	from authority a 
+	left join nhpe b on a.sssno=b.noa
+	where a.noa='z_trans_ln' and b.namea='Z001'
+	
+	if isnull(@priceshow,0)=0
+	begin
+		select gno
+			,@cmd b01
+			,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a01 
+			,v01 a02
+			,v02 a03
+			,v03 a04
+			,dbo.getComma(mount01,-1) a05
+			,0 a06
+			,dbo.getComma(mount02,-1) a07
+			,0 a08
+			,0 a09
+			,dbo.getComma(mount,-1) a10
+			,0 a11
+			,memo a12 
+		from @tmpb
+		order by pno,recno
+	end
+	else
+	begin
+		select gno
+			,@cmd b01
+			,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a01 
+			,v01 a02
+			,v02 a03
+			,v03 a04
+			,dbo.getComma(mount01,-1) a05
+			,dbo.getComma(money01,-1) a06
+			,dbo.getComma(mount02,-1) a07
+			,dbo.getComma(money02,-1) a08
+			,dbo.getComma(money03,-1) a09
+			,dbo.getComma(mount,-1) a10
+			,dbo.getComma([money],-1) a11
+			,memo a12 
+		from @tmpb
+		order by pno,recno
+	end
 	drop table #z_trans_ln03;
 
 z_trans_ln15:--z_trans_ln15
@@ -1919,27 +1959,58 @@ z_trans_ln13:--z_trans_ln13
 	set @cmd = @cmd + case when @t_bno=@t_eno then "　單號："+@t_bno
 							when @t_bno='' and @t_eno=char(255) then ''
 							else "　單號："+@t_bno+" ~ "+@t_eno end
-	select gno
-		,@cmd b01
-		,recno a01
-		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a02 
-		,typea a03
-		,v02 a04
-		,v03 a05
-		,straddr a06
-		,endaddr a07
-		,casetype a08
-		,dbo.getComma(mount01,-1) a09
-		,dbo.getComma(money01,-1) a10
-		,dbo.getComma(mount02,-1) a11
-		,dbo.getComma(money02,-1) a12
-		,dbo.getComma(money03,-1) a13
-		,dbo.getComma(tmount,-1) a14
-		,dbo.getComma(tmoney,-1) a15
-		,memo a16
-	from @tmpb
-	order by pno,recno
-
+	declare @priceshow int = 0
+	select top 1 @priceshow=a.price_show
+	from authority a 
+	left join nhpe b on a.sssno=b.noa
+	where a.noa='z_trans_ln' and b.namea='Z001'
+	
+	if isnull(@priceshow,0)=0
+	begin
+		select gno
+			,@cmd b01
+			,recno a01
+			,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a02 
+			,typea a03
+			,v02 a04
+			,v03 a05
+			,straddr a06
+			,endaddr a07
+			,casetype a08
+			,dbo.getComma(mount01,-1) a09
+			,0 a10
+			,dbo.getComma(mount02,-1) a11
+			,0 a12
+			,0 a13
+			,dbo.getComma(tmount,-1) a14
+			,0 a15
+			,memo a16
+		from @tmpb
+		order by pno,recno
+	end
+	else
+	begin
+		select gno
+			,@cmd b01
+			,recno a01
+			,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" a02 
+			,typea a03
+			,v02 a04
+			,v03 a05
+			,straddr a06
+			,endaddr a07
+			,casetype a08
+			,dbo.getComma(mount01,-1) a09
+			,dbo.getComma(money01,-1) a10
+			,dbo.getComma(mount02,-1) a11
+			,dbo.getComma(money02,-1) a12
+			,dbo.getComma(money03,-1) a13
+			,dbo.getComma(tmount,-1) a14
+			,dbo.getComma(tmoney,-1) a15
+			,memo a16
+		from @tmpb
+		order by pno,recno
+	end
 	drop table #z_trans_ln13;
 
 
@@ -2364,40 +2435,84 @@ z_trans_ln12: --z_trans_ln12
 	close cursor_table
 	deallocate cursor_table
 
+	declare @priceshow int = 0
+	select top 1 @priceshow=a.price_show
+	from authority a 
+	left join nhpe b on a.sssno=b.noa
+	where a.noa='z_trans_ln' and b.namea='Z001'
+	
+	if isnull(@priceshow,0)=0
+	begin
+		select gno
+			,'' a01 -- REF_NO
+			,'' a02 --REF_DATE
+			,seller a03 --SUPPLY_CODE
+			,'TW' a04 --AGENT_CODE
+			,'' a05 --DEPOT_CODE
+			,'TWD' a06 --CURR
 
-	select gno
-		,'' a01 -- REF_NO
-		,'' a02 --REF_DATE
-		,seller a03 --SUPPLY_CODE
-		,'TW' a04 --AGENT_CODE
-		,'' a05 --DEPOT_CODE
-		,'TWD' a06 --CURR
-
-		,'I' b01--TYPE	
-		,left(invoice,2) b02--ID	
-		,right(invoice,8) b03--NO	
-		,invoice b04--CERTIFICATE	
-		,[date] b05--DATE	
-		,'21' b06--FMT	
-		,'1' b07--CUT	
-		,'1' b08--TAX	
-		,seller b09--REG_NO	
-		,[money] b10--AMOUNT	
-		,round([money]*0.05,0) b11--TAX_AMOUNT	
-		,[money]+round([money]*0.05,0) b12--TOL_AMOUNT	
-		,buyer b13--AREA
+			,'I' b01--TYPE	
+			,left(invoice,2) b02--ID	
+			,right(invoice,8) b03--NO	
+			,invoice b04--CERTIFICATE	
+			,[date] b05--DATE	
+			,'21' b06--FMT	
+			,'1' b07--CUT	
+			,'1' b08--TAX	
+			,seller b09--REG_NO	
+			,null b10--AMOUNT	
+			,null b11--TAX_AMOUNT	
+			,null b12--TOL_AMOUNT	
+			,buyer b13--AREA
 		
-		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" c01--INVOICE_SEQ	 
-		,'TWKHH' c02--PLACE_CODE	
-		,typea c03--NEW_ITEM	
-		,isnull(v03,'')+isnull(v02,'') c04--TFC_CODE	
-		,datea c05--DATE	
-		,'D' c06--D/C	
-		,isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0) c07--AMOUNT	
-		,seller c08--VENDOR_CODE
+			,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" c01--INVOICE_SEQ	 
+			,'TWKHH' c02--PLACE_CODE	
+			,typea c03--NEW_ITEM	
+			,isnull(v03,'')+isnull(v02,'') c04--TFC_CODE	
+			,datea c05--DATE	
+			,'D' c06--D/C	
+			,null c07--AMOUNT	
+			,seller c08--VENDOR_CODE
 
-	from @tmpc 
-	order by invoice,pno,sel;
+		from @tmpc 
+		order by invoice,pno,sel
+	end
+	else
+	begin
+		select gno
+			,'' a01 -- REF_NO
+			,'' a02 --REF_DATE
+			,seller a03 --SUPPLY_CODE
+			,'TW' a04 --AGENT_CODE
+			,'' a05 --DEPOT_CODE
+			,'TWD' a06 --CURR
+
+			,'I' b01--TYPE	
+			,left(invoice,2) b02--ID	
+			,right(invoice,8) b03--NO	
+			,invoice b04--CERTIFICATE	
+			,[date] b05--DATE	
+			,'21' b06--FMT	
+			,'1' b07--CUT	
+			,'1' b08--TAX	
+			,seller b09--REG_NO	
+			,[money] b10--AMOUNT	
+			,round([money]*0.05,0) b11--TAX_AMOUNT	
+			,[money]+round([money]*0.05,0) b12--TOL_AMOUNT	
+			,buyer b13--AREA
+		
+			,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln3.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" c01--INVOICE_SEQ	 
+			,'TWKHH' c02--PLACE_CODE	
+			,typea c03--NEW_ITEM	
+			,isnull(v03,'')+isnull(v02,'') c04--TFC_CODE	
+			,datea c05--DATE	
+			,'D' c06--D/C	
+			,isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0) c07--AMOUNT	
+			,seller c08--VENDOR_CODE
+
+		from @tmpc 
+		order by invoice,pno,sel
+	end;
 	
 z_trans_ln08:--z_trans_ln.txt/z_trans_ln08 	
 	SET QUOTED_IDENTIFIER OFF
@@ -3356,7 +3471,6 @@ z_trans_ln10: -- z_trans_ln10
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	-------------------------------------------------------------------------------------------------------------
-	-------------------------------------------------------------------------------------------------------------
 	declare @tmp table(
 		sel int identity(1,1)
 		,noa nvarchar(20)
@@ -3523,26 +3637,59 @@ z_trans_ln10: -- z_trans_ln10
 		set @n = @n + 1
 	end
 	
-	select gno
-		,invoKey invokey
-		,[id] a01
-		,[no] a02
-		,[certificate] a03
-		,[date] a04
-		,amount a05
-		,tax_amount a06
-		,tol_amount a07
+	declare @priceshow int = 0
+	select top 1 @priceshow=a.price_show
+	from authority a 
+	left join nhpe b on a.sssno=b.noa
+	where a.noa='z_trans_ln' and b.namea='Z001'
+	
+	if isnull(@priceshow,0)=0
+	begin
+		select gno
+			,invoKey invokey
+			,[id] a01
+			,[no] a02
+			,[certificate] a03
+			,[date] a04
+			,null a05
+			,null a06
+			,null a07
 		
-		,invoice_seq b01
-		,place_code b02
-		,new_item b03
-		,tfc_code b04
-		,[date_s] b05
-		,dc b06
-		,amount_s b07
-		,vendor_code b08
-	from @tmpb 
-	order by invokey,sel;
+			,invoice_seq b01
+			,place_code b02
+			,new_item b03
+			,tfc_code b04
+			,[date_s] b05
+			,dc b06
+			,null b07
+			,vendor_code b08
+		from @tmpb 
+		order by invokey,sel
+	end
+	else
+	begin
+		select gno
+			,invoKey invokey
+			,[id] a01
+			,[no] a02
+			,[certificate] a03
+			,[date] a04
+			,amount a05
+			,tax_amount a06
+			,tol_amount a07
+		
+			,invoice_seq b01
+			,place_code b02
+			,new_item b03
+			,tfc_code b04
+			,[date_s] b05
+			,dc b06
+			,amount_s b07
+			,vendor_code b08
+		from @tmpb 
+		order by invokey,sel
+	end
+	;
 
 z_trans_ln09_old:--z_trans_ln09 z_trans_ln.txt
 	SET QUOTED_IDENTIFIER OFF 
