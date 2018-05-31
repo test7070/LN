@@ -794,7 +794,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	set @cmd2 = @cmd2 + case when @t_bcustno=@t_ecustno then "　客戶："+@bcust
 							when @t_bcustno='' and @t_ecustno=char(255) then ''
 							else "　客戶："+@bcust+" ~ "+@ecust end
-	set @cmd2 = @cmd2 + case when len(@t_type)>0 then "收入內容：" + @t_type else "" end
+	set @cmd2 = @cmd2 + case when len(@t_type)>0 then "　收入內容：" + @t_type else "" end
 							
 	select @cmd + '營收月報表' titlea 
 		,@cmd2 a00
