@@ -400,7 +400,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(n05b,0)+isnull(n06b,0) end) money02
 		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01a-n01b,0)+isnull(n02a-n02b,0)+isnull(n03a-n03b,0)+isnull(n04a-n04b,0)+isnull(n05a-n05b,0)+isnull(n06a-n06b,0) end) money03
 	from #z_trans_ln13
-	where charindex(',移櫃,',','+@t_type+',')>0
+	where (len(@t_type)=0 or charindex(',移櫃,',','+@t_type+',')>0)
 	group by custno
 	having count(1)>0
 	--if len(@t_option)>0
@@ -705,7 +705,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 			+isnull(n16a,0)-isnull(n16c,0)+isnull(n17a,0)-isnull(n17c,0)+isnull(n18a,0)-isnull(n18c,0)
 			+isnull(n19a,0)-isnull(n19c,0)+isnull(n20a,0)-isnull(n20c,0)+isnull(inteisa,0)-isnull(inteisc,0)+isnull(arreragea,0)-isnull(arreragec,0) end) money03
 	from #z_trans_ln03
-	where charindex(N',船邊,',','+@t_type+',')>0
+	where (len(@t_type)=0 or charindex(N',船邊,',','+@t_type+',')>0)
 	having count(1)>0
 
 	drop table #z_trans_ln03
@@ -733,7 +733,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	left join tboat b on a.noa=b.noa
 	where a.trandate between @t_bdate and @t_edate
 	and '001' between @t_bcustno and @t_ecustno --一律為萬海
-	and charindex(','+b.typea+',',','+@t_type+',')>0
+	and (len(@t_type)=0 or charindex(','+b.typea+',',','+@t_type+',')>0)
 
 	insert into @tmpa(gno,pno,custno,item,itema,money01,money02,money03)
 	select '1',case left(typea,2) when '移櫃' then 1 when '船邊' then 3 else 5 end pno
@@ -794,6 +794,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	set @cmd2 = @cmd2 + case when @t_bcustno=@t_ecustno then "　客戶："+@bcust
 							when @t_bcustno='' and @t_ecustno=char(255) then ''
 							else "　客戶："+@bcust+" ~ "+@ecust end
+	set @cmd2 = @cmd2 + case when len(@t_type)>0 then "收入內容：" + @t_type else "" end
 							
 	select @cmd + '營收月報表' titlea 
 		,@cmd2 a00
