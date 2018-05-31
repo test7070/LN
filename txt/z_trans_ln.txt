@@ -176,7 +176,6 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	declare @t_type nvarchar(max) = case when '#non' = [26] then '' else [26] end
 	declare @t_option nvarchar(max) = case when '#non' = [17] then '' else [17] end
 	----------------------------------------------------------------------------------------------------------------
-	----------------------------------------------------------------------------------------------------------------
 	declare @tmpa table(
 		sel int identity(1,1)
 		,gno nvarchar(20)
@@ -395,6 +394,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	----------------------------------------------------------------------------------------------------------------
 	if len(@t_option)>0
 	begin
+		
 		insert into @tmpa(gno,pno,custno,item,itema,mount01,money01,mount02,money02,money03)
 		select '1',1,custno,'移櫃','移櫃'
 			,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
@@ -409,6 +409,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	end
 	else
 	begin
+		
 		insert into @tmpa(gno,pno,custno,item,itema,mount01,money01,mount02,money02,money03)
 		select '1',1,custno,'移櫃','移櫃'
 			,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
@@ -420,6 +421,8 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 		where (len(@t_type)=0 or charindex(',移櫃,',','+@t_type+',')>0)
 		group by custno
 		having count(1)>0
+		--沒勾新安單價,除001萬海,其餘金額都歸0
+		update @tmpa set money01=0,money02=0,money03=0 where custno!='001'
 	end
 	drop table #z_trans_ln13
 	--end z_trans_ln13
@@ -547,40 +550,40 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	--------------------------------------------------------------------------------------------------------------
 	--20'F
 	update #z_trans_ln03 set n01a = round(n01 * c.custprice,0)
-		,n01b = round(n01 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n01b = round(n01 * c.tggprice,0)
 		,n01c = round(n01 * c.driverprice,0)
 		,n03a = round(n03 * c.custprice,0)
-		,n03b = round(n03 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n03b = round(n03 * c.tggprice,0)
 		,n03c = round(n03 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$F' and datea<=a.datea order by datea desc,noq desc) c
 	--40'F
 	update #z_trans_ln03 set n02a = round(n02 * c.custprice,0)
-		,n02b = round(n02 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n02b = round(n02 * c.tggprice,0)
 		,n02c = round(n02 * c.driverprice,0)
 		,n04a = round(n04 * c.custprice,0)
-		,n04b = round(n04 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n04b = round(n04 * c.tggprice,0)
 		,n04c = round(n04 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$F' and datea<=a.datea order by datea desc,noq desc) c
 	--20'E
 	update #z_trans_ln03 set n05a = round(n05 * c.custprice,0)
-		,n05b = round(n05 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n05b = round(n05 * c.tggprice,0)
 		,n05c = round(n05 * c.driverprice,0)
 		,n07a = round(n07 * c.custprice,0)
-		,n07b = round(n07 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n07b = round(n07 * c.tggprice,0)
 		,n07c = round(n07 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$E' and datea<=a.datea order by datea desc,noq desc) c
 	--40'E
 	update #z_trans_ln03 set n06a = round(n06 * c.custprice,0)
-		,n06b = round(n06 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n06b = round(n06 * c.tggprice,0)
 		,n06c = round(n06 * c.driverprice,0)
 		,n08a = round(n08 * c.custprice,0)
-		,n08b = round(n08 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n08b = round(n08 * c.tggprice,0)
 		,n08c = round(n08 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
@@ -588,91 +591,91 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 
 	--20'HATCH
 	update #z_trans_ln03 set n09a = round(n09 * c.custprice,0)
-		,n09b = round(n09 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n09b = round(n09 * c.tggprice,0)
 		,n09c = round(n09 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$HATCH' and datea<=a.datea order by datea desc,noq desc) c
 	--40'HATCH
 	update #z_trans_ln03 set n10a = round(n10 * c.custprice,0)
-		,n10b = round(n10 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n10b = round(n10 * c.tggprice,0)
 		,n10c = round(n10 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$HATCH' and datea<=a.datea order by datea desc,noq desc) c
 	--20'SHIFT
 	update #z_trans_ln03 set n11a = round(n11 * c.custprice,0)
-		,n11b = round(n11 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n11b = round(n11 * c.tggprice,0)
 		,n11c = round(n11 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$SHIFT' and datea<=a.datea order by datea desc,noq desc) c
 	--40'SHIFT
 	update #z_trans_ln03 set n12a = round(n12 * c.custprice,0)
-		,n12b = round(n12 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n12b = round(n12 * c.tggprice,0)
 		,n12c = round(n12 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$SHIFT' and datea<=a.datea order by datea desc,noq desc) c
 	--20'RELOAD
 	update #z_trans_ln03 set n13a = round(n13 * c.custprice,0)
-		,n13b = round(n13 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n13b = round(n13 * c.tggprice,0)
 		,n13c = round(n13 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$RELOAD' and datea<=a.datea order by datea desc,noq desc) c
 	--40'RELOAD
 	update #z_trans_ln03 set n14a = round(n14 * c.custprice,0)
-		,n14b = round(n14 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n14b = round(n14 * c.tggprice,0)
 		,n14c = round(n14 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$RELOAD' and datea<=a.datea order by datea desc,noq desc) c
 	--超高吊架	
 	update #z_trans_ln03 set inteisa = round(inteis * c.custprice,0)
-		,inteisb = round(inteis * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,inteisb = round(inteis * c.tggprice,0)
 		,inteisc = round(inteis * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit=N'超高吊架' and datea<=a.datea order by datea desc,noq desc) c
 	--鐳仔桶	
 	update #z_trans_ln03 set arreragea = round(arrerage * c.custprice,0)
-		,arrerageb = round(arrerage * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,arrerageb = round(arrerage * c.tggprice,0)
 		,arreragec = round(arrerage * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit=N'鐳仔桶' and datea<=a.datea order by datea desc,noq desc) c
 	--20'其他	
 	update #z_trans_ln03 set n16a = round(n16 * c.custprice,0)
-		,n16b = round(n16 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n16b = round(n16 * c.tggprice,0)
 		,n16c = round(n16 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c	
 	--40'其他
 	update #z_trans_ln03 set n17a = round(n17 * c.custprice,0)
-		,n17b = round(n17 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n17b = round(n17 * c.tggprice,0)
 		,n17c = round(n17 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c	
 	--補洞	
 	update #z_trans_ln03 set n18a = round(n18 * c.custprice,0)
-		,n18b = round(n18 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n18b = round(n18 * c.tggprice,0)
 		,n18c = round(n18 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='補洞' and datea<=a.datea order by datea desc,noq desc) c	
 	--20'OOG
 	update #z_trans_ln03 set n19a = round(n19 * c.custprice,0)
-		,n19b = round(n19 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n19b = round(n19 * c.tggprice,0)
 		,n19c = round(n19 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$OOG' and datea<=a.datea order by datea desc,noq desc) c	
 	--40'OOG
 	update #z_trans_ln03 set n20a = round(n20 * c.custprice,0)
-		,n20b = round(n20 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n20b = round(n20 * c.tggprice,0)
 		,n20c = round(n20 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
@@ -781,6 +784,9 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	select '3',7,sum(isnull(mount01,0)),sum(isnull(money01,0)),sum(isnull(mount02,0)),sum(isnull(money02,0)),sum(isnull(money03,0))
 	from @tmpa 
 	where pno=2 or pno=4 or pno=6
+
+	insert into @tmpa(gno,pno)
+	select '4',99 
 
 	set @cmd = '日期：' + @t_bdate + ' ~ ' + @t_edate
 	
@@ -1193,40 +1199,40 @@ z_trans_ln03:--z_trans_ln03
 	--------------------------------------------------------------------------------------------------------------
 	--20'F
 	update #z_trans_ln03 set n01a = round(n01 * c.custprice,0)
-		,n01b = round(n01 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n01b = round(n01 * c.tggprice,0)
 		,n01c = round(n01 * c.driverprice,0)
 		,n03a = round(n03 * c.custprice,0)
-		,n03b = round(n03 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n03b = round(n03 * c.tggprice,0)
 		,n03c = round(n03 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$F' and datea<=a.datea order by datea desc,noq desc) c
 	--40'F
 	update #z_trans_ln03 set n02a = round(n02 * c.custprice,0)
-		,n02b = round(n02 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n02b = round(n02 * c.tggprice,0)
 		,n02c = round(n02 * c.driverprice,0)
 		,n04a = round(n04 * c.custprice,0)
-		,n04b = round(n04 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n04b = round(n04 * c.tggprice,0)
 		,n04c = round(n04 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$F' and datea<=a.datea order by datea desc,noq desc) c
 	--20'E
 	update #z_trans_ln03 set n05a = round(n05 * c.custprice,0)
-		,n05b = round(n05 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n05b = round(n05 * c.tggprice,0)
 		,n05c = round(n05 * c.driverprice,0)
 		,n07a = round(n07 * c.custprice,0)
-		,n07b = round(n07 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n07b = round(n07 * c.tggprice,0)
 		,n07c = round(n07 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$E' and datea<=a.datea order by datea desc,noq desc) c
 	--40'E
 	update #z_trans_ln03 set n06a = round(n06 * c.custprice,0)
-		,n06b = round(n06 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n06b = round(n06 * c.tggprice,0)
 		,n06c = round(n06 * c.driverprice,0)
 		,n08a = round(n08 * c.custprice,0)
-		,n08b = round(n08 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n08b = round(n08 * c.tggprice,0)
 		,n08c = round(n08 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
@@ -1234,91 +1240,91 @@ z_trans_ln03:--z_trans_ln03
 
 	--20'HATCH
 	update #z_trans_ln03 set n09a = round(n09 * c.custprice,0)
-		,n09b = round(n09 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n09b = round(n09 * c.tggprice,0)
 		,n09c = round(n09 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$HATCH' and datea<=a.datea order by datea desc,noq desc) c
 	--40'HATCH
 	update #z_trans_ln03 set n10a = round(n10 * c.custprice,0)
-		,n10b = round(n10 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n10b = round(n10 * c.tggprice,0)
 		,n10c = round(n10 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$HATCH' and datea<=a.datea order by datea desc,noq desc) c
 	--20'SHIFT
 	update #z_trans_ln03 set n11a = round(n11 * c.custprice,0)
-		,n11b = round(n11 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n11b = round(n11 * c.tggprice,0)
 		,n11c = round(n11 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$SHIFT' and datea<=a.datea order by datea desc,noq desc) c
 	--40'SHIFT
 	update #z_trans_ln03 set n12a = round(n12 * c.custprice,0)
-		,n12b = round(n12 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n12b = round(n12 * c.tggprice,0)
 		,n12c = round(n12 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$SHIFT' and datea<=a.datea order by datea desc,noq desc) c
 	--20'RELOAD
 	update #z_trans_ln03 set n13a = round(n13 * c.custprice,0)
-		,n13b = round(n13 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n13b = round(n13 * c.tggprice,0)
 		,n13c = round(n13 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$RELOAD' and datea<=a.datea order by datea desc,noq desc) c
 	--40'RELOAD
 	update #z_trans_ln03 set n14a = round(n14 * c.custprice,0)
-		,n14b = round(n14 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n14b = round(n14 * c.tggprice,0)
 		,n14c = round(n14 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$RELOAD' and datea<=a.datea order by datea desc,noq desc) c
 	--超高吊架	
 	update #z_trans_ln03 set inteisa = round(inteis * c.custprice,0)
-		,inteisb = round(inteis * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,inteisb = round(inteis * c.tggprice,0)
 		,inteisc = round(inteis * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit=N'超高吊架' and datea<=a.datea order by datea desc,noq desc) c
 	--鐳仔桶	
 	update #z_trans_ln03 set arreragea = round(arrerage * c.custprice,0)
-		,arrerageb = round(arrerage * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,arrerageb = round(arrerage * c.tggprice,0)
 		,arreragec = round(arrerage * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit=N'鐳仔桶' and datea<=a.datea order by datea desc,noq desc) c
 	--20'其他	
 	update #z_trans_ln03 set n16a = round(n16 * c.custprice,0)
-		,n16b = round(n16 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n16b = round(n16 * c.tggprice,0)
 		,n16c = round(n16 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c	
 	--40'其他
 	update #z_trans_ln03 set n17a = round(n17 * c.custprice,0)
-		,n17b = round(n17 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n17b = round(n17 * c.tggprice,0)
 		,n17c = round(n17 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c	
 	--補洞	
 	update #z_trans_ln03 set n18a = round(n18 * c.custprice,0)
-		,n18b = round(n18 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n18b = round(n18 * c.tggprice,0)
 		,n18c = round(n18 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='補洞' and datea<=a.datea order by datea desc,noq desc) c	
 	--20'OOG
 	update #z_trans_ln03 set n19a = round(n19 * c.custprice,0)
-		,n19b = round(n19 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n19b = round(n19 * c.tggprice,0)
 		,n19c = round(n19 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='20~#$OOG' and datea<=a.datea order by datea desc,noq desc) c	
 	--40'OOG
 	update #z_trans_ln03 set n20a = round(n20 * c.custprice,0)
-		,n20b = round(n20 * case when isnull(c.tggprice,0)=0 then c.custprice else c.tggprice end,0)
+		,n20b = round(n20 * c.tggprice,0)
 		,n20c = round(n20 * c.driverprice,0)
 	from #z_trans_ln03 a
 	outer apply(select top 1 * from addrs 
@@ -1927,6 +1933,9 @@ z_trans_ln13:--z_trans_ln13
 			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01a-n01b,0)+isnull(n02a-n02b,0)+isnull(n03a-n03b,0)+isnull(n04a-n04b,0)+isnull(n05a-n05b,0)+isnull(n06a-n06b,0) end) money03
 		from #z_trans_ln13
 		group by noa,typea,v02,v03,straddrno,straddr,endaddrno,endaddr,casetype,memo
+		
+		--沒勾新安單價,除001萬海,其餘金額都歸0
+		update @tmpa set money01=0,money02=0,money03=0 where custno!='001'
 	end
 	update @tmpb set tmount = isnull(mount01,0)+isnull(mount02,0)
 		,tmoney = isnull(money01,0)+isnull(money02,0)+isnull(money03,0)
@@ -2749,7 +2758,13 @@ z_trans_ln08:--z_trans_ln.txt/z_trans_ln08
 	from @tmpb
 	where pno = 1
 	group by custno,cust
-
+	
+	insert into @tmpb(gno,pno,custno,cust)
+	select '5' gno,5 pno,custno,cust
+	from @tmpb
+	where pno = 1
+	group by custno,cust
+	
 	--空白行
 	declare @pagecount int = 30
 
