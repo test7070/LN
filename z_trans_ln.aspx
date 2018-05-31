@@ -94,6 +94,9 @@
                     }, {
 						//[26]                 16 收入內容
 						type : '6', name : 'ytype'
+					}, {
+						//[27]                 17 科目
+						type : '6', name : 'ztype'
 					}]
                 });
                 q_popAssign();
