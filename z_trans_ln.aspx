@@ -91,7 +91,10 @@
                     },{//[24][25]              15
                         type : '1',
                         name : 'xv01'
-                    }]
+                    }, {
+						//[26]                 16 收入內容
+						type : '6', name : 'ytype'
+					}]
                 });
                 q_popAssign();
 				$('#txtMon').mask(r_picm);
