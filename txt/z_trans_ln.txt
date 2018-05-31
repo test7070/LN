@@ -174,6 +174,7 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
 	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
 	declare @t_type nvarchar(max) = case when '#non' = [26] then '' else [26] end
+	declare @t_option nvarchar(max) = case when '#non' = [17] then '' else [17] end
 	----------------------------------------------------------------------------------------------------------------
 	declare @tmpa table(
 		sel int identity(1,1)
@@ -391,42 +392,34 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	
 	update #z_trans_ln13 set casetype=replace(casetype,'~#$',"'")
 	----------------------------------------------------------------------------------------------------------------
-	
-	insert into @tmpa(gno,pno,custno,item,itema,mount01,money01,mount02,money02,money03)
-	select '1',1,custno,'移櫃','移櫃'
-		,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
-		,sum(case when left(cardealno,1)='A' then isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0) else 0 end) money01
-		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0) end) mount02
-		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(n05b,0)+isnull(n06b,0) end) money02
-		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01a-n01b,0)+isnull(n02a-n02b,0)+isnull(n03a-n03b,0)+isnull(n04a-n04b,0)+isnull(n05a-n05b,0)+isnull(n06a-n06b,0) end) money03
-	from #z_trans_ln13
-	where (len(@t_type)=0 or charindex(',移櫃,',','+@t_type+',')>0)
-	group by custno
-	having count(1)>0
-	--if len(@t_option)>0
-	--begin
-	--	insert into @tmpb(custno,mount01,money01,mount02,money02,money03)
-	--	select custno
-	--		,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
-	--		,sum(case when left(cardealno,1)='A' then isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(n05b,0)+isnull(n06b,0) else 0 end) money01
-	--		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0) end) mount02
-	--		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(n05c,0)+isnull(n06c,0) end) money02
-	--		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01b-n01c,0)+isnull(n02b-n02c,0)+isnull(n03b-n03c,0)+isnull(n04b-n04c,0)+isnull(n05b-n05c,0)+isnull(n06b-n06c,0) end) money03
-	--	from #z_trans_ln13
-	--	group by custno
-	--end
-	--else
-	--begin
-	--	insert into @tmpb(custno,mount01,money01,mount02,money02,money03)
-	--	select custno
-	--		,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
-	--		,sum(case when left(cardealno,1)='A' then isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0) else 0 end) money01
-	--		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0) end) mount02
-	--		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(n05b,0)+isnull(n06b,0) end) money02
-	--		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01a-n01b,0)+isnull(n02a-n02b,0)+isnull(n03a-n03b,0)+isnull(n04a-n04b,0)+isnull(n05a-n05b,0)+isnull(n06a-n06b,0) end) money03
-	--	from #z_trans_ln13
-	--	group by custno
-	--end
+	if len(@t_option)>0
+	begin
+		insert into @tmpa(gno,pno,custno,item,itema,mount01,money01,mount02,money02,money03)
+		select '1',1,custno,'移櫃','移櫃'
+			,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
+			,sum(case when left(cardealno,1)='A' then isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(n05b,0)+isnull(n06b,0) else 0 end) money01
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0) end) mount02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(n05c,0)+isnull(n06c,0) end) money02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01b-n01c,0)+isnull(n02b-n02c,0)+isnull(n03b-n03c,0)+isnull(n04b-n04c,0)+isnull(n05b-n05c,0)+isnull(n06b-n06c,0) end) money03
+		from #z_trans_ln13
+		where (len(@t_type)=0 or charindex(',移櫃,',','+@t_type+',')>0)
+		group by custno
+		having count(1)>0
+	end
+	else
+	begin
+		insert into @tmpa(gno,pno,custno,item,itema,mount01,money01,mount02,money02,money03)
+		select '1',1,custno,'移櫃','移櫃'
+			,sum(case when left(cardealno,1)='A' then isnull(n01,0) else 0 end) mount01
+			,sum(case when left(cardealno,1)='A' then isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0) else 0 end) money01
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0) end) mount02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01b,0)+isnull(n02b,0)+isnull(n03b,0)+isnull(n04b,0)+isnull(n05b,0)+isnull(n06b,0) end) money02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01a-n01b,0)+isnull(n02a-n02b,0)+isnull(n03a-n03b,0)+isnull(n04a-n04b,0)+isnull(n05a-n05b,0)+isnull(n06a-n06b,0) end) money03
+		from #z_trans_ln13
+		where (len(@t_type)=0 or charindex(',移櫃,',','+@t_type+',')>0)
+		group by custno
+		having count(1)>0
+	end
 	drop table #z_trans_ln13
 	--end z_trans_ln13
 	--=============================================================================================================
@@ -684,29 +677,32 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	outer apply(select top 1 * from addrs 
 		where noa='001' and salesno=a.cardealno and custunit='40~#$OOG' and datea<=a.datea order by datea desc,noq desc) c	
 	--=====================================================================================================================
-	insert into @tmpa(gno,pno,custno,item,itema,mount01,money01,mount02,money02,money03)
-	select '1',3,'001' custno,'船邊','船邊'
-		,sum(case when left(cardealno,1)='A' then isnull(n01,0)+isnull(n02,0)+isnull(n03,0)+isnull(n04,0)+isnull(n05,0)+isnull(n06,0)+isnull(n07,0)
-			+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0) else 0 end) mount01
-		,sum(case when left(cardealno,1)='A' then isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0)+isnull(n07a,0)
-			+isnull(n08a,0)+isnull(n09a,0)+isnull(n10a,0)+isnull(n11a,0)+isnull(n12a,0)+isnull(n13a,0)+isnull(n14a,0) 
-			+isnull(n16a,0)+isnull(n17a,0)+isnull(n18a,0)+isnull(n19a,0)+isnull(n20a,0)+isnull(inteisa,0)+isnull(arreragea,0) else 0 end) money01
+	if len(@t_option)>0
+	begin
+		insert into @tmpa(gno,pno,custno,item,itema,mount01,money01,mount02,money02,money03)
+		select '1',3,'001' custno,'船邊','船邊'
+			,sum(case when left(cardealno,1)='A' then isnull(n01,0)+isnull(n02,0)+isnull(n03,0)+isnull(n04,0)+isnull(n05,0)+isnull(n06,0)+isnull(n07,0)
+				+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0) else 0 end) mount01
+			,sum(case when left(cardealno,1)='A' then isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0)+isnull(n07a,0)
+				+isnull(n08a,0)+isnull(n09a,0)+isnull(n10a,0)+isnull(n11a,0)+isnull(n12a,0)+isnull(n13a,0)+isnull(n14a,0) 
+				+isnull(n16a,0)+isnull(n17a,0)+isnull(n18a,0)+isnull(n19a,0)+isnull(n20a,0)+isnull(inteisa,0)+isnull(arreragea,0) else 0 end) money01
 
-		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0)+isnull(n02,0)+isnull(n03,0)+isnull(n04,0)+isnull(n05,0)+isnull(n06,0)+isnull(n07,0)
-			+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0) end) mount02
-		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(n05c,0)+isnull(n06c,0)+isnull(n07c,0)
-			+isnull(n08c,0)+isnull(n09c,0)+isnull(n10c,0)+isnull(n11c,0)+isnull(n12c,0)+isnull(n13c,0)+isnull(n14c,0) 
-			+isnull(n16c,0)+isnull(n17c,0)+isnull(n18c,0)+isnull(n19c,0)+isnull(n20c,0)+isnull(inteisc,0)+isnull(arreragec,0) end) money02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0)+isnull(n02,0)+isnull(n03,0)+isnull(n04,0)+isnull(n05,0)+isnull(n06,0)+isnull(n07,0)
+				+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0) end) mount02
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(n05c,0)+isnull(n06c,0)+isnull(n07c,0)
+				+isnull(n08c,0)+isnull(n09c,0)+isnull(n10c,0)+isnull(n11c,0)+isnull(n12c,0)+isnull(n13c,0)+isnull(n14c,0) 
+				+isnull(n16c,0)+isnull(n17c,0)+isnull(n18c,0)+isnull(n19c,0)+isnull(n20c,0)+isnull(inteisc,0)+isnull(arreragec,0) end) money02
 
-		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01a,0)-isnull(n01c,0)+isnull(n02a,0)-isnull(n02c,0)+isnull(n03a,0)-isnull(n03c,0)
-			+isnull(n04a,0)-isnull(n04c,0)+isnull(n05a,0)-isnull(n05c,0)+isnull(n06a,0)-isnull(n06c,0)+isnull(n07a,0)-isnull(n07c,0)
-			+isnull(n08a,0)-isnull(n08c,0)+isnull(n09a,0)-isnull(n09c,0)+isnull(n10a,0)-isnull(n10c,0)+isnull(n11a,0)-isnull(n11c,0)
-			+isnull(n12a,0)-isnull(n12c,0)+isnull(n13a,0)-isnull(n13c,0)+isnull(n14a,0)-isnull(n14c,0) 
-			+isnull(n16a,0)-isnull(n16c,0)+isnull(n17a,0)-isnull(n17c,0)+isnull(n18a,0)-isnull(n18c,0)
-			+isnull(n19a,0)-isnull(n19c,0)+isnull(n20a,0)-isnull(n20c,0)+isnull(inteisa,0)-isnull(inteisc,0)+isnull(arreragea,0)-isnull(arreragec,0) end) money03
-	from #z_trans_ln03
-	where (len(@t_type)=0 or charindex(N',船邊,',','+@t_type+',')>0)
-	having count(1)>0
+			,sum(case when left(cardealno,1)='A' then 0 else isnull(n01a,0)-isnull(n01c,0)+isnull(n02a,0)-isnull(n02c,0)+isnull(n03a,0)-isnull(n03c,0)
+				+isnull(n04a,0)-isnull(n04c,0)+isnull(n05a,0)-isnull(n05c,0)+isnull(n06a,0)-isnull(n06c,0)+isnull(n07a,0)-isnull(n07c,0)
+				+isnull(n08a,0)-isnull(n08c,0)+isnull(n09a,0)-isnull(n09c,0)+isnull(n10a,0)-isnull(n10c,0)+isnull(n11a,0)-isnull(n11c,0)
+				+isnull(n12a,0)-isnull(n12c,0)+isnull(n13a,0)-isnull(n13c,0)+isnull(n14a,0)-isnull(n14c,0) 
+				+isnull(n16a,0)-isnull(n16c,0)+isnull(n17a,0)-isnull(n17c,0)+isnull(n18a,0)-isnull(n18c,0)
+				+isnull(n19a,0)-isnull(n19c,0)+isnull(n20a,0)-isnull(n20c,0)+isnull(inteisa,0)-isnull(inteisc,0)+isnull(arreragea,0)-isnull(arreragec,0) end) money03
+		from #z_trans_ln03
+		where (len(@t_type)=0 or charindex(N',船邊,',','+@t_type+',')>0)
+		having count(1)>0
+	end
 
 	drop table #z_trans_ln03
 	--end z_trans_ln03
@@ -735,15 +731,17 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	and '001' between @t_bcustno and @t_ecustno --一律為萬海
 	and (len(@t_type)=0 or charindex(','+b.typea+',',','+@t_type+',')>0)
 
-	insert into @tmpa(gno,pno,custno,item,itema,money01,money02,money03)
-	select '1',case left(typea,2) when '移櫃' then 1 when '船邊' then 3 else 5 end pno
-		,custno,left(typea,2),typea
-		,sum(case when left(cardealno,1)='A' then total else 0 end) money01
-		,sum(case when left(cardealno,1)='A' then 0 else total end) money02
-		,0 money03
-	from @tmpc
-	group by case left(typea,2) when '移櫃' then 1 when '船邊' then 3 else 5 end,custno,left(typea,2),typea
-
+	if len(@t_option)>0
+	begin
+		insert into @tmpa(gno,pno,custno,item,itema,money01,money02,money03)
+		select '1',case left(typea,2) when '移櫃' then 1 when '船邊' then 3 else 5 end pno
+			,custno,left(typea,2),typea
+			,sum(case when left(cardealno,1)='A' then total else 0 end) money01
+			,sum(case when left(cardealno,1)='A' then 0 else total end) money02
+			,0 money03
+		from @tmpc
+		group by case left(typea,2) when '移櫃' then 1 when '船邊' then 3 else 5 end,custno,left(typea,2),typea
+	end
 	---select * from @tmpc
 	--select * from @tmpa
 	--return
@@ -790,7 +788,8 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 	select @bcust = nick from cust where noa=@t_bcustno
 	select @ecust = nick from cust where noa=@t_ecustno
 	declare @cmd2 nvarchar(max)
-	set @cmd2 = "日期：" + case when @t_bdate=@t_edate then @t_bdate else @t_bdate+' ~ '+@t_edate end
+	set @cmd2 = case when len(@t_option)>0 then '新實' else '' end
+	set @cmd2 = @cmd2 +"　日期：" + case when @t_bdate=@t_edate then @t_bdate else @t_bdate+' ~ '+@t_edate end
 	set @cmd2 = @cmd2 + case when @t_bcustno=@t_ecustno then "　客戶："+@bcust
 							when @t_bcustno='' and @t_ecustno=char(255) then ''
 							else "　客戶："+@bcust+" ~ "+@ecust end
@@ -4162,7 +4161,8 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	select gno 
 		,recno rr
 		,"電腦編號："+case when @bno=@eno then @bno else @bno+"~"+@eno end a01
-		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+"',' "+CHAR(59)+"noa=\'"+noa+"\'','95%','95%','B1')"+char(34)+">"+noa+"</a>" b01
+		--,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx?' + r_userno + '"+CHAR(59)+"' + r_name + '"+CHAR(59)+"' + q_id + '"+CHAR(59)+"noa=\'"+noa+"\'"+CHAR(59)+"',' "+CHAR(59)+"noa=\'"+noa+"\'','95%','95%','B1')"+char(34)+">"+noa+"</a>" b01
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"%7b%22noa%22%3a%22"+noa+"%22%7d','95%','95%','')"+char(34)+">"+noa+"</a>" b01 
 		,right(datea,5) b02
 		,v01 b03
 		,v02 b04
