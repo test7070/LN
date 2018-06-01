@@ -44,10 +44,16 @@
             	t_edate = $.trim($('#txtEdate').val());
             	t_noa = $.trim($('#txtNoa').val());
             	t_v01 = $.trim($('#txtV01').val());
+            	t_v02 = $.trim($('#txtV02').val());
             	t_voyage = $.trim($('#txtVoyage').val());
             	t_caseno = $.trim($('#txtCaseno').val());
             	t_carno = $.trim($('#txtCarno').val());
             	t_worker = $.trim($('#txtWorker').val());
+            	t_addrno = $.trim($('#txtAddrno').val());
+            	t_addr = $.trim($('#txtAddr').val());
+            	t_addrno2 = $.trim($('#txtAddrno2').val());
+            	t_addr2 = $.trim($('#txtAddr2').val());
+            	
             			
 				var t_where = " 1=1 and vccno='tran_ln4'" 
 					+ q_sqlPara2("noa", t_noa)
@@ -56,13 +62,33 @@
                 if(t_v01.length > 0)
                 	t_where += " and charindex('" + t_v01 + "',v01)>0";
                 if(t_voyage.length > 0)
-                	t_where += " and (charindex(N'" + t_voyage + "',v02)>0 or charindex(N'" + t_voyage + "',v03)>0)";
+                    t_where += " and charindex(N'" + t_voyage + "',v02)>0)";
+                if(t_voyage.length > 0)
+                	t_where += " and charindex(N'" + t_voyage + "',v03)>0)";
                 if(t_caseno.length > 0){
                 	t_where += " and exists(select noq from borrgs where borrgs.noa=borrg.noa and  (charindex(N'" + t_caseno + "',borrgs.caseno)>0 or charindex(N'" + t_caseno + "',borrgs.checkno)>0))";
                 }  
                 if(t_carno.length > 0){
                 	t_where += " and exists(select noq from borrgs where borrgs.noa=borrg.noa and  (charindex(N'" + t_carno + "',borrgs.carno)>0))";
+                }
+                if(t_caseno.length > 0){
+                    t_where += " and exists(select noq from borrgs where borrgs.noa=borrg.noa and  (charindex(N'" + t_caseno + "',borrgs.caseno)>0 or charindex(N'" + t_caseno + "',borrgs.checkno)>0))";
                 }  
+                if(t_carno.length > 0){
+                    t_where += " and exists(select noq from borrgs where borrgs.noa=borrg.noa and  (charindex(N'" + t_carno + "',borrgs.carno)>0))";
+                }
+                if(t_addrno.length > 0){
+                    t_where += " and exists(select noq from borrgs where borrgs.noa=borrg.noa and  (charindex(N'" + t_addrno + "',borrgs.addrno)>0))";
+                }
+                if(t_addr.length > 0){
+                    t_where += " and exists(select noq from borrgs where borrgs.noa=borrg.noa and  (charindex(N'" + t_addr + "',borrgs.addr)>0))";
+                } 
+                if(t_addrno2.length > 0){
+                    t_where += " and exists(select noq from borrgs where borrgs.noa=borrg.noa and  (charindex(N'" + t_addrno2 + "',borrgs.addrno2)>0))";
+                } 
+                if(t_addr2.length > 0){
+                    t_where += " and exists(select noq from borrgs where borrgs.noa=borrg.noa and  (charindex(N'" + t_addr2 + "',borrgs.addr2)>0))";
+                } 
                 t_where = ' where=^^' + t_where + '^^ ';
                 return t_where;
             }
@@ -91,10 +117,14 @@
 					<td class='seek'  style="width:20%;"><a id='lblNoa'>電腦編號</a></td>
 					<td><input class="txt" id="txtNoa" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
-				<tr class='seek_tr'>
+				<!--<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a id='lblV01'>PLAN_ID</a></td>
 					<td><input class="txt" id="txtV01" type="text" style="width:215px; font-size:medium;" /></td>
-				</tr>
+				</tr>-->
+				<tr class='seek_tr'>
+                    <td class='seek'  style="width:20%;"><a>船名</a></td>
+                    <td><input class="txt" id="txtV02" type="text" style="width:215px; font-size:medium;" /></td>
+                </tr>
 				<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a id='lblVoyage'>航次</a></td>
 					<td><input class="txt" id="txtVoyage" type="text" style="width:215px; font-size:medium;" /></td>
@@ -108,9 +138,21 @@
 					<td><input class="txt" id="txtCarno" type="text" style="width:215px; font-size:medium;" /></td>
 				</tr>
 				<tr class='seek_tr'>
+                    <td class='seek'  style="width:20%;"><a>起點</a></td>
+                    <td><input class="txt" id="txtAddrno" type="text" style="width:100px; font-size:medium;" />
+                        <input class="txt" id="txtAddr" type="text" style="width:115px; font-size:medium;" />
+                    </td>
+                </tr>
+                <tr class='seek_tr'>
+                    <td class='seek'  style="width:20%;"><a>迄點</a></td>
+                    <td><input class="txt" id="txtAddrno2" type="text" style="width:100px; font-size:medium;" />
+                        <input class="txt" id="txtAddr2" type="text" style="width:115px; font-size:medium;" />
+                    </td>
+                </tr>
+				<!--<tr class='seek_tr'>
 					<td class='seek'  style="width:20%;"><a>製單員</a></td>
 					<td><input class="txt" id="txtWorker" type="text" style="width:215px; font-size:medium;" /></td>
-				</tr>
+				</tr>-->
 			</table>
 			<!--#include file="../inc/seek_ctrl.inc"-->
 		</div>
