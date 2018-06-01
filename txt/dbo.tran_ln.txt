@@ -1,0 +1,31 @@
+alter function [dbo].[tran_ln](@t_bdate nvarchar(20),@t_edate nvarchar(20))
+RETURNS @tmp TABLE (
+	sel int identity(1,1)
+	,noa nvarchar(20)
+	,v01 nvarchar(50)--船隻編號
+	,datea nvarchar(20)--作業日期
+	,custno nvarchar(20)--客戶名稱
+	,cust nvarchar(50)
+	,partno nvarchar(20)--貨主
+	,part nvarchar(50)
+	,v02 nvarchar(50)--M.V.
+	,v03 nvarchar(50)--VOY NO.
+	,v04 nvarchar(50)--PORT.
+	,begindate nvarchar(20) --ARRIVAL
+	,v05 nvarchar(50)--BERTHED
+	,v06 nvarchar(50)--WHARF NO
+	,memo nvarchar(max))
+as
+begin
+	if len(@t_edate) = 0
+		set @t_edate = char(255)
+	insert into @tmp(noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06)
+	select noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06
+	from borr 
+	where vccno='tran_ln'
+	and datea between @t_bdate and @t_edate
+	and isnull(enda,0)=0
+	order by datea desc,noa desc
+	return
+end
+GO

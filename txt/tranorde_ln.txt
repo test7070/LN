@@ -1,0 +1,348 @@
+tranordet_borrgs:--tranordet_borrgs
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_userno nvarchar(20) = [1]
+	declare @t_noa nvarchar(20) = [2]
+	-------------------------------------------------------------------------------------------
+	-- tran_ln4.aspx 存檔後檢查
+	--因為實際工作日期可能和單據上的不一樣,因此放寬到前後十天
+	declare @t_date nvarchar(20) = ''
+	select @t_date=datea from borrg where noa=@t_noa
+	
+	declare @t_bdate nvarchar(20) = ''
+	declare @t_edate nvarchar(20) = ''
+	begin try
+		set @t_bdate = CONVERT(nvarchar,dateadd(DD,-10,cast(@t_date as datetime)),111) 
+		set @t_edate = CONVERT(nvarchar,dateadd(DD,10,cast(@t_date as datetime)),111)
+	end try
+	begin catch
+		-- nothing
+	end catch
+	----------------------------------------------------------------------------------------
+	declare @sel int
+	declare @caseno nvarchar(30)
+	declare @accy nvarchar(10)
+	declare @noa nvarchar(20)
+	declare @noq nvarchar(10)
+	
+	-- 原則上同一張請款單不會有重複的櫃號
+	declare @tmpa table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,caseno1 nvarchar(30) -- borrgs.caseno
+		,caseno2 nvarchar(30) -- borrgs.checkno
+		,ordeno1 nvarchar(30)
+		,ordeno2 nvarchar(30)
+	)
+	insert into @tmpa(noa,noq,caseno1,caseno2,ordeno1,ordeno2)
+	select noa,noq,isnull(caseno,''),isnull(checkno,''),ISNULL(ordeno1,''),ISNULL(ordeno2,'')
+	from borrgs
+	where noa = @t_noa
+	
+	declare @tmpb table(
+		sel int identity(1,1)
+		,caseno nvarchar(30)
+		,ordeno nvarchar(30)
+		,isexist int
+	)
+	insert into @tmpb(caseno,ordeno,isexist)
+	select caseno1,ordeno1,0
+	from @tmpa
+	where len(caseno1)>0
+	insert into @tmpb(caseno,ordeno,isexist)
+	select caseno2,ordeno2,0
+	from @tmpa
+	where len(caseno2)>0
+	
+	--先檢查原本的訂單是否還存在
+	update @tmpb set isexist = 1
+	from @tmpb a
+	left join view_tranordet b on a.ordeno=b.accy+'-'+b.noa+'-'+b.noq
+	where b.noa is not null
+	--假如原先的訂單已不存在,就清除關聯,重新匹配
+	update @tmpb set ordeno='' where isexist=0
+	--沒有訂單號碼的,開始匹配
+	declare cursor_table cursor for
+	select sel,caseno from @tmpb where len(ordeno)=0
+	open cursor_table
+	fetch next from cursor_table
+	into @sel,@caseno
+	while(@@FETCH_STATUS <> -1)
+	begin
+		select @accy='',@noa='',@noq=''
+		select @accy=a.accy,@noa=a.noa,@noq=a.noq
+		from(
+			select a.accy,a.noa,a.noq,a.containerno1
+			from view_tranordet a
+			where a.containerno1=@caseno
+			and a.datea between @t_bdate and @t_edate) a
+		outer apply(select top 1 * from borrgs where noa!=@t_noa and ordeno1=a.accy+'-'+a.noa+'-'+a.noq) b
+		outer apply(select top 1 * from @tmpb where ordeno1=a.accy+'-'+a.noa+'-'+a.noq) c
+		where b.noa is null and c.sel is null
+		
+		if len(@accy+@noa+@noq)>0
+			update @tmpb set ordeno=@accy+'-'+@noa+'-'+@noq where sel=@sel
+		
+		fetch next from cursor_table
+		into @sel,@caseno
+	end
+	close cursor_table
+	deallocate cursor_table
+	-- 資料回寫@tmpa
+	update @tmpa set ordeno1='',ordeno2=''
+	
+	update @tmpa set ordeno1=b.ordeno
+	from @tmpa a
+	left join @tmpb b on a.caseno1=b.caseno
+	where b.sel is not null
+	
+	update @tmpa set ordeno2=b.ordeno
+	from @tmpa a
+	left join @tmpb b on a.caseno2=b.caseno
+	where b.sel is not null
+	
+	-- 有異動的記錄到DRUN
+	declare @tmpc table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,memo nvarchar(max)
+	)
+	declare @Xcaseno1 nvarchar(30)
+	declare @Xcaseno2 nvarchar(30)
+	declare @Xordeno1 nvarchar(30)
+	declare @Xordeno2 nvarchar(30)
+	declare @Ycaseno1 nvarchar(30)
+	declare @Ycaseno2 nvarchar(30)
+	declare @Yordeno1 nvarchar(30)
+	declare @Yordeno2 nvarchar(30)
+	declare @memo nvarchar(max)
+	
+	declare cursor_table cursor for
+	select a.noa,a.noq
+		,isnull(b.caseno,''),isnull(b.checkno,''),isnull(b.ordeno1,''),isnull(b.ordeno2,'')
+		,a.caseno1,a.caseno2,a.ordeno1,a.ordeno2
+	from @tmpa a
+	left join borrgs b on a.noa=b.noa and a.noq=b.noq
+	open cursor_table
+	fetch next from cursor_table
+	into @noa,@noq,@Xcaseno1,@Xcaseno2,@Xordeno1,@Xordeno2,@Ycaseno1,@Ycaseno2,@Yordeno1,@Yordeno2
+	while(@@FETCH_STATUS <> -1)
+	begin
+		set @memo = ''
+		if @Xordeno1!=@Yordeno1
+		begin
+			set @memo = @memo + case when len(@memo)=0 then '' else ',' end + 'ordeno1:'+@Xordeno1+'->'+@Yordeno1
+		end
+		if @Xordeno2!=@Yordeno2
+		begin
+			set @memo = @memo + case when len(@memo)=0 then '' else ',' end + 'ordeno2:'+@Xordeno2+'->'+@Yordeno2
+		end
+		if len(@memo)>0
+		begin
+			insert into @tmpc(noa,noq,memo)select @noa,@noq,@memo
+		end
+		
+		fetch next from cursor_table
+		into @noa,@noq,@Xcaseno1,@Xcaseno2,@Xordeno1,@Xordeno2,@Ycaseno1,@Ycaseno2,@Yordeno1,@Yordeno2
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	
+	DECLARE @chk tinyint = 0
+	Begin Transaction [Trans_Name]
+	set @memo = ''
+	begin try
+		-- 回寫borrgs
+		update borrgs set ordeno1=b.ordeno1,ordeno2=b.ordeno2
+		from borrgs a
+		left join @tmpa b on a.noa=b.noa and a.noq=b.noq
+		where b.noa is not null
+		-- 回寫drun
+		insert into drun(datea,timea
+			,usera,[action],noa,tablea,accno,title,memo)
+		select left(CONVERT(nvarchar,getdate(),111),10) 
+			,left(CONVERT(nvarchar,getdate(),108),5)
+			,@t_userno,'Update',noa,'borrgs',noq,'外車派車匹配',memo
+		from @tmpc
+	
+		Commit Transaction [Trans_Name] -- 提交所有操作所造成的變更
+	end try
+	begin catch
+		Rollback Transaction [Trans_Name] -- 復原所有操作所造成的變更
+		set @memo = ERROR_MESSAGE()
+	end catch
+	
+	select @memo msg,* from @tmpa
+	;
+	
+tranorde_borr:--tranorde_borr   tran_ln3	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_bno nvarchar(20) = [1]
+	declare @t_eno nvarchar(20) = [2]
+	-----------------------------------------------------------------------------------------------------
+	-----------------------------------------------------------------------------------------------------
+	declare @bbm table(
+		sel int identity(1,1)
+		,accy nvarchar(20)
+		,noa nvarchar(20)
+		,planid nvarchar(20)
+		,datea nvarchar(20)
+		,begindate nvarchar(20)
+		,enddate nvarchar(20)
+		,boatname nvarchar(20)
+		,ship nvarchar(20)
+		,memo nvarchar(max)
+		,memo2 nvarchar(max)
+		,custno nvarchar(20)
+		,cust nvarchar(100)
+		,custnick nvarchar(30)
+	)
+	declare @bbs table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,caseno nvarchar(20)
+		,casetype nvarchar(20)
+		,carno nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,straddrno nvarchar(20)
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+		,n01 float --數量
+		,n02 float --油桶櫃
+		,n03 float --20'押運
+		,n04 float --40'押運
+		,m01 float --20'OOG附加費
+		,m02 float --40'OOG附加費
+		,memo nvarchar(max)
+	)
+	insert into @bbm(accy,noa,planid,datea,begindate,enddate,boatname,ship,memo,memo2
+		,custno,cust,custnick)
+	select a.accy,a.noa,a.[contract] planid,a.datea
+		,a.date1,a.date2,a.boatname,a.ship,a.memo,a.memo2
+		,custno,comp,nick
+	from view_tranorde a
+	where a.noa between @t_bno and @t_eno
+	
+	insert into @bbs(noa,noq,caseno,casetype,carno,cardealno,cardeal
+		,straddrno,straddr,endaddrno,endaddr,n01,n02,n03,n04,m01,m02,memo)
+	select a.noa,a.noq,a.containerno1 caseno,a.caseno casetype,a.carno,a.driverno cardealno,a.driver cardeal
+		,a.addrno straddrno,a.addr straddr,a.addrno2 endaddrno,a.addr2 endaddr
+		,a.mount n01,a.lengthb n02,a.width n03,a.height n04,a.total m01,a.total2 m02,a.memo
+	from view_tranordes a
+	where a.noa between @t_bno and @t_eno
+	
+	update @bbs set cardealno = ISNULL(b.noa,'')
+	from @bbs a
+	left join cardeal b on a.cardeal=b.nick
+	where len(ISNULL(a.cardealno,''))=0
+	and b.noa is not null
+	
+	update @bbs set cardealno='B00',cardeal='外車'
+	from @bbs a
+	where len(ISNULL(a.cardealno,''))=0
+	
+	update @bbs set straddr = ISNULL(b.addr,'')
+	from @bbs a
+	left join addr2 b on a.straddrno=b.noa
+	where len(ISNULL(a.straddr,''))=0
+	and b.noa is not null
+	
+	update @bbs set endaddr = ISNULL(b.addr,'')
+	from @bbs a
+	left join addr2 b on a.endaddrno=b.noa
+	where len(ISNULL(a.endaddr,''))=0
+	and b.noa is not null
+	-----------------------------------------------------------------------------------------------
+	declare @bbs2 table(
+		sel int identity(1,1)
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,caseno nvarchar(20)
+		,casetype nvarchar(20)
+		,carno nvarchar(20)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,straddrno nvarchar(20)
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+		,n01 float --數量
+		,n02 float --油桶櫃
+		,n03 float --20'押運
+		,n04 float --40'押運
+		,m01 float --20'OOG附加費
+		,m02 float --40'OOG附加費
+		,memo nvarchar(max)
+	)
+	insert into @bbs2(noa,caseno,casetype,carno,cardealno,cardeal
+		,straddrno,straddr,endaddrno,endaddr,n01,n02,n03,n04,m01,m02,memo)
+	select noa,caseno,casetype,carno,cardealno,cardeal
+		,straddrno,straddr,endaddrno,endaddr
+		,SUM(ISNULL(n01,0)),SUM(ISNULL(n02,0)),SUM(ISNULL(n03,0)),SUM(ISNULL(n04,0))
+		,SUM(ISNULL(m01,0)),SUM(ISNULL(m01,0))
+		,''
+	from @bbs
+	group by noa,caseno,cardealno,cardeal,casetype,carno
+		,straddrno,straddr,endaddrno,endaddr
+	
+	update @bbs2 set noq= RIGHT('00'+CAST(recno as nvarchar),3)
+	from @bbs2 a
+	left join (select sel,ROW_NUMBER()over(partition by noa order by sel) recno from @bbs2 ) b on a.sel=b.sel
+	
+	-----------------------------------------------------------------------------------------------
+	declare @accy nvarchar(10)
+	declare @noa nvarchar(20)
+	
+	Begin Transaction [Trans_Name]
+	begin try
+		declare cursor_table cursor for
+		select accy,noa from @bbm group by accy,noa 
+		open cursor_table
+		fetch next from cursor_table
+		into @accy,@noa
+		while(@@FETCH_STATUS <> -1)
+		begin
+			set @cmd = "update tranorde"+@accy+" set enda=1 where noa=@noa"
+			execute sp_executesql @cmd,N'@noa nvarchar(20)',@noa=@noa
+			fetch next from cursor_table
+			into @accy,@noa
+		end
+		close cursor_table
+		deallocate cursor_table
+	
+		insert into borr(vccno,noa,v01,v02,v03,datea,begindate,enddate,memo,memo2,custno,cust,custnick)
+		select 'tran_ln3',a.noa,a.planid,a.boatname,a.ship,a.datea,a.begindate,a.enddate,a.memo,a.memo2
+			,a.custno,a.cust,a.custnick
+		from @bbm a
+		left join borr b on a.noa=b.noa
+		where b.noa is null
+		
+		update borr set vccno='tran_ln3',v01=b.planid,v02=b.boatname,v03=b.ship,datea=b.datea
+			,begindate=b.begindate,enddate=b.enddate,memo=b.memo,memo2=b.memo2
+			,custno=b.custno,cust=b.cust,custnick=b.custnick
+		from borr a
+		left join @bbm b on a.noa=b.noa
+		where b.noa is not null
+		
+		delete borrs where noa between @t_bno and @t_eno
+		 
+		insert into borrs(noa,noq,caseno,casetype,carno,cardealno,cardeal
+		,addrno,addr,addrno2,addr2,n01,n02,n03,n04,m01,m02,memo) 
+		select noa,noq,caseno,casetype,carno,cardealno,cardeal
+		,straddrno,straddr,endaddrno,endaddr,n01,n02,n03,n04,m01,m02,memo
+		from @bbs2
+		 
+		Commit Transaction [Trans_Name] -- 提交所有操作所造成的變更
+		select 1 [status],'done' msg
+	end try
+	begin catch
+		Rollback Transaction [Trans_Name] -- 復原所有操作所造成的變更
+		select 0 [status],error_message() msg
+	end catch;

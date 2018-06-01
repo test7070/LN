@@ -1,0 +1,154 @@
+zxls_addrsln:--zxls_addrsln 2018/05/25
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @workerno nvarchar(max) = [1]
+	declare @worker nvarchar(max) = [2]
+	declare @filename nvarchar(max) = [3]
+	--------------------------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,rateId nvarchar(20)
+		,straddrno nvarchar(20)
+		,endaddrno nvarchar(20)
+	)
+	declare @rateid nvarchar(max) = ''
+	declare @straddrno nvarchar(max) = ''
+	declare @endaddrno nvarchar(max) = ''
+
+	declare @a nvarchar(max)
+	declare @b nvarchar(max)
+	
+	declare cursor_table cursor for	
+	select ltrim(rtrim(a)),ltrim(rtrim(b)) from ztmpxls order by cast(noa as int)
+	open cursor_table
+	fetch next from cursor_table
+	into @a,@b
+	while(@@FETCH_STATUS <> -1)
+	begin	
+		if charindex('費率',@b)>0
+		begin
+			set @rateid = @a
+		end
+		else if len(@a)>0
+		begin
+			-- rateid,straddrno,endaddrno 唯一,之後會同一費率 起訖去回,單價一樣
+			set @straddrno = case when @a<=@b then @a else @b end 
+			set @endaddrno = case when @a<=@b then @b else @a end
+
+			if not exists(select * from @tmpa where rateId = @rateid and straddrno=@straddrno and endaddrno=@endaddrno)
+			begin
+				insert into @tmpa(rateid,straddrno,endaddrno)
+				select @rateid,@straddrno,@endaddrno
+			end
+		end
+		
+		fetch next from cursor_table
+		into @a,@b
+	end
+	close cursor_table
+	deallocate cursor_table
+	--------------------------------------------------------------------------------------------
+	IF OBJECT_ID('tempdb..#zxls_addr_ln2')is not null
+	BEGIN
+		drop table #zxls_addr_ln2
+	END
+	create table #zxls_addr_ln2(
+		sel int identity(1,1)
+		,rateId nvarchar(20)
+		,straddrno nvarchar(20)
+		,endaddrno nvarchar(20)
+
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,datea nvarchar(20)
+		,custprice float
+		,tggprice float
+		,driverprice float
+		,salesno nvarchar(20)
+		,sales nvarchar(50)
+		,memo nvarchar(max)
+		,custunit nvarchar(20)
+		,custno nvarchar(20)
+		,cust nvarchar(50)
+		,typea nvarchar(20)
+	)
+	--  straddr -> endaddr
+	insert into #zxls_addr_ln2(rateId,straddrno,endaddrno
+		,noa,noq,datea,custprice,tggprice,driverprice,salesno,sales,memo,custunit,custno,cust,typea)
+	select a.rateId,a.straddrno,a.endaddrno 
+		,a.rateId+'-'+a.straddrno+'-'+a.endaddrno noa,noq,c.datea,c.custprice,c.tggprice,c.driverprice,c.salesno,c.sales,c.memo,c.custunit,c.custno,c.cust,c.typea
+	from @tmpa a
+	left join addr b on a.rateId = b.noa
+	left join addrs c on b.noa=c.noa
+	where b.noa is not null
+
+	--  endaddr -> straddr
+	insert into #zxls_addr_ln2(rateId,straddrno,endaddrno
+		,noa,noq,datea,custprice,tggprice,driverprice,salesno,sales,memo,custunit,custno,cust,typea)
+	select a.rateId,a.endaddrno,a.straddrno 
+		,a.rateId+'-'+a.endaddrno+'-'+a.straddrno noa,noq,c.datea,c.custprice,c.tggprice,c.driverprice,c.salesno,c.sales,c.memo,c.custunit,c.custno,c.cust,c.typea
+	from @tmpa a
+	left join addr b on a.rateId = b.noa
+	left join addrs c on b.noa=c.noa
+	where b.noa is not null
+
+	--注意!!  2018/05/28
+	update  #zxls_addr_ln2 set custunit = replace(custunit,"'","~#$")
+	-- 有錯誤就放棄
+	Begin Transaction [Trans_Name]
+	begin try
+		--===============================================================================================
+		--刪除舊資料
+		delete addr 
+		from addr a
+		left join @tmpa b on a.noa= b.rateId+'-'+b.straddrno+'-'+b.endaddrno
+		where b.rateId is not null
+
+		delete addr 
+		from addr a
+		left join @tmpa b on a.noa= b.rateId+'-'+b.endaddrno+'-'+b.straddrno
+		where b.rateId is not null
+
+		delete addrs
+		from addrs a
+		left join @tmpa b on a.noa= b.rateId+'-'+b.straddrno+'-'+b.endaddrno
+		where b.rateId is not null
+
+		delete addrs
+		from addrs a
+		left join @tmpa b on a.noa= b.rateId+'-'+b.endaddrno+'-'+b.straddrno
+		where b.rateId is not null
+		--===============================================================================================
+		-- 資料寫入
+		----  addr
+		--  straddr -> endaddr
+		insert into addr(noa,addr,productno,straddrno,straddr,endaddrno,endaddr)
+		select a.rateId+'-'+a.straddrno+'-'+a.endaddrno noa
+			,b.addr addr,'' productno
+			,a.straddrno,c.addr straddr,a.endaddrno,d.addr endaddr
+		from @tmpa a
+		left join addr b on a.rateId=b.noa
+		left join addr2 c on a.straddrno=c.noa
+		left join addr2 d on a.endaddrno=d.noa
+		--  endaddr -> straddr
+		insert into addr(noa,addr,productno,straddrno,straddr,endaddrno,endaddr)
+		select a.rateId+'-'+a.endaddrno+'-'+a.straddrno noa
+			,b.addr addr,'' productno
+			,a.endaddrno,c.addr straddr,a.straddrno,d.addr endaddr
+		from @tmpa a
+		left join addr b on a.rateId=b.noa
+		left join addr2 c on a.endaddrno=c.noa
+		left join addr2 d on a.straddrno=d.noa
+
+		----addrs
+		insert into addrs(noa,noq,datea,custprice,tggprice,driverprice,salesno,sales,memo,custunit,custno,cust,typea)
+		select a.noa,a.noq,a.datea,a.custprice,a.tggprice,a.driverprice,a.salesno,a.sales,a.memo,a.custunit,a.custno,a.cust,a.typea
+		from #zxls_addr_ln2 a
+		Commit Transaction [Trans_Name] -- 提交所有操作所造成的變更
+	end try
+	begin catch
+		Rollback Transaction [Trans_Name] -- 復原所有操作所造成的變更
+		select ERROR_MESSAGE()
+	end catch
+	--===============================================================================================
+	drop table #zxls_addr_ln2;
