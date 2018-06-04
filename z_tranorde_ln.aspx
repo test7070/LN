@@ -55,9 +55,15 @@
 						//[8]                 3
 						type : '6', name : 'xendaddr'
 					}, {
-						//[8]                 4
+						//[9]                 4
 						type : '5', name : 'xoption',value : ['0@全部','1@已對應','2@未對應']
-					}]
+					},{
+                        type : '2', //[10][11]
+                        name : 'xcust',
+                        dbf : 'cust',
+                        index : 'noa,comp',
+                        src : 'cust_b.aspx'
+                    }]
                 });
                 q_popAssign();
 				$('#txtMon').mask(r_picm);
