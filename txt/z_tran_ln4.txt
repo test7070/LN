@@ -1,0 +1,598 @@
+z_tran_ln402:--z_tran_ln402
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_userno nvarchar(max) = '[4]'
+	declare @t_user nvarchar(max) = '[5]'
+	declare @t_bdate nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	declare @t_edate nvarchar(20) = case when '#non' = [7] then char(255) else [7] end
+	---------------------------------------------------------------------------------------------------------
+	declare @t_rank int = 0
+	select @t_rank=[RANK] from nhpe where noa=@t_userno and namea=@t_user
+	
+	declare @tmpa table(
+		sel int identity(1,1)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,gno nvarchar(20)
+		,pno int
+		
+		,noa nvarchar(20)
+		
+		,datea nvarchar(20)
+		,boatname nvarchar(30) --tranordet 船名
+		,ship nvarchar(30) --tranordet 航次
+		,straddr nvarchar(30) --tranordet 
+		,endaddr nvarchar(30) --tranordet 
+		,caseno1 nvarchar(30) --borrgs.caseno
+		,caseno2 nvarchar(30) --borrgs.checkno
+		,casetype nvarchar(20) --borrgs.casetype
+		,n01 float --borrgs
+		,chk1 bit --borrgs 請款
+		,chk2 bit --borrgs 油桶櫃
+		,chk3 bit --borrgs 押運櫃
+		,chk4 bit --borrgs 儀檢
+		,chk5 bit --borrgs 危標
+		,total2 float --borrgs OOG
+		,n16 float --其他費用
+		,memo nvarchar(max) --borrgs
+		,ordeno1 nvarchar(30)--borrgs
+		,ordeno2 nvarchar(30)--borrgs
+		,price float -- addrs
+		,[money] float
+	)
+	insert into @tmpa(gno,pno,cardealno,noa,datea,caseno1,caseno2,casetype
+		,n01,chk1,chk2,chk3,chk4,chk5,total2,n16
+		,memo,ordeno1,ordeno2)
+	select '1',1,b.worker,b.noa,b.datea,a.caseno,a.checkno,a.casetype
+		,a.n01,a.chk1,a.chk2,a.chk3,a.chk4,a.chk5,a.total2,a.n16
+		,a.memo,a.ordeno1,a.ordeno2
+	from borrgs a
+	left join borrg b on a.noa=b.noa
+	where b.datea between @t_bdate and @t_edate
+	and b.vccno='tran_ln4'
+	and (b.worker=@t_userno or @t_rank>=7)
+	
+	update @tmpa set cardeal=ISNULL(b.nick,a.cardealno)
+	from @tmpa a
+	left join cardeal b on a.cardealno=b.noa
+
+	--******************************************************************************
+	declare @sel int 
+	declare @ordeno1 nvarchar(30)
+	declare @ordeno2 nvarchar(30)
+	
+	declare @boatname1 nvarchar(30)
+	declare @ship1 nvarchar(30)
+	declare @straddr1 nvarchar(30)
+	declare @endaddr1 nvarchar(30)
+	declare @boatname2 nvarchar(30)
+	declare @ship2 nvarchar(30)
+	declare @straddr2 nvarchar(30)
+	declare @endaddr2 nvarchar(30)
+	
+	declare cursor_table cursor for
+	select sel,ordeno1,ordeno2 from @tmpa 
+	open cursor_table
+	fetch next from cursor_table
+	into @sel,@ordeno1,@ordeno2
+	while(@@FETCH_STATUS <> -1)
+	begin
+	
+		select @boatname1='',@ship1='',@straddr1='',@endaddr1=''
+		select @boatname2='',@ship2='',@straddr2='',@endaddr2=''
+		
+		select @boatname1=b.boatname,@ship1=b.ship,@straddr1=a.straddr,@endaddr1=a.endaddr
+		from view_tranordet a
+		left join view_tranorde b on a.accy=b.accy and a.noa=b.noa
+		where a.accy+'-'+a.noa+'-'+a.noq = @ordeno1
+		
+		select @boatname2=b.boatname,@ship2=b.ship,@straddr2=a.straddr,@endaddr2=a.endaddr
+		from view_tranordet a
+		left join view_tranorde b on a.accy=b.accy and a.noa=b.noa
+		where a.accy+'-'+a.noa+'-'+a.noq = @ordeno2
+		
+		update @tmpa set boatname = case when @boatname1=@boatname2 then @boatname1 else @boatname1+@boatname2 end
+			,ship = case when @ship1=@ship2 then @ship1 else @ship1+@ship2 end
+			,straddr = case when @straddr1=@straddr2 then @straddr1 else @straddr1+@straddr2 end
+			,endaddr = case when @endaddr1=@endaddr2 then @endaddr1 else @endaddr1+@endaddr2 end
+		where sel = @sel
+		
+		fetch next from cursor_table
+		into @sel,@ordeno1,@ordeno2
+	end
+	close cursor_table
+	deallocate cursor_table
+	-------------------------------------------------------------------------------------------------------
+	update @tmpa set casetype = REPLACE(casetype,"~#$","'")
+	-- 單價
+	declare @datea nvarchar(20)
+	declare @casetype nvarchar(20)
+	declare @straddrno nvarchar(30)
+	declare @endaddrno nvarchar(30)
+	declare @n01 float,@total2 float,@n16 float
+	declare @chk1 bit,@chk2 bit,@chk3 bit,@chk4 bit,@chk5 bit
+	
+	declare @price float,@money float
+	declare @tmpprice float
+	
+	declare cursor_table cursor for
+	select sel,datea,casetype,straddr,endaddr
+		,n01,isnull(chk1,0),isnull(chk2,0),isnull(chk3,0),isnull(chk4,0),isnull(chk5,0),total2,n16 
+		from @tmpa 
+		--where isnull(chk1,0)=1 -- 只計算請款的
+	open cursor_table
+	fetch next from cursor_table
+	into @sel,@datea,@casetype,@straddrno,@endaddrno
+		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16
+	while(@@FETCH_STATUS <> -1)
+	begin
+		select @price = 0, @money = 0
+		
+		-- 20'  40'
+		set @tmpprice = 0
+		select top 1 @tmpprice = isnull(a.driverprice,0)
+		from addrs a
+		left join addr b on a.noa=b.noa
+		where @datea >= a.datea
+		and b.straddrno = @straddrno 
+		and b.endaddrno = @endaddrno
+		and REPLACE(a.custunit,"~#$","'") =@casetype
+		order by datea desc
+		set @price = @price + @tmpprice
+		
+		if @chk2 = 1 --油桶櫃
+		begin
+			set @tmpprice = 0
+			select top 1 @tmpprice = isnull(a.driverprice,0)
+			from addrs a
+			left join addr b on a.noa=b.noa
+			where @datea >= a.datea
+			and b.straddrno = @straddrno 
+			and b.endaddrno = @endaddrno
+			and REPLACE(a.custunit,"~#$","'") = N'油桶櫃'
+			order by datea desc
+			set @price = @price + @tmpprice
+		end
+		if @chk3 = 1 --押運櫃
+		begin
+			set @tmpprice = 0
+			select top 1 @tmpprice = isnull(a.driverprice,0)
+			from addrs a
+			left join addr b on a.noa=b.noa
+			where @datea >= a.datea
+			and b.straddrno = @straddrno 
+			and b.endaddrno = @endaddrno
+			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'押運'
+			order by datea desc
+			set @price = @price + @tmpprice
+		end
+		if @chk4 = 1 --儀檢
+		begin
+			set @tmpprice = 0
+			select top 1 @tmpprice = isnull(a.driverprice,0)
+			from addrs a
+			left join addr b on a.noa=b.noa
+			where @datea >= a.datea
+			and b.straddrno = @straddrno 
+			and b.endaddrno = @endaddrno
+			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'儀檢'
+			order by datea desc
+			set @price = @price + @tmpprice
+		end
+		if @chk5 = 1 --危標
+		begin
+			set @tmpprice = 0
+			select top 1 @tmpprice = isnull(a.driverprice,0)
+			from addrs a
+			left join addr b on a.noa=b.noa
+			where @datea >= a.datea
+			and b.straddrno = @straddrno 
+			and b.endaddrno = @endaddrno
+			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'危標'
+			order by datea desc
+			set @price = @price + @tmpprice
+		end
+	
+		update @tmpa set price=@price where sel=@sel
+		
+		fetch next from cursor_table
+		into @sel,@datea,@casetype,@straddrno,@endaddrno
+		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16 
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	update @tmpa set [money]=round(ISNULL(n01,0)*ISNULL(price,0),0) + ISNULL(total2,0) + ISNULL(n16,0)
+	------------------------------------------------------------------------------------------------------------
+	declare @tmpb table(
+		sel int identity(1,1)
+		,gno nvarchar(10)
+		,pno int
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(30)
+		,noa nvarchar(20)
+		,straddr nvarchar(30)
+		,endaddr nvarchar(30)
+		,casetype nvarchar(20)
+		,n01 float
+		,chk2 int
+		,chk3 int
+		,chk4 int
+		,chk5 int
+		,total2 float
+		,n16 float
+		,[money] float
+		
+		,tax float
+		,total float
+	)
+	insert into @tmpb(gno,pno,cardealno,cardeal,noa,straddr,endaddr,casetype)
+	select '1',1,cardealno,cardeal,noa,straddr,endaddr,casetype
+	from @tmpa
+	group by cardealno,cardeal,noa,straddr,endaddr,casetype
+	
+	declare @cardealno nvarchar(30)
+	declare @cardeal nvarchar(30)
+	declare @noa nvarchar(20)
+	declare @straddr nvarchar(30)
+	declare @endaddr nvarchar(30)
+	
+	update @tmpb set n01=ISNULL(b.n01,0)
+		,chk2=ISNULL(b.chk2,0),chk3=ISNULL(b.chk3,0),chk4=ISNULL(b.chk4,0),chk5=ISNULL(b.chk5,0)
+		,total2=ISNULL(b.total2,0),n16=isnull(b.n16,0),[money]=ISNULL(b.[money],0)
+	from @tmpb a
+	left join(select cardealno,cardeal,noa,straddr,endaddr,casetype 
+		,SUM(ISNULL(n01,0)) n01 
+		,SUM(case when isnull(chk2,0)=1 then 1 else 0 end) chk2
+		,SUM(case when isnull(chk3,0)=1 then 1 else 0 end) chk3
+		,SUM(case when isnull(chk4,0)=1 then 1 else 0 end) chk4
+		,SUM(case when isnull(chk5,0)=1 then 1 else 0 end) chk5
+		,SUM(ISNULL(total2,0)) total2
+		,SUM(ISNULL(n16,0)) n16
+		,SUM(ISNULL([money],0)) [money]
+	from @tmpa 
+	group by cardealno,cardeal,noa,straddr,endaddr,casetype) b 
+	on a.cardealno=b.cardealno and a.cardeal=b.cardeal and a.noa=b.noa and a.straddr=b.straddr and a.casetype=b.casetype
+	------------------------------------------------------------------------------------------------------------
+	declare @tax float = 0
+	declare @total float = 0
+	
+	declare cursor_table cursor for
+	select cardealno,cardeal,sum(isnull([money],0)) from @tmpb where pno=1 group by cardealno,cardeal
+	open cursor_table
+	fetch next from cursor_table
+	into @cardealno,@cardeal,@money
+	while(@@FETCH_STATUS <> -1)
+	begin
+		set @tax = round(@money * 0.05,0)
+		set @total = @money + @tax
+		--運費合計
+		insert into @tmpb(gno,pno,cardealno,cardeal,[money],tax,total)
+		select '3' gno,3 pno,@cardealno,@cardeal,@money,@tax,@total
+		--5%營業稅	
+		insert into @tmpb(gno,pno,cardealno,cardeal,[money],tax,total)
+		select '4' gno,4 pno,@cardealno,@cardeal,@money,@tax,@total
+		--運費總計	
+		insert into @tmpb(gno,pno,cardealno,cardeal,[money],tax,total)
+		select '5' gno,5 pno,@cardealno,@cardeal,@money,@tax,@total
+		--發票日期	
+		insert into @tmpb(gno,pno,cardealno,cardeal,[money],tax,total)
+		select '6' gno,6 pno,@cardealno,@cardeal,@money,@tax,@total
+		--發票號碼
+		insert into @tmpb(gno,pno,cardealno,cardeal,[money],tax,total)
+		select '7' gno,7 pno,@cardealno,@cardeal,@money,@tax,@total
+		
+		fetch next from cursor_table
+		into @cardealno,@cardeal,@money 
+	end
+	close cursor_table
+	deallocate cursor_table
+
+	------------------------------------------------------------------------------------------------------------
+	declare @t_pagecount int = 15 -- 一頁15行
+	declare @n int
+	
+	declare cursor_table cursor for
+	select cardealno,cardeal,count(1) from @tmpb group by cardealno,cardeal
+	open cursor_table
+	fetch next from cursor_table
+	into @cardealno,@cardeal,@n
+	while(@@FETCH_STATUS <> -1)
+	begin
+		while @n%@t_pagecount != 0
+		begin
+			insert into @tmpb(gno,pno,cardealno,cardeal)
+			select '2',2,@cardealno,@cardeal
+			set @n = @n + 1
+		end
+		fetch next from cursor_table
+		into @cardealno,@cardeal,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+
+	select gno
+		,'期間：'+@t_bdate +' ～ '+@t_edate b01
+		,'車行：'+ISNULL(cardeal,'') b02
+		,'客戶：新安運輸' b03 
+		,noa a01--電腦編號	
+		,straddr a02--起點	
+		,endaddr a03--訖點	
+		,casetype a04--櫃型	
+		,dbo.getComma(n01,-1) a05--數量	
+		,dbo.getComma(chk2,-1) a06--儀檢	
+		,dbo.getComma(chk3,-1) a07--油櫃	
+		,dbo.getComma(chk4,-1) a08--押運	
+		,dbo.getComma(chk5,-1) a09--危險櫃	
+		,dbo.getComma(total2,-1) a10--OOG	
+		,dbo.getComma(n16,-1) a11--其他費用
+		,dbo.getComma([money],-1) a12--運費小計	
+		,'' a13--備註	
+		,dbo.getComma([money],-1) c01
+		,dbo.getComma([tax],-1) c02
+		,dbo.getComma([total],-1) c03
+	from @tmpb order by cardealno,pno,sel;
+	
+z_tran_ln401:--z_tran_ln401	
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_userno nvarchar(max) = '[4]'
+	declare @t_user nvarchar(max) = '[5]'
+	declare @t_bdate nvarchar(20) = case when '#non' = [6] then '' else [6] end
+	declare @t_edate nvarchar(20) = case when '#non' = [7] then char(255) else [7] end
+	---------------------------------------------------------------------------------------------------------
+	declare @t_rank int = 0
+	select @t_rank=[RANK] from nhpe where noa=@t_userno and namea=@t_user
+	
+	declare @tmpa table(
+		sel int identity(1,1)
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,gno nvarchar(20)
+		,pno int
+		
+		,noa nvarchar(20)
+		
+		,datea nvarchar(20)
+		,boatname nvarchar(30) --tranordet 船名
+		,ship nvarchar(30) --tranordet 航次
+		,straddr nvarchar(30) --tranordet 
+		,endaddr nvarchar(30) --tranordet 
+		,caseno1 nvarchar(30) --borrgs.caseno
+		,caseno2 nvarchar(30) --borrgs.checkno
+		,casetype nvarchar(20) --borrgs.casetype
+		,n01 float --borrgs
+		,chk1 bit --borrgs 請款
+		,chk2 bit --borrgs 油桶櫃
+		,chk3 bit --borrgs 押運櫃
+		,chk4 bit --borrgs 儀檢
+		,chk5 bit --borrgs 危標
+		,total2 float --borrgs OOG
+		,n16 float--其他費用
+		,memo nvarchar(max) --borrgs
+		,ordeno1 nvarchar(30)--borrgs
+		,ordeno2 nvarchar(30)--borrgs
+		,price float -- addrs
+		,[money] float
+	)
+	insert into @tmpa(gno,pno,cardealno,noa,datea,caseno1,caseno2,casetype
+		,n01,chk1,chk2,chk3,chk4,chk5,total2,n16
+		,memo,ordeno1,ordeno2)
+	select '1',1,b.worker,b.noa,b.datea,a.caseno,a.checkno,a.casetype
+		,a.n01,a.chk1,a.chk2,a.chk3,a.chk4,a.chk5,a.total2,a.n16
+		,a.memo,a.ordeno1,a.ordeno2
+	from borrgs a
+	left join borrg b on a.noa=b.noa
+	where b.datea between @t_bdate and @t_edate
+	and (b.worker=@t_userno or @t_rank>=7)
+	and b.vccno='tran_ln4'
+	
+	update @tmpa set cardeal=ISNULL(b.nick,a.cardealno)
+	from @tmpa a
+	left join cardeal b on a.cardealno=b.noa
+	--***********************************************************
+	declare @sel int 
+	declare @ordeno1 nvarchar(30)
+	declare @ordeno2 nvarchar(30)
+	
+	declare @boatname1 nvarchar(30)
+	declare @ship1 nvarchar(30)
+	declare @straddr1 nvarchar(30)
+	declare @endaddr1 nvarchar(30)
+	declare @boatname2 nvarchar(30)
+	declare @ship2 nvarchar(30)
+	declare @straddr2 nvarchar(30)
+	declare @endaddr2 nvarchar(30)
+	
+	declare cursor_table cursor for
+	select sel,ordeno1,ordeno2 from @tmpa 
+	open cursor_table
+	fetch next from cursor_table
+	into @sel,@ordeno1,@ordeno2
+	while(@@FETCH_STATUS <> -1)
+	begin
+	
+		select @boatname1='',@ship1='',@straddr1='',@endaddr1=''
+		select @boatname2='',@ship2='',@straddr2='',@endaddr2=''
+		
+		select @boatname1=b.boatname,@ship1=b.ship,@straddr1=a.straddr,@endaddr1=a.endaddr
+		from view_tranordet a
+		left join view_tranorde b on a.accy=b.accy and a.noa=b.noa
+		where a.accy+'-'+a.noa+'-'+a.noq = @ordeno1
+		
+		select @boatname2=b.boatname,@ship2=b.ship,@straddr2=a.straddr,@endaddr2=a.endaddr
+		from view_tranordet a
+		left join view_tranorde b on a.accy=b.accy and a.noa=b.noa
+		where a.accy+'-'+a.noa+'-'+a.noq = @ordeno2
+		
+		update @tmpa set boatname = case when @boatname1=@boatname2 then @boatname1 else @boatname1+@boatname2 end
+			,ship = case when @ship1=@ship2 then @ship1 else @ship1+@ship2 end
+			,straddr = case when @straddr1=@straddr2 then @straddr1 else @straddr1+@straddr2 end
+			,endaddr = case when @endaddr1=@endaddr2 then @endaddr1 else @endaddr1+@endaddr2 end
+		where sel = @sel
+		
+		fetch next from cursor_table
+		into @sel,@ordeno1,@ordeno2
+	end
+	close cursor_table
+	deallocate cursor_table
+	-------------------------------------------------------------------------------------------------------
+	update @tmpa set casetype = REPLACE(casetype,"~#$","'")
+	-- 單價
+	declare @datea nvarchar(20)
+	declare @casetype nvarchar(20)
+	declare @straddrno nvarchar(30)
+	declare @endaddrno nvarchar(30)
+	declare @n01 float,@total2 float,@n16 float
+	declare @chk1 bit,@chk2 bit,@chk3 bit,@chk4 bit,@chk5 bit
+	
+	declare @price float,@money float
+	declare @tmpprice float
+	
+	declare cursor_table cursor for
+	select sel,datea,casetype,straddr,endaddr
+		,n01,isnull(chk1,0),isnull(chk2,0),isnull(chk3,0),isnull(chk4,0),isnull(chk5,0),total2 ,n16
+		from @tmpa 
+		--where isnull(chk1,0)=1 -- 只計算請款的
+	open cursor_table
+	fetch next from cursor_table
+	into @sel,@datea,@casetype,@straddrno,@endaddrno
+		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16
+	while(@@FETCH_STATUS <> -1)
+	begin
+		select @price = 0, @money = 0
+		
+		-- 20'  40'
+		set @tmpprice = 0
+		select top 1 @tmpprice = isnull(a.driverprice,0)
+		from addrs a
+		left join addr b on a.noa=b.noa
+		where @datea >= a.datea
+		and b.straddrno = @straddrno 
+		and b.endaddrno = @endaddrno
+		and REPLACE(a.custunit,"~#$","'") =@casetype
+		order by datea desc
+		set @price = @price + @tmpprice
+		
+		if @chk2 = 1 --油桶櫃
+		begin
+			set @tmpprice = 0
+			select top 1 @tmpprice = isnull(a.driverprice,0)
+			from addrs a
+			left join addr b on a.noa=b.noa
+			where @datea >= a.datea
+			and b.straddrno = @straddrno 
+			and b.endaddrno = @endaddrno
+			and REPLACE(a.custunit,"~#$","'") = N'油桶櫃'
+			order by datea desc
+			set @price = @price + @tmpprice
+		end
+		if @chk3 = 1 --押運櫃
+		begin
+			set @tmpprice = 0
+			select top 1 @tmpprice = isnull(a.driverprice,0)
+			from addrs a
+			left join addr b on a.noa=b.noa
+			where @datea >= a.datea
+			and b.straddrno = @straddrno 
+			and b.endaddrno = @endaddrno
+			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'押運'
+			order by datea desc
+			set @price = @price + @tmpprice
+		end
+		if @chk4 = 1 --儀檢
+		begin
+			set @tmpprice = 0
+			select top 1 @tmpprice = isnull(a.driverprice,0)
+			from addrs a
+			left join addr b on a.noa=b.noa
+			where @datea >= a.datea
+			and b.straddrno = @straddrno 
+			and b.endaddrno = @endaddrno
+			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'儀檢'
+			order by datea desc
+			set @price = @price + @tmpprice
+		end
+		if @chk5 = 1 --危標
+		begin
+			set @tmpprice = 0
+			select top 1 @tmpprice = isnull(a.driverprice,0)
+			from addrs a
+			left join addr b on a.noa=b.noa
+			where @datea >= a.datea
+			and b.straddrno = @straddrno 
+			and b.endaddrno = @endaddrno
+			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'危標'
+			order by datea desc
+			set @price = @price + @tmpprice
+		end
+	
+		update @tmpa set price=@price where sel=@sel
+		
+		fetch next from cursor_table
+		into @sel,@datea,@casetype,@straddrno,@endaddrno
+		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16 
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	update @tmpa set [money]=round(ISNULL(n01,0)*ISNULL(price,0),0) + ISNULL(total2,0) + ISNULL(n16,0)
+	------------------------------------------------------------------------------------------------------------
+	insert into @tmpa(gno,pno,cardealno,cardeal,[money])
+	select '2',2,cardealno,cardeal,sum(ISNULL([money],0)) 
+	from @tmpa
+	group by cardealno,cardeal
+	
+	declare @t_pagecount int = 20 -- 一頁２０行
+	declare @cardealno nvarchar(20)
+	declare @cardeal nvarchar(30)
+	declare @n int
+	
+	declare cursor_table cursor for
+	select cardealno,cardeal,count(1) from @tmpa group by cardealno,cardeal
+	open cursor_table
+	fetch next from cursor_table
+	into @cardealno,@cardeal,@n
+	while(@@FETCH_STATUS <> -1)
+	begin
+		while @n%@t_pagecount != 0
+		begin
+			insert into @tmpa(gno,pno,cardealno,cardeal)
+			select '3',3,@cardealno,@cardeal
+			set @n = @n + 1
+		end
+		fetch next from cursor_table
+		into @cardealno,@cardeal,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+	
+	select gno
+		,'期間：'+@t_bdate +' ～ '+@t_edate b01
+		,'車行：'+ISNULL(cardeal,'') b02
+		,'客戶：新安運輸' b03 
+		,noa a01--電腦編號	
+		,datea a02--拖櫃日期	
+		,boatname a03--船名	
+		,ship a04--航次	
+		,straddr a05--起點	
+		,endaddr a06--訖點	
+		,casetype a07--櫃型	
+		,caseno1 a08--櫃號1
+		,caseno2 a09--櫃號2		
+		,n01 a10--數量	
+		,case when ISNULL(chk2,0)=1 then '*' else '' end a11--油櫃
+		,case when ISNULL(chk3,0)=1 then '*' else '' end a12--押運	
+		,case when ISNULL(chk4,0)=1 then '*' else '' end a13--儀檢
+		,case when ISNULL(chk5,0)=1 then '*' else '' end a14--危險櫃	
+		,dbo.getComma(total2,0) a15--OOG
+		,dbo.getComma(n16,0) a16--其他費用	
+		,dbo.getComma([money],0) a17--運費小計	
+		,memo a18--備註
+	from @tmpa order by cardealno,pno,sel;

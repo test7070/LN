@@ -1,0 +1,106 @@
+z_addr_ln01:--z_addr_ln01	要和zxls_addrln的格式一致
+	SET QUOTED_IDENTIFIER OFF
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_bno nvarchar(20) = case when '#non' = [4] then '' else [4] end
+	declare @t_eno nvarchar(20) = case when '#non' = [5] then char(255) else [5] end
+	declare @t_straddrno nvarchar(max) = case when '#non' = [6] then '' else [6] end
+	declare @t_endaddrno nvarchar(max) = case when '#non' = [7] then '' else [7] end
+	declare @t_productno nvarchar(max) = case when '#non' = [8] then '' else [8] end
+	---------------------------------------------------------------------
+	declare @tmp table(
+		sel int identity(1,1)
+		,gno nvarchar(10)
+		,pno int
+		
+		,itemno nvarchar(20)
+		,straddrno nvarchar(20)
+		,straddr nvarchar(50)
+		,endaddrno nvarchar(20)
+		,endaddr nvarchar(50)
+		,productno nvarchar(20)
+		,product nvarchar(50)
+		
+		,noa nvarchar(20)
+		,noq nvarchar(10)
+		,datea nvarchar(20)
+		,typea nvarchar(20)
+		,custunit nvarchar(20)
+		,custno nvarchar(20)
+		,cust nvarchar(50)
+		,custprice float
+		,tggprice float
+		,salesno nvarchar(20)
+		,sales nvarchar(50)
+		,driverprice float
+		,memo nvarchar(max)
+	)
+	---------------------------------------------------------------------------------------------------------------
+	insert into @tmp(gno,pno,noa)values('1',1,'')
+	insert into @tmp(gno,pno,noa,itemno,straddrno,straddr,endaddrno,endaddr,productno,product)
+	select '2',2,'',noa,straddrno,straddr,endaddrno,endaddr,productno,product
+	from addr
+	where len(noa)!=2
+	and noa between @t_bno and @t_eno
+	and (len(@t_straddrno)=0 or straddrno=@t_straddrno)
+	and (len(@t_endaddrno)=0 or endaddrno=@t_endaddrno)
+	order by noa
+	
+	update @tmp set product=ISNULL(b.addr,'')
+	from @tmp a
+	left join (select * from addr where len(noa)=2) b on a.productno=b.noa
+	
+	insert into @tmp(gno,pno,noa)values('3',3,'')
+	insert into @tmp(gno,pno,noa)values('3',3,'')
+	---------------------------------------------------------------------------------------------------------------
+	insert into @tmp(gno,pno,noa)
+	select '4',4,noa 
+	from addr 
+	where len(noa) = 2 
+	and (len(@t_productno)=0 or noa=@t_productno)
+	
+	insert into @tmp(gno,pno,noa,product,noq,datea,typea,custunit,custno,cust,custprice,tggprice,salesno,sales,driverprice,memo)
+	select '5',4,a.noa,b.addr,a.noq,a.datea,a.typea,a.custunit,a.custno,a.cust
+		,a.custprice,a.tggprice,a.salesno,a.sales,a.driverprice,a.memo
+	from addrs a
+	left join addr b on a.noa=b.noa
+	where len(b.noa) = 2
+	and (len(@t_productno)=0 or b.noa=@t_productno)
+	
+	insert into @tmp(gno,pno,noa)
+	select '3',6,noa 
+	from addr 
+	where len(noa) = 2 
+	and (len(@t_productno)=0 or noa=@t_productno)
+	insert into @tmp(gno,pno,noa)
+	select '3',6,noa 
+	from addr 
+	where len(noa) = 2 
+	and (len(@t_productno)=0 or noa=@t_productno)
+	---------------------------------------------------------------------------------------------------------------
+	
+	select gno 
+	,itemno a01
+	,straddrno a02
+	,replace(straddr,"~#$","'") a03
+	,endaddrno a04
+	,replace(endaddr,"~#$","'") a05
+	,productno a06
+	,product a07
+	
+	,noa b01
+	,product b02
+	,noq b03
+	,datea b04
+	,typea b05
+	,replace(custunit,"~#$","'") b06
+	,custno b07
+	,cust b08
+	,custprice b09
+	,tggprice b10
+	,salesno b11
+	,sales b12
+	,driverprice b13
+	,memo b14
+	from @tmp order by noa,pno,sel,noq;
