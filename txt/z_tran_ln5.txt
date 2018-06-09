@@ -1,3 +1,392 @@
+z_tran_ln502:--z_tran_ln502
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max)
+	declare @t_path nvarchar(max) = '[1]'
+	declare @t_db nvarchar(max) = '[2]'
+	declare @t_project nvarchar(max) = '[3]'
+	declare @t_userno nvarchar(max) = '[4]'
+	declare @t_user nvarchar(max) = '[5]'	
+	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	---------------------------------------------------------------------------------------------------------
+	declare @t_rank int = 0
+	select @t_rank=[RANK] from nhpe where noa=@t_userno and namea=@t_user
+
+	IF OBJECT_ID('tempdb..#z_tran_ln502')is not null
+	BEGIN
+		drop table #z_tran_ln502
+	END
+	create table #z_tran_ln502(
+		sel int identity(1,1)
+		,cardealno nvarchar(20)
+		,v01 nvarchar(50)
+		,datea nvarchar(20)
+		,v02 nvarchar(50)
+		,v03 nvarchar(50)
+		,typea nvarchar(50)
+		,n01 float --20'F
+		,n02 float --40'F
+		,n03 float --20'F
+		,n04 float --40'F
+		,n05 float --20'E
+		,n06 float --40'E
+		,n07 float --20'E
+		,n08 float --40'E
+		,n09 float --20'HATCH
+		,n10 float --40'HATCH
+		,n11 float --20'SHIFT
+		,n12 float --40'SHIFT
+		,n13 float --20'RELOAD
+		,n14 float --40'RELOAD
+		,inteis float--超高吊架	
+		,arrerage float--鐳仔桶	
+		,n16 float--20'其他	
+		,n17 float--40'其他
+		,n18 float--補洞	
+		,n19 float--20'OOG
+		,n20 float--40'OOG
+
+		--應收
+		,n01a float --20'F
+		,n02a float --40'F
+		,n03a float --20'F
+		,n04a float --40'F
+		,n05a float --20'E
+		,n06a float --40'E
+		,n07a float --20'E
+		,n08a float --40'E
+		,n09a float --20'HATCH
+		,n10a float --40'HATCH
+		,n11a float --20'SHIFT
+		,n12a float --40'SHIFT
+		,n13a float --20'RELOAD
+		,n14a float --40'RELOAD
+		,inteisa float--超高吊架	
+		,arreragea float--鐳仔桶	
+		,n16a float--20'其他	
+		,n17a float--40'其他
+		,n18a float--補洞	
+		,n19a float--20'OOG
+		,n20a float--40'OOG
+		--請款
+		,n01b float --20'F
+		,n02b float --40'F
+		,n03b float --20'F
+		,n04b float --40'F
+		,n05b float --20'E
+		,n06b float --40'E
+		,n07b float --20'E
+		,n08b float --40'E
+		,n09b float --20'HATCH
+		,n10b float --40'HATCH
+		,n11b float --20'SHIFT
+		,n12b float --40'SHIFT
+		,n13b float --20'RELOAD
+		,n14b float --40'RELOAD
+		,inteisb float--超高吊架	
+		,arrerageb float--鐳仔桶	
+		,n16b float--20'其他	
+		,n17b float--40'其他
+		,n18b float--補洞	
+		,n19b float--20'OOG
+		,n20b float--40'OOG
+		--應付
+		,n01c float --20'F
+		,n02c float --40'F
+		,n03c float --20'F
+		,n04c float --40'F
+		,n05c float --20'E
+		,n06c float --40'E
+		,n07c float --20'E
+		,n08c float --40'E
+		,n09c float --20'HATCH
+		,n10c float --40'HATCH
+		,n11c float --20'SHIFT
+		,n12c float --40'SHIFT
+		,n13c float --20'RELOAD
+		,n14c float --40'RELOAD
+		,inteisc float--超高吊架	
+		,arreragec float--鐳仔桶	
+		,n16c float--20'其他	
+		,n17c float--40'其他
+		,n18c float--補洞	
+		,n19c float--20'OOG
+		,n20c float--40'OOG
+	)
+	insert into #z_tran_ln502(cardealno,v01,datea,v02,v03,typea
+		,n01,n02,n03,n04,n05,n06,n07,n08,n09,n10,n11,n12,n13,n14
+		,inteis,arrerage,n16,n17,n18,n19,n20)
+	select b.worker,b.v01,b.datea,b.v02,b.v03,a.typea
+		,a.n01,a.n02,a.n03,a.n04,a.n05,a.n06,a.n07,a.n08,a.n09,a.n10,a.n11,a.n12,a.n13,a.n14
+		,a.inteis,a.arrerage,a.n16,a.n17,a.n18,a.n19,a.n20
+	from borrgs a
+	left join borrg b on a.noa=b.noa
+	where b.vccno='tran_ln5'
+	and b.datea between @t_bdate and @t_edate
+	and (b.worker=@t_userno or @t_rank>=7)
+	--------------------------------------------------------------------------------------------------------------
+	--20'F
+	update #z_tran_ln502 set n01a = round(n01 * c.custprice,0)
+		,n01b = round(n01 * c.tggprice,0)
+		,n01c = round(n01 * c.driverprice,0)
+		,n03a = round(n03 * c.custprice,0)
+		,n03b = round(n03 * c.tggprice,0)
+		,n03c = round(n03 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='20~#$F' and datea<=a.datea order by datea desc,noq desc) c
+	--40'F
+	update #z_tran_ln502 set n02a = round(n02 * c.custprice,0)
+		,n02b = round(n02 * c.tggprice,0)
+		,n02c = round(n02 * c.driverprice,0)
+		,n04a = round(n04 * c.custprice,0)
+		,n04b = round(n04 * c.tggprice,0)
+		,n04c = round(n04 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='40~#$F' and datea<=a.datea order by datea desc,noq desc) c
+	--20'E
+	update #z_tran_ln502 set n05a = round(n05 * c.custprice,0)
+		,n05b = round(n05 * c.tggprice,0)
+		,n05c = round(n05 * c.driverprice,0)
+		,n07a = round(n07 * c.custprice,0)
+		,n07b = round(n07 * c.tggprice,0)
+		,n07c = round(n07 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='20~#$E' and datea<=a.datea order by datea desc,noq desc) c
+	--40'E
+	update #z_tran_ln502 set n06a = round(n06 * c.custprice,0)
+		,n06b = round(n06 * c.tggprice,0)
+		,n06c = round(n06 * c.driverprice,0)
+		,n08a = round(n08 * c.custprice,0)
+		,n08b = round(n08 * c.tggprice,0)
+		,n08c = round(n08 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='40~#$E' and datea<=a.datea order by datea desc,noq desc) c
+
+	--20'HATCH
+	update #z_tran_ln502 set n09a = round(n09 * c.custprice,0)
+		,n09b = round(n09 * c.tggprice,0)
+		,n09c = round(n09 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='20~#$HATCH' and datea<=a.datea order by datea desc,noq desc) c
+	--40'HATCH
+	update #z_tran_ln502 set n10a = round(n10 * c.custprice,0)
+		,n10b = round(n10 * c.tggprice,0)
+		,n10c = round(n10 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='40~#$HATCH' and datea<=a.datea order by datea desc,noq desc) c
+	--20'SHIFT
+	update #z_tran_ln502 set n11a = round(n11 * c.custprice,0)
+		,n11b = round(n11 * c.tggprice,0)
+		,n11c = round(n11 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='20~#$SHIFT' and datea<=a.datea order by datea desc,noq desc) c
+	--40'SHIFT
+	update #z_tran_ln502 set n12a = round(n12 * c.custprice,0)
+		,n12b = round(n12 * c.tggprice,0)
+		,n12c = round(n12 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='40~#$SHIFT' and datea<=a.datea order by datea desc,noq desc) c
+	--20'RELOAD
+	update #z_tran_ln502 set n13a = round(n13 * c.custprice,0)
+		,n13b = round(n13 * c.tggprice,0)
+		,n13c = round(n13 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='20~#$RELOAD' and datea<=a.datea order by datea desc,noq desc) c
+	--40'RELOAD
+	update #z_tran_ln502 set n14a = round(n14 * c.custprice,0)
+		,n14b = round(n14 * c.tggprice,0)
+		,n14c = round(n14 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='40~#$RELOAD' and datea<=a.datea order by datea desc,noq desc) c
+	--超高吊架	
+	update #z_tran_ln502 set inteisa = round(inteis * c.custprice,0)
+		,inteisb = round(inteis * c.tggprice,0)
+		,inteisc = round(inteis * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit=N'超高吊架' and datea<=a.datea order by datea desc,noq desc) c
+	--鐳仔桶	
+	update #z_tran_ln502 set arreragea = round(arrerage * c.custprice,0)
+		,arrerageb = round(arrerage * c.tggprice,0)
+		,arreragec = round(arrerage * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit=N'鐳仔桶' and datea<=a.datea order by datea desc,noq desc) c
+	--20'其他	
+	update #z_tran_ln502 set n16a = round(n16 * c.custprice,0)
+		,n16b = round(n16 * c.tggprice,0)
+		,n16c = round(n16 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='20~#$其他' and datea<=a.datea order by datea desc,noq desc) c	
+	--40'其他
+	update #z_tran_ln502 set n17a = round(n17 * c.custprice,0)
+		,n17b = round(n17 * c.tggprice,0)
+		,n17c = round(n17 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='40~#$其他' and datea<=a.datea order by datea desc,noq desc) c	
+	--補洞	
+	update #z_tran_ln502 set n18a = round(n18 * c.custprice,0)
+		,n18b = round(n18 * c.tggprice,0)
+		,n18c = round(n18 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='補洞' and datea<=a.datea order by datea desc,noq desc) c	
+	--20'OOG
+	update #z_tran_ln502 set n19a = round(n19 * c.custprice,0)
+		,n19b = round(n19 * c.tggprice,0)
+		,n19c = round(n19 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='20~#$OOG' and datea<=a.datea order by datea desc,noq desc) c	
+	--40'OOG
+	update #z_tran_ln502 set n20a = round(n20 * c.custprice,0)
+		,n20b = round(n20 * c.tggprice,0)
+		,n20c = round(n20 * c.driverprice,0)
+	from #z_tran_ln502 a
+	outer apply(select top 1 * from addrs 
+		where noa='001' and salesno=a.cardealno and custunit='40~#$OOG' and datea<=a.datea order by datea desc,noq desc) c	
+	-------------------------------------------------------------------------------------------
+	declare @tmpa table(
+		sel int identity(1,1)
+		,gno nvarchar(20)
+		,pno int
+		,recno int
+		,cardealno nvarchar(20)
+		,cardeal nvarchar(50)
+		,v01 nvarchar(50)
+		,datea nvarchar(20)
+		,v02 nvarchar(50)
+		,v03 nvarchar(50)
+		,typea nvarchar(20)
+		,mount01 float --櫃數	
+		,mount02 float --超高吊架	
+		,mount03 float --鐳仔桶	
+		,mount04 float --其他
+		,mount05 float --補洞	
+		,mount06 float --OOG	
+		,[money] float --當日小計
+		,tmoney float
+		,tax float
+		,total float
+	)
+	insert into @tmpa(gno,pno,cardealno,v01,datea,v02,v03,typea
+		,mount01,mount02,mount03,mount04,mount05,mount06,[money])
+	select '1',1,cardealno,v01,datea,v02,v03,typea
+		,sum(isnull(n01,0)+isnull(n02,0)+isnull(n03,0)+isnull(n04,0)+isnull(n05,0)+isnull(n06,0)+isnull(n07,0)
+			+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0))
+		,sum(isnull(inteis,0))
+		,sum(isnull(arrerage,0))
+		,sum(isnull(n16,0)+isnull(n17,0))
+		,sum(isnull(n18,0))
+		,sum(isnull(n19,0)+isnull(n20,0))
+		,sum(isnull(n01c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(n05c,0)+isnull(n06c,0)+isnull(n07c,0)
+			+isnull(n08c,0)+isnull(n09c,0)+isnull(n10c,0)+isnull(n11c,0)+isnull(n12c,0)+isnull(n13c,0)+isnull(n14c,0)
+			+isnull(inteis,0)+isnull(arrerage,0)
+			+isnull(n16c,0)+isnull(n17c,0)+isnull(n18c,0)+isnull(n19c,0)+isnull(n20c,0))
+	from #z_tran_ln502
+	group by cardealno,v01,datea,v02,v03,typea
+
+	insert into @tmpa(gno,pno,cardealno,mount01,mount02,mount03,mount04,mount05,mount06,[money],tmoney)
+	select '2',2,cardealno,sum(mount01) ,sum(mount02) ,sum(mount03) ,sum(mount04) 
+		,sum(mount05) ,sum(mount06) ,sum([money]) ,sum([money]) 
+	from @tmpa 
+	where pno=1
+	group by cardealno
+
+	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
+	select '3' gno, 3 pno, cardealno,tmoney,round(tmoney*0.05,0),tmoney+round(tmoney*0.05,0)
+	from @tmpa
+	where pno=2
+
+	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
+	select '4' gno, 4 pno, cardealno,tmoney,tax,total
+	from @tmpa
+	where pno=3
+
+	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
+	select '5' gno, 5 pno, cardealno,tmoney,tax,total
+	from @tmpa
+	where pno=3
+
+	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
+	select '6' gno, 6 pno, cardealno,tmoney,tax,total
+	from @tmpa
+	where pno=3
+
+	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
+	select '7' gno, 7 pno, cardealno,tmoney,tax,total
+	from @tmpa
+	where pno=3
+	-------------------------------------------------------------------------------------------------------------
+	--- 補空白行
+	declare @pagecount int = 25
+	declare @cardealno nvarchar(20)
+	declare @n int 
+
+	declare cursor_table cursor for
+	select cardealno,count(1) from @tmpa group by cardealno
+	open cursor_table
+	fetch next from cursor_table
+	into @cardealno,@n
+	while(@@FETCH_STATUS <> -1)
+	begin
+		while @n%@pagecount != 0
+		begin
+			insert into @tmpa(gno,pno,cardealno)
+			select top 1 '8' gno,8 pno,@cardealno
+
+			set @n=@n+1
+		end
+		fetch next from cursor_table
+		into @cardealno,@n
+	end
+	close cursor_table
+	deallocate cursor_table
+	----------------------------------------------------------------------------------------------------------------
+	update @tmpa set cardeal=isnull(b.nick,a.cardealno)
+	from @tmpa a
+	left join cardeal b on a.cardealno=b.noa
+
+	update @tmpa set recno=b.recno
+	from @tmpa a
+	left join (select sel,ROW_NUMBER()over(partition by cardealno order by pno,v01,typea,sel) recno from @tmpa) b on a.sel=b.sel
+
+	select gno
+		,cardeal+N'船邊運費請款單' titlea
+		,recno a01  
+		,v01 a02
+		,datea a03
+		,v02 a04
+		,v03 a05
+		,typea a06
+		,dbo.getcomma(mount01,-1) a07
+		,dbo.getcomma(mount02,-1) a08
+		,dbo.getcomma(mount03,-1) a09
+		,dbo.getcomma(mount04,-1) a10
+		,dbo.getcomma(mount05,-1) a11
+		,dbo.getcomma(mount06,-1) a12
+		,dbo.getcomma([money],-1) a13
+
+		,dbo.getcomma(tmoney,-1) b01
+		,dbo.getcomma(tax,-1) b02
+		,dbo.getcomma(total,-1) b03
+	from @tmpa
+	order by cardealno,pno
+
+	drop table #z_tran_ln502;
+
 z_tran_ln501:--z_tran_ln501
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max)
