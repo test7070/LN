@@ -298,35 +298,45 @@ z_tran_ln502:--z_tran_ln502
 	from #z_tran_ln502
 	group by cardealno,v01,datea,v02,v03,typea
 
+	--相同船隻編號,日期,M.V.,VOY的當日小計要合併
+	update @tmpa
+	set money=b.total
+	from @tmpa a 
+	outer apply(select sum(money)total from @tmpa where a.v01=v01 and a.datea=datea and a.v02=v02 and a.v03=a.v03 group by v01,datea,v02,v03)b
+
+	update a
+	set gno=case when rx!='1' then 2 else 1 end,money=case when rx!='1' then 0 else money end
+	from (select ROW_NUMBER()over(partition by cardealno,v01,v02,v03,datea order by v01,v02,v03,datea)rx,gno,money from @tmpa)a
+
 	insert into @tmpa(gno,pno,cardealno,mount01,mount02,mount03,mount04,mount05,mount06,[money],tmoney)
-	select '2',2,cardealno,sum(mount01) ,sum(mount02) ,sum(mount03) ,sum(mount04) 
+	select '3',2,cardealno,sum(mount01) ,sum(mount02) ,sum(mount03) ,sum(mount04) 
 		,sum(mount05) ,sum(mount06) ,sum([money]) ,sum([money]) 
 	from @tmpa 
 	where pno=1
 	group by cardealno
 
 	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
-	select '3' gno, 3 pno, cardealno,tmoney,round(tmoney*0.05,0),tmoney+round(tmoney*0.05,0)
+	select '4' gno, 3 pno, cardealno,tmoney,round(tmoney*0.05,0),tmoney+round(tmoney*0.05,0)
 	from @tmpa
 	where pno=2
 
 	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
-	select '4' gno, 4 pno, cardealno,tmoney,tax,total
+	select '5' gno, 4 pno, cardealno,tmoney,tax,total
 	from @tmpa
 	where pno=3
 
 	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
-	select '5' gno, 5 pno, cardealno,tmoney,tax,total
+	select '6' gno, 5 pno, cardealno,tmoney,tax,total
 	from @tmpa
 	where pno=3
 
 	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
-	select '6' gno, 6 pno, cardealno,tmoney,tax,total
+	select '7' gno, 6 pno, cardealno,tmoney,tax,total
 	from @tmpa
 	where pno=3
 
 	insert into @tmpa(gno,pno,cardealno,tmoney,tax,total)
-	select '7' gno, 7 pno, cardealno,tmoney,tax,total
+	select '8' gno, 7 pno, cardealno,tmoney,tax,total
 	from @tmpa
 	where pno=3
 	-------------------------------------------------------------------------------------------------------------
@@ -345,7 +355,7 @@ z_tran_ln502:--z_tran_ln502
 		while @n%@pagecount != 0
 		begin
 			insert into @tmpa(gno,pno,cardealno)
-			select top 1 '8' gno,8 pno,@cardealno
+			select top 1 '9' gno,8 pno,@cardealno
 
 			set @n=@n+1
 		end
@@ -355,13 +365,19 @@ z_tran_ln502:--z_tran_ln502
 	close cursor_table
 	deallocate cursor_table
 	----------------------------------------------------------------------------------------------------------------
+	
+	insert @tmpa(gno,cardealno,pno)
+	select '10',cardealno,10 pno
+	from @tmpa
+	group by cardealno
+
 	update @tmpa set cardeal=isnull(b.nick,a.cardealno)
 	from @tmpa a
 	left join cardeal b on a.cardealno=b.noa
 
 	update @tmpa set recno=b.recno
 	from @tmpa a
-	left join (select sel,ROW_NUMBER()over(partition by cardealno order by pno,v01,typea,sel) recno from @tmpa) b on a.sel=b.sel
+	left join (select sel,ROW_NUMBER()over(partition by cardealno order by pno,v01,typea,sel) recno from @tmpa where gno='1') b on a.sel=b.sel
 
 	select gno
 		,cardeal+N'船邊運費請款單' titlea

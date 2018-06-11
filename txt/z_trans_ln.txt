@@ -1362,13 +1362,13 @@ z_trans_ln03:--z_trans_ln03
 	insert into @tmpb(gno,pno,noa,v01,v02,v03,memo,mount01,money01,mount02,money02,money03)
 	select '1',1,noa,v01,v02,v03,memo
 		,sum(case when left(cardealno,1)='A' then isnull(n01,0)+isnull(n02,0)+isnull(n03,0)+isnull(n04,0)+isnull(n05,0)+isnull(n06,0)+isnull(n07,0)
-			+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0) else 0 end) mount01
+			+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0)+isnull(n16,0)+isnull(n17,0)+isnull(n18,0)+isnull(n19,0)+isnull(n20,0)+isnull(inteis,0)+isnull(arrerage,0) else 0 end) mount01
 		,sum(case when left(cardealno,1)='A' then isnull(n01a,0)+isnull(n02a,0)+isnull(n03a,0)+isnull(n04a,0)+isnull(n05a,0)+isnull(n06a,0)+isnull(n07a,0)
 			+isnull(n08a,0)+isnull(n09a,0)+isnull(n10a,0)+isnull(n11a,0)+isnull(n12a,0)+isnull(n13a,0)+isnull(n14a,0) 
 			+isnull(n16a,0)+isnull(n17a,0)+isnull(n18a,0)+isnull(n19a,0)+isnull(n20a,0)+isnull(inteisa,0)+isnull(arreragea,0) else 0 end) money01
 
 		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01,0)+isnull(n02,0)+isnull(n03,0)+isnull(n04,0)+isnull(n05,0)+isnull(n06,0)+isnull(n07,0)
-			+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0) end) mount02
+			+isnull(n08,0)+isnull(n09,0)+isnull(n10,0)+isnull(n11,0)+isnull(n12,0)+isnull(n13,0)+isnull(n14,0)+isnull(n16,0)+isnull(n17,0)+isnull(n18,0)+isnull(n19,0)+isnull(n20,0)+isnull(inteis,0)+isnull(arrerage,0) end) mount02
 		,sum(case when left(cardealno,1)='A' then 0 else isnull(n01c,0)+isnull(n02c,0)+isnull(n03c,0)+isnull(n04c,0)+isnull(n05c,0)+isnull(n06c,0)+isnull(n07c,0)
 			+isnull(n08c,0)+isnull(n09c,0)+isnull(n10c,0)+isnull(n11c,0)+isnull(n12c,0)+isnull(n13c,0)+isnull(n14c,0) 
 			+isnull(n16c,0)+isnull(n17c,0)+isnull(n18c,0)+isnull(n19c,0)+isnull(n20c,0)+isnull(inteisc,0)+isnull(arreragec,0) end) money02
