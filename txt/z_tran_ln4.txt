@@ -110,6 +110,7 @@ z_tran_ln402:--z_tran_ln402
 	-- 單價
 	declare @datea nvarchar(20)
 	declare @casetype nvarchar(20)
+	declare @cardealnoa nvarchar(20)
 	declare @straddrno nvarchar(30)
 	declare @endaddrno nvarchar(30)
 	declare @n01 float,@total2 float,@n16 float
@@ -119,13 +120,13 @@ z_tran_ln402:--z_tran_ln402
 	declare @tmpprice float
 	
 	declare cursor_table cursor for
-	select sel,datea,casetype,straddr,endaddr
+	select sel,datea,casetype,cardealno,straddr,endaddr
 		,n01,isnull(chk1,0),isnull(chk2,0),isnull(chk3,0),isnull(chk4,0),isnull(chk5,0),total2,n16 
 		from @tmpa 
 		--where isnull(chk1,0)=1 -- 只計算請款的
 	open cursor_table
 	fetch next from cursor_table
-	into @sel,@datea,@casetype,@straddrno,@endaddrno
+	into @sel,@datea,@casetype,@cardealnoa,@straddrno,@endaddrno
 		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16
 	while(@@FETCH_STATUS <> -1)
 	begin
@@ -139,6 +140,7 @@ z_tran_ln402:--z_tran_ln402
 		where @datea >= a.datea
 		and b.straddrno = @straddrno 
 		and b.endaddrno = @endaddrno
+		and a.salesno=@cardealnoa
 		and REPLACE(a.custunit,"~#$","'") =@casetype
 		order by datea desc
 		set @price = @price + @tmpprice
@@ -152,6 +154,7 @@ z_tran_ln402:--z_tran_ln402
 			where @datea >= a.datea
 			and b.straddrno = @straddrno 
 			and b.endaddrno = @endaddrno
+			and a.salesno=@cardealnoa
 			and REPLACE(a.custunit,"~#$","'") = N'油桶櫃'
 			order by datea desc
 			set @price = @price + @tmpprice
@@ -165,6 +168,7 @@ z_tran_ln402:--z_tran_ln402
 			where @datea >= a.datea
 			and b.straddrno = @straddrno 
 			and b.endaddrno = @endaddrno
+			and a.salesno=@cardealnoa
 			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'押運'
 			order by datea desc
 			set @price = @price + @tmpprice
@@ -178,6 +182,7 @@ z_tran_ln402:--z_tran_ln402
 			where @datea >= a.datea
 			and b.straddrno = @straddrno 
 			and b.endaddrno = @endaddrno
+			and a.salesno=@cardealnoa
 			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'儀檢'
 			order by datea desc
 			set @price = @price + @tmpprice
@@ -191,6 +196,7 @@ z_tran_ln402:--z_tran_ln402
 			where @datea >= a.datea
 			and b.straddrno = @straddrno 
 			and b.endaddrno = @endaddrno
+			and a.salesno=@cardealnoa
 			and REPLACE(a.custunit,"~#$","'") = left(@casetype,3)+N'危標'
 			order by datea desc
 			set @price = @price + @tmpprice
@@ -199,7 +205,7 @@ z_tran_ln402:--z_tran_ln402
 		update @tmpa set price=@price where sel=@sel
 		
 		fetch next from cursor_table
-		into @sel,@datea,@casetype,@straddrno,@endaddrno
+		into @sel,@datea,@casetype,@cardealnoa,@straddrno,@endaddrno
 		,@n01,@chk1,@chk2,@chk3,@chk4,@chk5,@total2,@n16 
 	end
 	close cursor_table
