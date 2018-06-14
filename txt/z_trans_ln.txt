@@ -1046,6 +1046,7 @@ z_trans_ln09:--z_trans_ln09 z_trans_ln.txt
 		,case when len(cardeala)>0 then cardeala else cardealnoa end x02
 		,case when len(cardealb)>0 then cardealb else cardealnob end x03
 		,recno a01
+		,"<a href="+CHAR(34)+"JavaScript:q_box('tran_ln.aspx',' "+CHAR(59)+"%7b%22v01%22%3a%22"+v01+"%22%7d','95%','95%','')"+char(34)+">"+v01+"</a>" a02 
 		,v01 a02
 		,v02 a03
 		,v03 a04
@@ -4289,7 +4290,7 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	declare @t_user nvarchar(max) = '[4]'
 	declare @t_noa nvarchar(20) = case when '#non' = [5] then '' else [5] end
 	declare @t_workno nvarchar(20) = case when '#non' = [6] then '' else [6] end
-	--declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
+	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
 	declare @t_brecno int = case when '#non' = [11] then '' else [11] end
@@ -4330,7 +4331,7 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 			,SUM(ISNULL(inteis,0)) inteis
 			,SUM(ISNULL(arrerage,0)) arrerage
 		from borrs where [sign]='borr'  group by noa) b on a.noa=b.noa 
-	where a.datea between @t_bdate and @t_edate
+	where (left(a.datea,7)=@t_mon or len(@t_mon)=0)
 	and a.vccno='tran_ln'
 	order by a.noa
 	

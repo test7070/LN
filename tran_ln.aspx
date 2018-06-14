@@ -69,8 +69,12 @@
 				
 				try{
 					t_para = JSON.parse(q_getId()[3]);
-					if(t_para.noa.length>0)
-						q_content = "where=^^ noa='"+t_para.noa+"' and vccno='tran_ln' ^^";
+					if(t_para.noa!=undefined){
+                       q_content = "where=^^ noa='"+t_para.noa+"' and vccno='tran_ln' ^^"; 
+                    }else if(t_para.v01!=undefined){
+                       q_content = "where=^^ v01='"+t_para.v01+"' and vccno='tran_ln' ^^"; 
+                    }
+                    
 				}catch(e){
 					q_content = "where=^^ vccno='tran_ln'^^";
 				}

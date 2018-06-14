@@ -387,6 +387,8 @@ z_tran_ln502:--z_tran_ln502
 		,v02 a04
 		,v03 a05
 		,typea a06
+		,cardeal
+		,@t_bdate+' ~ '+@t_edate bdate
 		,dbo.getcomma(mount01,-1) a07
 		,dbo.getcomma(mount02,-1) a08
 		,dbo.getcomma(mount03,-1) a09
