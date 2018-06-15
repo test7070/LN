@@ -74,12 +74,15 @@
 	            try{
 	            	t_para = JSON.parse(q_getId()[3]);
 	            }catch(e){
-	            }    
+	            }   
 	            if(t_para.length==0 || t_para.noa==undefined){
-	            }else{
+	            }/*else{//2018/06/15 小葉 單號不自動帶入
 	            	$('#txtXno1').val(t_para.noa);
 	            	$('#txtXno2').val(t_para.noa);
-	            }
+	            }*/
+	           
+	            $('#txtXdate1').val(q_date().substr(0,r_lenm)+'/01');
+                $('#txtXdate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',45).substr(0,r_lenm)+'/01',-1));
             }
 
             function q_boxClose(s2) {
