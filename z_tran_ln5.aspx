@@ -61,7 +61,10 @@
 					}, {
 						//[11]                 4
 						type : '6', name : 'xv03'
-					}]
+					},{//[12][13]              15
+                        type : '1',
+                        name : 'xv01'
+                    }]
                 });
                 q_popAssign();
 				$('#txtXdate1').mask(r_picd);

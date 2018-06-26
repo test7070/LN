@@ -4,7 +4,7 @@
 		{
 		    jwcf wcf = new jwcf();
 		
-		    wcf.q_content("borrg", " worker=$r_userno or $r_rank >= 7 ");
+		    wcf.q_content("borrg", " worker=SUBSTRING($r_userno,0,CHARINDEX('-',$r_userno)) or $r_rank >= 7 ");
 		    
 		}
 	</script>
@@ -574,9 +574,9 @@
 					<tr>
 						<td align="center" style="width:20px; color:black;"><a id='vewChk'> </a></td>
 						<td align="center" style="width:100px; color:black;"><a>電腦編號</a></td>
-						<td align="center" style="width:100px; color:black;"><a>PLAN_ID</a></td>
+						<td align="center" style="width:120px; color:black;"><a>PLAN_ID</a></td>
 						<td align="center" style="width:100px; color:black;"><a>進出站時間</a></td>
-						<td align="center" style="width:100px; color:black;"><a>代表航次</a></td>
+						<td align="center" style="width:120px; color:black;"><a>代表航次</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox"/></td>

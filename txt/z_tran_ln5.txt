@@ -8,6 +8,8 @@ z_tran_ln502:--z_tran_ln502
 	declare @t_user nvarchar(max) = '[5]'	
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
+	declare @t_bv01 nvarchar(20) = case when '#non' = [12] then '' else [12] end  --船隻編號
+	declare @t_ev01 nvarchar(20) = case when '#non' = [13] then char(255) else [13] end
 	---------------------------------------------------------------------------------------------------------
 	declare @t_rank int = 0
 	select @t_rank=[RANK] from nhpe where noa=@t_userno and namea=@t_user
@@ -123,7 +125,8 @@ z_tran_ln502:--z_tran_ln502
 	left join borrg b on a.noa=b.noa
 	where b.vccno='tran_ln5'
 	and b.datea between @t_bdate and @t_edate
-	and (b.worker=@t_userno or @t_rank>=7)
+	and b.v01 between @t_bv01 and @t_ev01
+	and (b.worker=SUBSTRING(@t_userno,0,CHARINDEX('-',@t_userno)) or @t_rank>=7)
 	--------------------------------------------------------------------------------------------------------------
 	--20'F
 	update #z_tran_ln502 set n01a = round(n01 * c.custprice,0)
@@ -513,6 +516,8 @@ z_tran_ln501:--z_tran_ln501
 	where pno=3
 	group by noa,v01,datea,custno,cust,partno,part,v02,v03,v04,begindate,v05,v06,enddate,v07,v09,v10,v11,typea,cardealno,cardeal
 	
+	--2018/06/26 小葉外車不能顯示
+	delete @tmpa where SUBSTRING(@t_userno,0,CHARINDEX('-',@t_userno)) in (select noa from cardeal)
 	-- pno = 3  明細,暫時先不顯示
 	delete @tmpa where pno=3
 

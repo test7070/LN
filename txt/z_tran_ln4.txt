@@ -53,7 +53,7 @@ z_tran_ln402:--z_tran_ln402
 	left join borrg b on a.noa=b.noa
 	where b.datea between @t_bdate and @t_edate
 	and b.vccno='tran_ln4'
-	and (b.worker=@t_userno or @t_rank>=7)
+	and (b.worker=SUBSTRING(@t_userno,0,CHARINDEX('-',@t_userno)) or @t_rank>=7)
 	
 	update @tmpa set cardeal=ISNULL(b.nick,a.cardealno)
 	from @tmpa a
@@ -352,6 +352,9 @@ z_tran_ln401:--z_tran_ln401
 	declare @t_user nvarchar(max) = '[5]'
 	declare @t_bdate nvarchar(20) = case when '#non' = [6] then '' else [6] end
 	declare @t_edate nvarchar(20) = case when '#non' = [7] then char(255) else [7] end
+	declare @t_straddrno nvarchar(20) = case when '#non' = [8] then '' else [8] end
+	declare @t_endaddrno nvarchar(20) = case when '#non' = [9] then '' else [9] end
+	declare @t_stype nvarchar(20) = case when '#non' = [10] then '' else [10]+',' end
 	---------------------------------------------------------------------------------------------------------
 	declare @t_rank int = 0
 	select @t_rank=[RANK] from nhpe where noa=@t_userno and namea=@t_user
@@ -396,7 +399,10 @@ z_tran_ln401:--z_tran_ln401
 	from borrgs a
 	left join borrg b on a.noa=b.noa
 	where b.datea between @t_bdate and @t_edate
-	and (b.worker=@t_userno or @t_rank>=7)
+	and (b.worker=SUBSTRING(@t_userno,0,CHARINDEX('-',@t_userno)) or @t_rank>=7)
+	and (a.addrno=@t_straddrno or len(@t_straddrno)=0)
+	and (a.addrno2=@t_endaddrno or len(@t_endaddrno)=0)
+	and (len(@t_stype)=0 or CHARINDEX(a.casetype+',',replace(@t_stype,' ','~#$'))>0)
 	and b.vccno='tran_ln4'
 	
 	update @tmpa set cardeal=ISNULL(b.nick,a.cardealno)
