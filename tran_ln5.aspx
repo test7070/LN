@@ -4,7 +4,7 @@
 		{
 		    jwcf wcf = new jwcf();
 		
-		    wcf.q_content("borrg", " worker=SUBSTRING($r_userno,0,CHARINDEX('-',$r_userno)) or $r_rank >= 7 ");
+		    wcf.q_content("borrg", " (worker=case when CHARINDEX('-',$r_userno)!=0 then SUBSTRING($r_userno,0,CHARINDEX('-',$r_userno)) else $r_userno end)  or $r_rank >= 7 ");
 		    
 		}
 	</script>
