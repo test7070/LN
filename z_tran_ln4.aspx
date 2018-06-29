@@ -49,9 +49,18 @@
 						type : '0', //[5]
 						name : 'user',
 						value : r_name
-					},{//[8][9]              1
+					},{//[6][7]              1
                         type : '1',
                         name : 'xdate'
+                    }, {
+                        //[8]                 7
+                        type : '6', name : 'xstraddr'
+                    }, {
+                        //[9]                 8
+                        type : '6', name : 'xendaddr'
+                    },{
+                        type : '6',
+                        name : 'xstype', //[10]
                     }]
                 });
                 q_popAssign();
@@ -60,6 +69,9 @@
 				$('#txtXdate2').mask(r_picd);
 				$('#txtXdate2').datepicker();
 				
+				$('#txtXstype').change(function(e){
+				    $('#txtXstype').val(replaceAll($('#txtXstype').val(),"'",' '));
+				});  
 				
 				/*var t_para = new Array();
 	            try{

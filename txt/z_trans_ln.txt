@@ -14,6 +14,8 @@
 	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
 	declare @t_bno nvarchar(20) = case when '#non' = [22] then '' else [22] end
 	declare @t_eno nvarchar(20) = case when '#non' = [23] then char(255) else [23] end
+	declare @t_bv01 nvarchar(20) = case when '#non' = [24] then '' else [24] end  --船隻編號
+	declare @t_ev01 nvarchar(20) = case when '#non' = [25] then char(255) else [25] end
 	----------------------------------------------------------------------------------------------
 	declare @t_bsel int = 0
 	declare @t_esel int = 0
@@ -91,15 +93,14 @@
 		and b.[sign]!='borrs'
 		group by a.noa,a.datea,a.custno,a.v01,a.v02,a.v03
 		
-		delete @tmp where not sel between @t_bsel and @t_esel 
-		delete @tmp where not noa between @t_bno and @t_eno
+		delete @tmp where not v01 between @t_bv01 and @t_ev01
 		delete @tmp where not custno between @t_bcustno and @t_ecustno
 		-------------------------------------------------------------------------------------------------------
 		-- 40筆一個合計
 		declare @t_pagecount int = 40
 		update @tmp set recno=b.recno
 		from @tmp a
-		left join (select sel,ROW_NUMBER()over(order by sel) recno from @tmp ) b on a.sel=b.sel
+		left join (select sel,ROW_NUMBER()over(order by v01) recno from @tmp ) b on a.sel=b.sel
 
 		update @tmp set pp = (recno-1)%@t_pagecount + 1, qq = floor((recno-1)/@t_pagecount) + 1
 		----合計
@@ -432,6 +433,8 @@ z_trans_ln14:--z_trans_ln.txt/z_trans_ln14
 		where (len(@t_type)=0 or charindex(',移櫃,',','+@t_type+',')>0)
 		group by custno
 		having count(1)>0
+		--新實唯一外車即為新安，故"自運金額"不應有收入，只有"應付外車"及"代運收入"有金額。
+		update @tmpa set money01=0,money02=money01+money02 where custno='001'
 		--沒勾新安單價,除001萬海,其餘金額都歸0
 		update @tmpa set money01=0,money02=0,money03=0 where custno!='001'
 	end
@@ -1090,6 +1093,8 @@ z_trans_ln03:--z_trans_ln03
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
 	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
 	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
+	declare @t_bv01 nvarchar(20) = case when '#non' = [24] then '' else [24] end  --船隻編號
+	declare @t_ev01 nvarchar(20) = case when '#non' = [25] then char(255) else [25] end
 	---------------------------------------------------------------------------------------------------------
 	IF OBJECT_ID('tempdb..#z_trans_ln03')is not null
 	BEGIN
@@ -1207,6 +1212,7 @@ z_trans_ln03:--z_trans_ln03
 	where b.vccno = 'tran_ln'
 	and b.datea between @t_bdate and @t_edate
 	and isnull(b.custno,'') between @t_bcustno and @t_ecustno
+	and b.v01 between @t_bv01 and @t_ev01
 
 	--------------------------------------------------------------------------------------------------------------
 	--20'F
@@ -4293,8 +4299,10 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 	declare @t_mon nvarchar(20) = case when '#non' = [7] then '' else [7] end
 	declare @t_bdate nvarchar(20) = case when '#non' = [8] then '' else [8] end
 	declare @t_edate nvarchar(20) = case when '#non' = [9] then char(255) else [9] end
-	declare @t_brecno int = case when '#non' = [11] then '' else [11] end
-	declare @t_erecno int = case when '#non' = [12] then '' else [12] end
+	declare @t_bcustno nvarchar(20) = case when '#non' = [18] then '' else [18] end
+	declare @t_ecustno nvarchar(20) = case when '#non' = [19] then char(255) else [19] end
+	declare @t_bv01 nvarchar(20) = case when '#non' = [24] then '' else [24] end  --船隻編號
+	declare @t_ev01 nvarchar(20) = case when '#non' = [25] then char(255) else [25] end
 	-------------------------------------------------------------------
 	declare @t_page int = 50 --  每頁資料筆數
 	
@@ -4331,15 +4339,16 @@ z_trans_ln06:--z_trans_ln06 z_trans_ln.txt
 			,SUM(ISNULL(inteis,0)) inteis
 			,SUM(ISNULL(arrerage,0)) arrerage
 		from borrs where [sign]='borr'  group by noa) b on a.noa=b.noa 
-	where (left(a.datea,7)=@t_mon or len(@t_mon)=0)
+	where a.datea between @t_bdate and @t_edate
+	and a.custno between @t_bcustno and @t_ecustno
+	and a.v01 between @t_bv01 and @t_ev01
 	and a.vccno='tran_ln'
 	order by a.noa
 	
 	update @tmp set recno=b.recno
 	from @tmp a
-	left join (select sel,ROW_NUMBER()over(order by noa) recno from @tmp) b on a.sel=b.sel
-	delete @tmp where not recno between @t_brecno and @t_erecno
-	
+	left join (select sel,ROW_NUMBER()over(order by v01,noa) recno from @tmp) b on a.sel=b.sel
+
 	update @tmp set boatno=ISNULL(b.noa,'')
 	from @tmp a
 	left join boat b on a.v02=b.boat
